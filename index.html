@@ -69,11 +69,11 @@
             <span class="cart-count-badge" id="cartCountBadge">1</span>
           </button>
           
-          <button class="btn btn-primary btn-sm" onclick="openCakeBuilderModal()">
+          <button class="btn btn-primary btn-sm header-custom-cta" onclick="openCakeBuilderModal()">
             <i class="fas fa-magic"></i> Order Custom Cake
           </button>
 
-          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="openMobileNav()" aria-label="Toggle navigation">
             <i class="fas fa-bars"></i>
           </button>
         </div>
@@ -81,6 +81,47 @@
       </div>
     </div>
   </header>
+
+  <!-- Mobile Slide Navigation Drawer -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer" onclick="closeMobileNav()">
+    <div class="mobile-nav-content" onclick="event.stopPropagation()">
+      <div class="mobile-drawer-header">
+        <div class="brand-logo-wrap">
+          <img src="images/logo-icon.svg" alt="The Flora Bakery Logo" class="brand-logo-img" style="width:38px; height:38px;">
+          <span class="brand-name" style="font-size:1.15rem;">The Flora Bakery</span>
+        </div>
+        <button class="cart-close-btn" onclick="closeMobileNav()" aria-label="Close menu">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <ul class="mobile-nav-links">
+        <li><a href="#categories" class="mobile-nav-link" onclick="closeMobileNav()"><span>🌸 Categories</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="#bestsellers" class="mobile-nav-link" onclick="closeMobileNav()"><span>✨ Bestsellers</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="#combos" class="mobile-nav-link" onclick="closeMobileNav()"><span>🎁 Gift Combos</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="#why-us" class="mobile-nav-link" onclick="closeMobileNav()"><span>🌿 Why Flora</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="#how-it-works" class="mobile-nav-link" onclick="closeMobileNav()"><span>🎂 Custom Orders</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="#testimonials" class="mobile-nav-link" onclick="closeMobileNav()"><span>⭐ Reviews</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="#delivery-info" class="mobile-nav-link" onclick="closeMobileNav()"><span>📍 Nashik Delivery</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+      </ul>
+
+      <div style="margin-bottom: 20px;">
+        <button class="btn btn-primary" style="width: 100%;" onclick="closeMobileNav(); openCakeBuilderModal();">
+          <i class="fas fa-magic"></i> Order Custom Cake
+        </button>
+      </div>
+
+      <div class="mobile-drawer-contact">
+        <p style="margin-bottom:6px;"><strong>Bakery Studio:</strong> Sai Nath Nagar, Nashik</p>
+        <p style="margin-bottom:12px;"><strong>Direct Call / WhatsApp:</strong> <a href="tel:07083517862" style="color:var(--rose-deep); font-weight:700;">070835 17862</a></p>
+        <div class="social-links">
+          <a href="https://www.instagram.com/the.flora.bakery" target="_blank" rel="noopener noreferrer" class="social-btn"><i class="fab fa-instagram"></i></a>
+          <a href="https://wa.me/917083517862" target="_blank" rel="noopener noreferrer" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+          <a href="tel:07083517862" class="social-btn"><i class="fas fa-phone"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <main>
     <!-- ==========================================================================

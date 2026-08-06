@@ -510,20 +510,29 @@ function setupAnnouncements() {
   }
 }
 
+// Mobile Navigation Handlers
+function openMobileNav() {
+  const drawer = document.getElementById("mobileNavDrawer");
+  if (drawer) {
+    drawer.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+}
+
+function closeMobileNav() {
+  const drawer = document.getElementById("mobileNavDrawer");
+  if (drawer) {
+    drawer.classList.remove("active");
+    document.body.style.overflow = "auto";
+  }
+}
+
 // General Event Listeners
 function setupEventListeners() {
-  // Mobile Nav Toggle
-  const mobileToggle = document.getElementById("mobileMenuToggle");
-  const navMenu = document.getElementById("navMenu");
-  if (mobileToggle && navMenu) {
-    mobileToggle.addEventListener("click", () => {
-      navMenu.classList.toggle("mobile-active");
-    });
-  }
-
-  // Close modals on escape key
+  // Close modals & mobile nav on escape key
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
+      closeMobileNav();
       closeCartDrawer();
       closeCakeBuilderModal();
       closeQuickViewModal();
