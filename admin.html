@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Studio &bull; The Flora Bakery</title>
+  <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+  
+  <!-- Apple & Modern Font Stack -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Admin Stylesheet -->
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. APPLE-STYLE AUTHENTICATION GATE (LOGIN SCREEN)
+       ========================================================================= -->
+  <div id="authScreen" class="admin-auth-screen">
+    <div class="admin-auth-card">
+      <div class="auth-logo-badge">
+        <img src="images/logo.jpg" alt="The Flora Bakery Logo">
+      </div>
+      <h1 class="auth-title font-serif">The Flora Bakery</h1>
+      <p class="auth-subtitle">Artisanal Patisserie &bull; Admin Portal</p>
+
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label for="loginEmail">Staff Email</label>
+          <input type="email" id="loginEmail" class="form-input" value="admin@theflorabakery.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPass">Password</label>
+          <input type="password" id="loginPass" class="form-input" value="floral2026" required>
+        </div>
+
+        <button type="submit" class="auth-btn">
+          <span>Sign In to Dashboard</span> &rarr;
+        </button>
+      </form>
+
+      <div class="quick-demo-chip" id="quickDemoLoginBtn" title="Click to fill and enter automatically">
+        <span>⚡ Demo 1-Click Quick Login</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. MAIN APPLICATION SHELL
+       ========================================================================= -->
+  <div class="admin-app" id="adminApp" style="display: none;">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">
+          <img src="images/logo.jpg" alt="Logo">
+        </div>
+        <div class="brand-text">
+          <h2 class="font-serif">Flora Bakery</h2>
+          <span>Admin Suite</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div class="menu-category-label">Overview</div>
+        <a class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+
+        <div class="menu-category-label">Catalog & Sales</div>
+        <a class="nav-item" data-view="products">
+          <span class="nav-icon">🎂</span>
+          <span>Products</span>
+          <span class="nav-badge" id="sidebarProductCount">8</span>
+        </a>
+        <a class="nav-item" data-view="inventory">
+          <span class="nav-icon">📋</span>
+          <span>Inventory</span>
+          <span class="nav-badge badge-rose" id="sidebarLowStockBadge" style="display: none;">0</span>
+        </a>
+        <a class="nav-item" data-view="orders">
+          <span class="nav-icon">🛍️</span>
+          <span>Orders</span>
+          <span class="nav-badge" id="sidebarOrdersBadge">4</span>
+        </a>
+        <a class="nav-item" data-view="discounts">
+          <span class="nav-icon">🏷️</span>
+          <span>Discounts</span>
+        </a>
+
+        <div class="menu-category-label">Customer Studio</div>
+        <a class="nav-item" data-view="inquiries">
+          <span class="nav-icon">💌</span>
+          <span>Custom Inquiries</span>
+          <span class="nav-badge badge-rose" id="sidebarInqBadge">2</span>
+        </a>
+
+        <div class="menu-category-label">System</div>
+        <a class="nav-item" data-view="settings">
+          <span class="nav-icon">⚙️</span>
+          <span>Settings & Backup</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="index.html" target="_blank" class="store-preview-btn">
+          <span>🌸 View Live Store</span> &nearr;
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN ADMIN WORKSPACE -->
+    <div class="admin-main">
+
+      <!-- TOP HEADER -->
+      <header class="admin-header">
+        <div class="header-left">
+          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Menu">☰</button>
+          
+          <div class="global-search-trigger" id="globalSearchTrigger">
+            <span>🔍</span>
+            <span>Quick search or command...</span>
+            <kbd class="kbd-shortcut">⌘K</kbd>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button class="header-action-btn" id="btnHeaderNewProduct">
+            <span>+</span>
+            <span>New Product</span>
+          </button>
+
+          <div class="admin-profile-pill" id="adminProfileBtn">
+            <div class="admin-avatar">F</div>
+            <span class="admin-name">Studio Admin</span>
+            <span style="font-size: 0.75rem; color: var(--cocoa-muted);">▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <main class="admin-content">
+
+        <!-- ===================================================================
+             VIEW 1: DASHBOARD OVERVIEW
+             =================================================================== -->
+        <section id="view-dashboard" class="view-section active">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Studio Overview</h1>
+              <p>Real-time orders, bakery revenue, and inventory health</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn-secondary" id="btnRefreshAnalytics">🔄 Refresh Stats</button>
+            </div>
+          </div>
+
+          <!-- KPI Cards Grid -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Revenue</span>
+                <div class="kpi-icon-pill" style="background: #FEF3C7; color: #D97706;">₹</div>
+              </div>
+              <div class="kpi-value" id="kpiRevenue">₹0</div>
+              <div class="kpi-trend trend-up">
+                <span>↑ 18.4%</span>
+                <span style="color: var(--cocoa-muted); font-weight: normal;">vs last week</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Orders</span>
+                <div class="kpi-icon-pill" style="background: #DBEAFE; color: #2563EB;">🛍️</div>
+              </div>
+              <div class="kpi-value" id="kpiOrdersCount">0</div>
+              <div class="kpi-trend trend-up">
+                <span id="kpiActiveOrdersTag">0 active</span>
+                <span style="color: var(--cocoa-muted); font-weight: normal;">in baking pipeline</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">Average Order Value</span>
+                <div class="kpi-icon-pill" style="background: #D1FAE5; color: #059669;">📈</div>
+              </div>
+              <div class="kpi-value" id="kpiAOV">₹0</div>
+              <div class="kpi-trend trend-up">
+                <span>↑ ₹140</span>
+                <span style="color: var(--cocoa-muted); font-weight: normal;">above Nashik benchmark</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">Stock Alerts</span>
+                <div class="kpi-icon-pill" style="background: #FEE2E2; color: #DC2626;">⚠️</div>
+              </div>
+              <div class="kpi-value" id="kpiLowStockCount">0</div>
+              <div class="kpi-trend trend-warn" id="kpiLowStockSubtext">
+                <span>All items healthy</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders & Fast Actions Panel -->
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <h2 class="card-panel-title">Recent Customer Orders</h2>
+              <button class="btn-secondary" onclick="AdminApp.switchView('orders')">View All Orders &rarr;</button>
+            </div>
+            <div class="data-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardRecentOrdersBody">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 2: PRODUCTS STUDIO
+             =================================================================== -->
+        <section id="view-products" class="view-section">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Product Catalog</h1>
+              <p>Manage signature floral cakes, French pastries, muffins and gift sets</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn-primary" id="btnAddNewProduct">
+                <span>+ Add Product</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <div class="table-filter-bar">
+                <div class="search-input-wrapper">
+                  <span class="search-input-icon">🔍</span>
+                  <input type="text" id="productSearchInput" placeholder="Search bakes or SKU...">
+                </div>
+
+                <select id="productCategoryFilter" class="select-filter">
+                  <option value="all">All Categories</option>
+                  <option value="cakes">🎂 Floral Cakes</option>
+                  <option value="pastries">🥐 French Pastries</option>
+                  <option value="muffins">🧁 Artisanal Muffins</option>
+                  <option value="combos">🎁 Gifting Hampers</option>
+                </select>
+
+                <select id="productStatusFilter" class="select-filter">
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active on Store</option>
+                  <option value="draft">Drafts</option>
+                </select>
+              </div>
+
+              <div id="productCounterText" style="font-size: 0.85rem; color: var(--cocoa-muted);">
+                Showing 8 products
+              </div>
+            </div>
+
+            <div class="data-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Dietary</th>
+                    <th>Badge</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 3: INVENTORY TRACKER
+             =================================================================== -->
+        <section id="view-inventory" class="view-section">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Inventory & Stock Radar</h1>
+              <p>Real-time stock controls, low-stock notifications and batch restock</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn-secondary" id="btnRestockAll">📦 Batch Restock (+10 All)</button>
+            </div>
+          </div>
+
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <div class="table-filter-bar">
+                <div class="search-input-wrapper">
+                  <span class="search-input-icon">🔍</span>
+                  <input type="text" id="inventorySearchInput" placeholder="Filter inventory item...">
+                </div>
+                <select id="inventoryStockFilter" class="select-filter">
+                  <option value="all">All Stock Levels</option>
+                  <option value="low">⚠️ Low Stock (&le; 5 units)</option>
+                  <option value="out">❌ Out of Stock (0 units)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="data-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>SKU</th>
+                    <th>Current Inventory</th>
+                    <th>Quick Adjust</th>
+                    <th>Availability Status</th>
+                    <th>Unit / Portion</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryTableBody">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 4: ORDERS & LOGISTICS
+             =================================================================== -->
+        <section id="view-orders" class="view-section">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Orders & Fulfillment</h1>
+              <p>Manage order pipeline, Nashik delivery status and WhatsApp notifications</p>
+            </div>
+          </div>
+
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <div class="table-filter-bar">
+                <div class="search-input-wrapper">
+                  <span class="search-input-icon">🔍</span>
+                  <input type="text" id="orderSearchInput" placeholder="Search customer, phone or ID...">
+                </div>
+                <select id="orderStatusFilter" class="select-filter">
+                  <option value="all">All Order Stages</option>
+                  <option value="pending">Pending</option>
+                  <option value="baking">Baking in Progress</option>
+                  <option value="shipped">Out for Delivery</option>
+                  <option value="delivered">Delivered</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="data-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Customer & Address</th>
+                    <th>Items Ordered</th>
+                    <th>Total</th>
+                    <th>Delivery Status</th>
+                    <th>WhatsApp Notify</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 5: DISCOUNTS & PROMOTIONS
+             =================================================================== -->
+        <section id="view-discounts" class="view-section">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Discounts & Promo Codes</h1>
+              <p>Create promotional coupons that instantly apply on the customer checkout cart</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn-primary" id="btnCreateDiscount">
+                <span>+ Create Coupon</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <h2 class="card-panel-title">Active Store Coupons</h2>
+            </div>
+            <div class="data-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Coupon Code</th>
+                    <th>Type & Value</th>
+                    <th>Min. Order</th>
+                    <th>Description</th>
+                    <th>Redemptions</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="discountsTableBody">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 6: CUSTOM CAKE INQUIRIES
+             =================================================================== -->
+        <section id="view-inquiries" class="view-section">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Custom Cake Consultation Inquiries</h1>
+              <p>Bespoke requests submitted via the interactive Custom Cake Studio Builder</p>
+            </div>
+          </div>
+
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <h2 class="card-panel-title">Inquiry Log</h2>
+            </div>
+            <div class="data-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Inquiry ID</th>
+                    <th>Client</th>
+                    <th>Occasion & Date</th>
+                    <th>Flavor & Size</th>
+                    <th>Color Palette / Message</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="inquiriesTableBody">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 7: SETTINGS & DATA BACKUP
+             =================================================================== -->
+        <section id="view-settings" class="view-section">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Store Settings & Data Backup</h1>
+              <p>Bakery metadata, WhatsApp checkout configuration, and 1-click JSON backup</p>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="card-panel" style="padding: 24px;">
+              <h2 class="card-panel-title" style="margin-bottom: 18px;">Bakery Profile</h2>
+              <form id="settingsForm" class="auth-form">
+                <div class="form-group">
+                  <label>Bakery Name</label>
+                  <input type="text" id="setStoreName" class="form-input" value="The Flora Bakery">
+                </div>
+                <div class="form-group">
+                  <label>WhatsApp Number (without +)</label>
+                  <input type="text" id="setWhatsApp" class="form-input" value="917083517862">
+                </div>
+                <div class="form-group">
+                  <label>Free Delivery Threshold (₹)</label>
+                  <input type="number" id="setFreeShipping" class="form-input" value="999">
+                </div>
+                <div class="form-group">
+                  <label>Studio Address</label>
+                  <input type="text" id="setAddress" class="form-input" value="Ibadat Villa, Plot No. 41, Sai Nath Nagar, Nashik, Maharashtra 422006">
+                </div>
+                <button type="submit" class="btn-primary" style="margin-top: 8px;">Save Settings</button>
+              </form>
+            </div>
+
+            <div class="card-panel" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <h2 class="card-panel-title" style="margin-bottom: 12px;">Database Backup & Sync</h2>
+                <p style="font-size: 0.85rem; color: var(--cocoa-muted); margin-bottom: 20px;">
+                  Export full snapshot of your products, orders, inventory and coupons to a JSON file, or restore data at any time.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <button class="btn-secondary" id="btnExportJSON" style="text-align: left; padding: 12px 16px;">
+                    📥 <strong>Export Store JSON Backup</strong>
+                  </button>
+
+                  <label class="btn-secondary" style="cursor: pointer; text-align: left; padding: 12px 16px;">
+                    📤 <strong>Restore from JSON File</strong>
+                    <input type="file" id="importFileInput" accept=".json" style="display: none;">
+                  </label>
+
+                  <button class="btn-secondary" id="btnResetDefaults" style="color: var(--danger); text-align: left; padding: 12px 16px;">
+                    ⚠️ <strong>Reset to Fresh Demo Data</strong>
+                  </button>
+                </div>
+              </div>
+
+              <div style="margin-top: 20px; font-size: 0.78rem; color: var(--cocoa-muted);">
+                Data synchronized across all tabs via <code>FloraDB</code> reactive engine.
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       3. SLIDE-OVER PRODUCT EDITOR DRAWER
+       ========================================================================= -->
+  <div class="admin-drawer-overlay" id="productDrawerOverlay"></div>
+  <div class="admin-drawer" id="productDrawer">
+    <div class="drawer-header">
+      <h2 id="drawerTitle" class="font-serif">Add New Product</h2>
+      <button class="drawer-close-btn" id="drawerCloseBtn">&times;</button>
+    </div>
+
+    <form id="productForm" class="drawer-body">
+      <input type="hidden" id="prodId">
+
+      <div class="form-group">
+        <label for="prodName">Product Title *</label>
+        <input type="text" id="prodName" class="form-input" placeholder="e.g. Pistachio Rose Dream Cake" required>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="prodCategory">Category *</label>
+          <select id="prodCategory" class="form-input" required>
+            <option value="cakes">🎂 Floral Cake</option>
+            <option value="pastries">🥐 French Pastry</option>
+            <option value="muffins">🧁 Artisanal Muffin</option>
+            <option value="combos">🎁 Gifting Hamper</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="prodCategoryLabel">Category Sub-Label</label>
+          <input type="text" id="prodCategoryLabel" class="form-input" placeholder="e.g. Signature Cake">
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="prodPrice">Price (₹) *</label>
+          <input type="number" id="prodPrice" class="form-input" placeholder="1299" required min="1">
+        </div>
+
+        <div class="form-group">
+          <label for="prodComparePrice">Compare at Price (₹)</label>
+          <input type="number" id="prodComparePrice" class="form-input" placeholder="1499">
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="prodStock">Inventory Stock *</label>
+          <input type="number" id="prodStock" class="form-input" placeholder="10" required min="0">
+        </div>
+
+        <div class="form-group">
+          <label for="prodUnit">Portion / Unit Size</label>
+          <input type="text" id="prodUnit" class="form-input" placeholder="e.g. 0.5 kg (Serves 4-6)">
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="prodBadge">Badge Label</label>
+          <input type="text" id="prodBadge" class="form-input" placeholder="e.g. Bestseller, Chef's Pick">
+        </div>
+
+        <div class="form-group">
+          <label for="prodSku">SKU Code</label>
+          <input type="text" id="prodSku" class="form-input" placeholder="e.g. FB-CK-009">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="prodImage">Image Path / Preset</label>
+        <select id="prodImage" class="form-input">
+          <option value="images/cat-cakes.jpg">🎂 Signature Cake Photo (cat-cakes.jpg)</option>
+          <option value="images/hero-cake.jpg">🌸 Vintage Floral Tier (hero-cake.jpg)</option>
+          <option value="images/cat-pastries.jpg">🥐 Gourmet French Pastries (cat-pastries.jpg)</option>
+          <option value="images/cat-muffins.jpg">🧁 Floral Muffins (cat-muffins.jpg)</option>
+          <option value="images/combo-banner.jpg">🎁 Luxury Gift Hamper (combo-banner.jpg)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="prodDesc">Product Description</label>
+        <textarea id="prodDesc" class="form-input" rows="3" placeholder="Artisanal flavor notes, edible botanicals, and ingredients..."></textarea>
+      </div>
+
+      <div class="toggle-switch-row">
+        <div>
+          <strong style="font-size: 0.88rem; display: block;">100% Vegetarian / Eggless</strong>
+          <span style="font-size: 0.75rem; color: var(--cocoa-muted);">Display green veg emblem on storefront</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="prodEggless" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </form>
+
+    <div class="drawer-footer">
+      <button type="button" class="btn-secondary" id="drawerCancelBtn">Cancel</button>
+      <button type="button" class="btn-primary" id="drawerSaveBtn">Save Product</button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       4. COMMAND PALETTE MODAL (⌘K)
+       ========================================================================= -->
+  <div class="command-palette-modal" id="commandPalette">
+    <div class="palette-box">
+      <div class="palette-input-holder">
+        <span>🔍</span>
+        <input type="text" id="paletteInput" placeholder="Type a command, product name, or navigation...">
+        <kbd class="kbd-shortcut">ESC</kbd>
+      </div>
+      <div class="palette-results" id="paletteResults">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       5. CREATE DISCOUNT MODAL
+       ========================================================================= -->
+  <div class="admin-drawer-overlay" id="discountModalOverlay"></div>
+  <div class="command-palette-modal" id="discountModal" style="align-items: center;">
+    <div class="palette-box" style="max-width: 480px; padding: 28px;">
+      <h2 class="font-serif" style="margin-bottom: 6px; font-size: 1.3rem;">Create Discount Coupon</h2>
+      <p style="font-size: 0.85rem; color: var(--cocoa-muted); margin-bottom: 20px;">
+        Coupon will instantly be redeemable by clients in the storefront cart.
+      </p>
+
+      <form id="createDiscountForm" class="auth-form">
+        <div class="form-group">
+          <label>Coupon Code (e.g. ROSE15)</label>
+          <input type="text" id="discCode" class="form-input" style="text-transform: uppercase;" required placeholder="ROSE15">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Discount Type</label>
+            <select id="discType" class="form-input">
+              <option value="percent">Percentage (%)</option>
+              <option value="fixed">Flat Amount (₹)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Value</label>
+            <input type="number" id="discValue" class="form-input" required placeholder="15" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Minimum Order Value (₹)</label>
+          <input type="number" id="discMin" class="form-input" placeholder="499" value="499">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="discDesc" class="form-input" placeholder="15% off on celebratory bakes">
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
+          <button type="button" class="btn-secondary" id="btnCancelDiscount">Cancel</button>
+          <button type="submit" class="btn-primary">Save & Activate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="admin-toast-container" id="adminToastContainer"></div>
+
+  <!-- Unified Data Layer & Admin Controller Scripts -->
+  <script src="js/store-data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

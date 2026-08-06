@@ -1,177 +1,83 @@
 /**
  * THE FLORA BAKERY - E-COMMERCE & INTERACTIVE LOGIC
- * High-Converting CRO Features, Cart Drawer, Modals, Filter Tabs & WhatsApp Checkout
+ * Connected in real-time to FloraDB Unified Storage Engine
+ * High-Converting CRO Features, Cart Drawer, Modals, Dynamic Admin Sync & WhatsApp Checkout
  */
 
-// Product Catalog Data
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Blush Rose & Lychee Chiffon Cake",
-    category: "cakes",
-    categoryLabel: "Signature Cake",
-    price: 1299,
-    unit: "0.5 kg (Serves 4-6)",
-    rating: 4.9,
-    reviews: 142,
-    badge: "Bestseller",
-    eggless: true,
-    image: "images/cat-cakes.jpg",
-    description: "Light-as-air vanilla chiffon sponge layered with French rosewater mascarpone cream, fresh lychee compote, and crowned with edible organic pink roses and gold leaf."
-  },
-  {
-    id: 2,
-    name: "French Lavender Berry Choux Pastries",
-    category: "pastries",
-    categoryLabel: "Designer Pastry",
-    price: 449,
-    unit: "Box of 2 pieces",
-    rating: 4.8,
-    reviews: 98,
-    badge: "Chef's Pick",
-    eggless: true,
-    image: "images/cat-pastries.jpg",
-    description: "Crispy craquelin choux filled with infused Provence lavender crème diplomate and house-made wild blackberry coulis, finished with edible viola petals."
-  },
-  {
-    id: 3,
-    name: "Honey Chamomile Bloom Muffins",
-    category: "muffins",
-    categoryLabel: "Artisanal Muffin",
-    price: 399,
-    unit: "Box of 4 pieces",
-    rating: 4.9,
-    reviews: 86,
-    badge: "Most Loved",
-    eggless: true,
-    image: "images/cat-muffins.jpg",
-    description: "Golden honey sponge muffins topped with whipped chamomile buttercream piped into delicate blooming blossoms and dusted with organic yellow chamomile."
-  },
-  {
-    id: 4,
-    name: "Victorian Vintage Lambeth Heart Cake",
-    category: "cakes",
-    categoryLabel: "Custom Aesthetic Cake",
-    price: 1599,
-    unit: "1.0 kg (Serves 8-10)",
-    rating: 5.0,
-    reviews: 215,
-    badge: "Trending",
-    eggless: true,
-    image: "images/hero-cake.jpg",
-    description: "Aesthetic Lambeth piped vintage heart cake with delicate frills, blush pink and buttery yellow floral garlands, and customizable celebration message."
-  },
-  {
-    id: 5,
-    name: "Wildberry Mascarpone Blossom Tart",
-    category: "pastries",
-    categoryLabel: "French Tartlet",
-    price: 549,
-    unit: "Box of 2 pieces",
-    rating: 4.9,
-    reviews: 74,
-    badge: "New Release",
-    eggless: true,
-    image: "images/cat-pastries.jpg",
-    description: "Buttery almond tart shell filled with Madagascar vanilla bean cream, fresh strawberries, blueberries, and candied edible pansies."
-  },
-  {
-    id: 6,
-    name: "Meyer Lemon & Elderflower Muffins",
-    category: "muffins",
-    categoryLabel: "Artisanal Muffin",
-    price: 429,
-    unit: "Box of 4 pieces",
-    rating: 4.8,
-    reviews: 63,
-    badge: "Seasonal",
-    eggless: true,
-    image: "images/cat-muffins.jpg",
-    description: "Zesty Meyer lemon curd infused muffins crowned with elderflower whipped frosting and delicate lemon blossom sugar pearls."
-  },
-  {
-    id: 7,
-    name: "The Royal Flora + Cake Gifting Hamper",
-    category: "combos",
-    categoryLabel: "Luxury Gift Set",
-    price: 2499,
-    unit: "Cake + Fresh Flower Bouquet",
-    rating: 5.0,
-    reviews: 189,
-    badge: "Luxury Gifting",
-    eggless: true,
-    image: "images/combo-banner.jpg",
-    description: "A luxury presentation hamper containing our 0.5kg signature floral cake in a window keepsake box paired with a hand-tied bouquet of fresh garden roses and baby's breath."
-  },
-  {
-    id: 8,
-    name: "Two-Tier Botanical Anniversary Cake",
-    category: "cakes",
-    categoryLabel: "Celebration Tier",
-    price: 2899,
-    unit: "1.5 kg (Serves 12-16)",
-    rating: 5.0,
-    reviews: 112,
-    badge: "Signature",
-    eggless: true,
-    image: "images/hero-cake.jpg",
-    description: "Grand two-tier statement cake draped in pastel pink watercolor buttercream with cascading fresh garden roses, yellow buttercups, and real gold foil."
+// Helper to get active products from FloraDB or fallback
+function getStoreProducts() {
+  if (window.FloraDB && typeof window.FloraDB.getProducts === 'function') {
+    return window.FloraDB.getProducts();
   }
-];
+  return [];
+}
 
 // Shopping Cart State
 let cart = [
   { id: 1, name: "Blush Rose & Lychee Chiffon Cake", price: 1299, qty: 1, image: "images/cat-cakes.jpg" }
 ];
-let appliedDiscount = 0;
-const FREE_SHIPPING_THRESHOLD = 999;
+let appliedDiscountData = null;
+let currentFilterCategory = "all";
 
 // DOM Elements Initialization
 document.addEventListener("DOMContentLoaded", () => {
-  renderProducts("all");
+  renderProducts(currentFilterCategory);
   updateCartUI();
   setupStickyHeader();
   setupAnnouncements();
   setupEventListeners();
+
+  // Listen for real-time changes from Admin Panel
+  window.addEventListener('flora:data-changed', (e) => {
+    renderProducts(currentFilterCategory);
+    updateCartUI();
+  });
 });
 
 // Render Products Grid
 function renderProducts(filterCategory = "all") {
+  currentFilterCategory = filterCategory;
   const grid = document.getElementById("productGrid");
   if (!grid) return;
 
+  const allProducts = getStoreProducts();
   const filtered = filterCategory === "all" 
-    ? PRODUCTS 
-    : PRODUCTS.filter(p => p.category === filterCategory);
+    ? allProducts 
+    : allProducts.filter(p => p.category === filterCategory);
 
   // Update Status Text
   const statusEl = document.getElementById("filterStatusText");
   if (statusEl) {
-    const catLabels = {
-      all: "all 8 botanical creations",
-      cakes: "3 Handcrafted Floral Cakes",
-      pastries: "2 Designer French Pastries",
-      muffins: "2 Morning Blossom Muffins",
-      combos: "1 Luxury Flower + Cake Hamper"
-    };
-    statusEl.innerHTML = `Showing <strong>${catLabels[filterCategory] || filtered.length + " items"}</strong>`;
+    statusEl.innerHTML = `Showing <strong>${filtered.length} Handcrafted Bakes</strong>`;
   }
 
   // Update Tab Badges
   const countAll = document.getElementById("count-all");
-  if (countAll) countAll.textContent = PRODUCTS.length;
+  if (countAll) countAll.textContent = allProducts.length;
   const countCakes = document.getElementById("count-cakes");
-  if (countCakes) countCakes.textContent = PRODUCTS.filter(p => p.category === "cakes").length;
+  if (countCakes) countCakes.textContent = allProducts.filter(p => p.category === "cakes").length;
   const countPastries = document.getElementById("count-pastries");
-  if (countPastries) countPastries.textContent = PRODUCTS.filter(p => p.category === "pastries").length;
+  if (countPastries) countPastries.textContent = allProducts.filter(p => p.category === "pastries").length;
   const countMuffins = document.getElementById("count-muffins");
-  if (countMuffins) countMuffins.textContent = PRODUCTS.filter(p => p.category === "muffins").length;
+  if (countMuffins) countMuffins.textContent = allProducts.filter(p => p.category === "muffins").length;
   const countCombos = document.getElementById("count-combos");
-  if (countCombos) countCombos.textContent = PRODUCTS.filter(p => p.category === "combos").length;
+  if (countCombos) countCombos.textContent = allProducts.filter(p => p.category === "combos").length;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: var(--text-muted);">
+        <div style="font-size: 3rem; margin-bottom: 12px;">🌸</div>
+        <h4 style="font-size: 1.2rem; color: var(--text-cocoa); margin-bottom: 8px;">No items in this collection currently</h4>
+        <p style="font-size: 0.9rem;">Check back soon or consult our chef for a bespoke bake.</p>
+      </div>
+    `;
+    return;
+  }
 
   grid.innerHTML = filtered.map(product => {
     const cartItem = cart.find(item => item.id === product.id);
     const inCartQty = cartItem ? cartItem.qty : 0;
+    const isOutOfStock = product.stock <= 0;
 
     return `
       <div class="product-card" data-id="${product.id}">
@@ -181,8 +87,9 @@ function renderProducts(filterCategory = "all") {
           
           <!-- Pure Veg Emblem & Badges -->
           <div class="card-top-badges">
-            <span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>
+            ${product.eggless ? `<span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>` : ''}
             ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : ''}
+            ${isOutOfStock ? `<span class="product-tag-badge" style="background:#EF4444; color:#FFF;">Sold Out</span>` : ''}
           </div>
 
           <button class="product-quickview-btn" onclick="event.stopPropagation(); openQuickView(${product.id})" title="View Details">
@@ -193,32 +100,39 @@ function renderProducts(filterCategory = "all") {
         <!-- Product Information Body -->
         <div class="product-info">
           <div class="product-meta-row">
-            <span class="product-category-meta">${product.categoryLabel}</span>
+            <span class="product-category-meta">${product.categoryLabel || product.category}</span>
             <div class="product-rating-pill">
               <i class="fas fa-star"></i>
-              <span>${product.rating}</span>
+              <span>${product.rating || 5.0}</span>
             </div>
           </div>
 
           <h4 class="product-name" onclick="openQuickView(${product.id})">${product.name}</h4>
           
           <div class="product-unit-pill">
-            <i class="fas fa-scale-balanced" style="font-size:0.68rem; opacity:0.7;"></i> ${product.unit}
+            <i class="fas fa-scale-balanced" style="font-size:0.68rem; opacity:0.7;"></i> ${product.unit || '0.5 kg'}
           </div>
 
           <!-- Price & Add Action -->
           <div class="product-pricing-action">
             <div class="price-box">
               <span class="price-currency">₹</span><span class="price-current">${product.price}</span>
+              ${product.comparePrice ? `<span style="font-size:0.75rem; text-decoration:line-through; color:var(--text-muted); margin-left:4px;">₹${product.comparePrice}</span>` : ''}
             </div>
             
-            <button class="add-to-cart-btn ${inCartQty > 0 ? 'in-cart' : ''}" 
-                    id="addBtn-${product.id}" 
-                    onclick="addToCart(${product.id})" 
-                    title="Add ${product.name} to cart" 
-                    aria-label="Add ${product.name} to cart">
-              ${inCartQty > 0 ? `<i class="fas fa-check"></i> <span>${inCartQty} in cart</span>` : `<i class="fas fa-plus"></i> <span>ADD</span>`}
-            </button>
+            ${isOutOfStock ? `
+              <button class="add-to-cart-btn" style="background:#E2E8F0; color:#64748B; cursor:not-allowed;" disabled>
+                <span>Sold Out</span>
+              </button>
+            ` : `
+              <button class="add-to-cart-btn ${inCartQty > 0 ? 'in-cart' : ''}" 
+                      id="addBtn-${product.id}" 
+                      onclick="addToCart(${product.id})" 
+                      title="Add ${product.name} to cart" 
+                      aria-label="Add ${product.name} to cart">
+                ${inCartQty > 0 ? `<i class="fas fa-check"></i> <span>${inCartQty} in cart</span>` : `<i class="fas fa-plus"></i> <span>ADD</span>`}
+              </button>
+            `}
           </div>
 
         </div>
@@ -255,11 +169,21 @@ function selectCategory(category) {
 
 // Add Item to Cart
 function addToCart(productId) {
-  const product = PRODUCTS.find(p => p.id === productId);
+  const allProducts = getStoreProducts();
+  const product = allProducts.find(p => p.id === productId);
   if (!product) return;
+
+  if (product.stock <= 0) {
+    showToast("This item is currently sold out for baking.");
+    return;
+  }
 
   const existing = cart.find(item => item.id === productId);
   if (existing) {
+    if (existing.qty >= product.stock) {
+      showToast(`Only ${product.stock} units available in stock right now.`);
+      return;
+    }
     existing.qty += 1;
   } else {
     cart.push({
@@ -292,12 +216,22 @@ function updateCartUI() {
   const grandTotalEl = document.getElementById("cartGrandTotal");
   const progressFill = document.getElementById("freeShippingFill");
   const progressText = document.getElementById("freeShippingText");
+  const freeThreshold = window.FloraDB ? (window.FloraDB.getSettings().freeShippingThreshold || 999) : 999;
 
   const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
   if (cartBadge) cartBadge.textContent = totalItems;
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const discountAmount = subtotal * appliedDiscount;
+  
+  let discountAmount = 0;
+  if (appliedDiscountData) {
+    if (appliedDiscountData.type === 'percent') {
+      discountAmount = Math.round((subtotal * appliedDiscountData.value) / 100);
+    } else {
+      discountAmount = Math.min(subtotal, appliedDiscountData.value);
+    }
+  }
+
   const grandTotal = Math.max(0, subtotal - discountAmount);
 
   if (subtotalEl) subtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
@@ -305,13 +239,13 @@ function updateCartUI() {
 
   // Free shipping calculation
   if (progressFill && progressText) {
-    if (subtotal >= FREE_SHIPPING_THRESHOLD) {
+    if (subtotal >= freeThreshold) {
       progressFill.style.width = "100%";
       progressFill.style.background = "#2E7D32";
       progressText.innerHTML = `🎉 You unlocked <strong>FREE Nashik Delivery</strong>!`;
     } else {
-      const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
-      const pct = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
+      const remaining = freeThreshold - subtotal;
+      const pct = Math.min(100, Math.round((subtotal / freeThreshold) * 100));
       progressFill.style.width = `${pct}%`;
       progressFill.style.background = "var(--rose-deep)";
       progressText.innerHTML = `Add <strong>₹${remaining}</strong> more for <strong>FREE Delivery</strong> in Nashik`;
@@ -356,6 +290,12 @@ function changeQty(productId, delta) {
   const item = cart.find(i => i.id === productId);
   if (!item) return;
 
+  const product = getStoreProducts().find(p => p.id === productId);
+  if (delta > 0 && product && item.qty >= product.stock) {
+    showToast(`Only ${product.stock} units available in stock.`);
+    return;
+  }
+
   item.qty += delta;
   if (item.qty <= 0) {
     cart = cart.filter(i => i.id !== productId);
@@ -385,15 +325,25 @@ function closeCartDrawer() {
 function applyPromoCode() {
   const input = document.getElementById("cartPromoInput");
   const code = input ? input.value.trim().toUpperCase() : "";
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
-  if (code === "FLORA10" || code === "BLOOM10") {
-    appliedDiscount = 0.10;
-    updateCartUI();
-    showToast("✨ 10% VIP Discount Applied Successfully!");
-  } else if (code === "") {
-    showToast("Please enter a valid coupon code");
+  if (window.FloraDB) {
+    const result = window.FloraDB.validateDiscount(code, subtotal);
+    if (result.valid) {
+      appliedDiscountData = result.discount;
+      updateCartUI();
+      showToast(result.message);
+    } else {
+      showToast(result.message);
+    }
   } else {
-    showToast("Invalid code. Try using 'FLORA10'");
+    if (code === "FLORA10" || code === "BLOOM10") {
+      appliedDiscountData = { type: 'percent', value: 10, code };
+      updateCartUI();
+      showToast("✨ 10% VIP Discount Applied Successfully!");
+    } else {
+      showToast("Invalid code. Try using 'FLORA10'");
+    }
   }
 }
 
@@ -404,7 +354,9 @@ function checkoutWhatsApp() {
     return;
   }
 
-  const phone = "917083517862"; // 070835 17862
+  const settings = window.FloraDB ? window.FloraDB.getSettings() : { whatsapp: "917083517862" };
+  const phone = settings.whatsapp || "917083517862";
+
   let message = `*🌸 NEW ORDER INQUIRY - THE FLORA BAKERY NASHIK* 🌸\n\n`;
   message += `Hello! I would like to place an order:\n\n`;
 
@@ -415,16 +367,38 @@ function checkoutWhatsApp() {
     message += `${index + 1}. *${item.name}* (Qty: ${item.qty}) - ₹${itemTotal}\n`;
   });
 
-  const discountAmount = subtotal * appliedDiscount;
-  const grandTotal = subtotal - discountAmount;
+  let discountAmount = 0;
+  if (appliedDiscountData) {
+    if (appliedDiscountData.type === 'percent') {
+      discountAmount = Math.round((subtotal * appliedDiscountData.value) / 100);
+    } else {
+      discountAmount = Math.min(subtotal, appliedDiscountData.value);
+    }
+  }
+
+  const grandTotal = Math.max(0, subtotal - discountAmount);
 
   message += `\n*Subtotal:* ₹${subtotal}`;
-  if (appliedDiscount > 0) {
-    message += `\n*Discount (10%):* -₹${discountAmount}`;
+  if (discountAmount > 0) {
+    message += `\n*Discount (${appliedDiscountData.code}):* -₹${discountAmount}`;
   }
   message += `\n*Total Amount:* ₹${grandTotal}`;
   message += `\n*Delivery Location:* Nashik, Maharashtra`;
   message += `\n\nPlease confirm availability and payment details. Thank you! 🍰`;
+
+  // Auto-record order in Admin Database FloraDB
+  if (window.FloraDB) {
+    window.FloraDB.addOrder({
+      customerName: "Website WhatsApp Order",
+      phone: "070835 17862",
+      address: "Nashik Delivery Zone",
+      items: [...cart],
+      subtotal,
+      discount: discountAmount,
+      total: grandTotal,
+      notes: `Applied Coupon: ${appliedDiscountData ? appliedDiscountData.code : 'None'}`
+    });
+  }
 
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank");
@@ -451,7 +425,9 @@ function submitCustomCakeInquiry(event) {
   const date = document.getElementById("cakeDate")?.value;
   const notes = document.getElementById("cakeNotes")?.value || "N/A";
 
-  const phone = "917083517862";
+  const settings = window.FloraDB ? window.FloraDB.getSettings() : { whatsapp: "917083517862" };
+  const phone = settings.whatsapp || "917083517862";
+
   let waMsg = `*🎂 CUSTOM CAKE INQUIRY - THE FLORA BAKERY NASHIK* 🎂\n\n`;
   waMsg += `Hello Chef! I want to order a custom handcrafted floral cake:\n\n`;
   waMsg += `• *Occasion:* ${occasion}\n`;
@@ -463,6 +439,21 @@ function submitCustomCakeInquiry(event) {
   waMsg += `• *Special Notes:* ${notes}\n\n`;
   waMsg += `Please provide me with a custom quote and confirm the date. Thank you!`;
 
+  // Auto-record inquiry in Admin FloraDB
+  if (window.FloraDB) {
+    window.FloraDB.addInquiry({
+      customerName: "Custom Cake Consultation",
+      phone: "070835 17862",
+      occasion,
+      size,
+      flavor,
+      palette,
+      message: messageText,
+      requiredDate: date,
+      notes
+    });
+  }
+
   closeCakeBuilderModal();
   showToast("🎉 Custom cake inquiry prepared! Opening WhatsApp...");
   setTimeout(() => {
@@ -472,33 +463,37 @@ function submitCustomCakeInquiry(event) {
 
 // Quick View Modal
 function openQuickView(productId) {
-  const product = PRODUCTS.find(p => p.id === productId);
+  const allProducts = getStoreProducts();
+  const product = allProducts.find(p => p.id === productId);
   if (!product) return;
 
   const content = document.getElementById("quickViewContent");
   if (content) {
+    const isOutOfStock = product.stock <= 0;
     content.innerHTML = `
       <div class="quickview-modal-grid">
         <div class="quickview-img-wrap">
           <img src="${product.image}" alt="${product.name}" class="quickview-img">
           <div class="card-top-badges">
-            <span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>
+            ${product.eggless ? `<span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>` : ''}
             ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : ''}
+            ${isOutOfStock ? `<span class="product-tag-badge" style="background:#EF4444; color:#FFF;">Sold Out</span>` : ''}
           </div>
         </div>
         <div class="quickview-details">
-          <span class="heading-tag" style="margin-bottom:6px;">${product.categoryLabel}</span>
+          <span class="heading-tag" style="margin-bottom:6px;">${product.categoryLabel || product.category}</span>
           <h3 class="quickview-title">${product.name}</h3>
           
           <div class="product-rating" style="margin-bottom:10px;">
             <span class="star" style="color:#FFB800;"><i class="fas fa-star"></i></span>
-            <strong>${product.rating}</strong>
-            <span style="color:var(--text-muted); font-size:0.8rem;">(${product.reviews} reviews in Nashik)</span>
+            <strong>${product.rating || 5.0}</strong>
+            <span style="color:var(--text-muted); font-size:0.8rem;">(${product.reviews || 40} reviews in Nashik)</span>
           </div>
 
           <div class="quickview-price-row">
             <span class="quickview-price">₹${product.price}</span>
-            <span class="quickview-unit">/ ${product.unit}</span>
+            <span class="quickview-unit">/ ${product.unit || '0.5 kg'}</span>
+            ${product.stock <= 5 && product.stock > 0 ? `<span style="color:#D97706; font-weight:700; font-size:0.8rem; margin-left:10px;">⚠️ Only ${product.stock} left</span>` : ''}
           </div>
 
           <p class="quickview-desc">
@@ -511,9 +506,15 @@ function openQuickView(productId) {
           </div>
 
           <div class="quickview-actions">
-            <button class="btn btn-primary" style="flex:1;" onclick="addToCart(${product.id}); closeQuickViewModal();">
-              <i class="fas fa-shopping-bag"></i> Add to Cart • ₹${product.price}
-            </button>
+            ${isOutOfStock ? `
+              <button class="btn btn-secondary" style="flex:1; cursor:not-allowed;" disabled>
+                Sold Out for Today
+              </button>
+            ` : `
+              <button class="btn btn-primary" style="flex:1;" onclick="addToCart(${product.id}); closeQuickViewModal();">
+                <i class="fas fa-shopping-bag"></i> Add to Cart • ₹${product.price}
+              </button>
+            `}
             <a href="https://wa.me/917083517862?text=Hello%20The%20Flora%20Bakery!%20I%20have%20a%20question%20about%20${encodeURIComponent(product.name)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding:10px 14px;" title="Chat with Baker">
               <i class="fab fa-whatsapp"></i>
             </a>
@@ -522,7 +523,6 @@ function openQuickView(productId) {
       </div>
     `;
   }
-
   document.getElementById("quickViewModal")?.classList.add("active");
   document.body.style.overflow = "hidden";
 }
@@ -532,101 +532,95 @@ function closeQuickViewModal() {
   document.body.style.overflow = "auto";
 }
 
-// Toast Alert System
+// Sticky Header Setup
+function setupStickyHeader() {
+  const header = document.getElementById("header");
+  if (!header) return;
+
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 40) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
+  });
+}
+
+// Announcements Rotator
+function setupAnnouncements() {
+  const messages = [
+    "🌸 Handcrafted with 100% Organic Edible Flowers & Pure Butter",
+    "🚚 FREE Chilled Doorstep Delivery Across Nashik on Orders Above ₹999",
+    "🎂 Bespoke Custom Cakes Made to Order — 24 Hours Advance Notice",
+    "🌿 100% Vegetarian & Pure Eggless Kitchen Studio in Nashik"
+  ];
+  let index = 0;
+  const announcementEl = document.getElementById("announcementText");
+  if (!announcementEl) return;
+
+  setInterval(() => {
+    index = (index + 1) % messages.length;
+    announcementEl.style.opacity = "0";
+    announcementEl.style.transform = "translateY(-8px)";
+    setTimeout(() => {
+      announcementEl.textContent = messages[index];
+      announcementEl.style.opacity = "1";
+      announcementEl.style.transform = "translateY(0)";
+    }, 300);
+  }, 4500);
+}
+
+// Toast Alert Engine
 function showToast(message) {
-  let container = document.getElementById("toastContainer");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "toastContainer";
-    container.className = "toast-container";
-    document.body.appendChild(container);
-  }
+  const container = document.getElementById("toastContainer");
+  if (!container) return;
 
   const toast = document.createElement("div");
-  toast.className = "toast-alert";
-  toast.innerHTML = `<span>🌸</span> <span>${message}</span>`;
+  toast.className = "toast";
+  toast.innerHTML = `
+    <span class="toast-icon">🌸</span>
+    <span class="toast-message">${message}</span>
+  `;
+
   container.appendChild(toast);
 
   setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.style.transform = "translateX(-100%)";
-    toast.style.transition = "all 0.3s ease";
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
+    toast.style.animation = "toastOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+    setTimeout(() => toast.remove(), 400);
+  }, 3200);
 }
 
-// Newsletter Signup & Instant Coupon Unlock
-function submitNewsletter(event) {
-  event.preventDefault();
-  const input = document.getElementById("newsletterEmail");
-  const val = input ? input.value : "";
-  if (val) {
-    showToast("🎉 Welcome to VIP Bloom Club! Use code 'FLORA10' for 10% off your first order!");
-    if (input) input.value = "";
-    appliedDiscount = 0.10;
-    updateCartUI();
-  }
-}
-
-// Sticky Header & Scroll Effects
-function setupStickyHeader() {
-  const header = document.getElementById("siteHeader");
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 40) {
-      header?.classList.add("scrolled");
-    } else {
-      header?.classList.remove("scrolled");
-    }
-  });
-}
-
-// Announcement Bar Dynamic Messages
-function setupAnnouncements() {
-  const announcements = [
-    "🌸 Free Delivery Above ₹999 across Nashik • Order 24h in Advance",
-    "✨ 100% Handcrafted Eggless Floral Cakes & Gift Hampers",
-    "📍 Studio: Sai Nath Nagar, Nashik • Call 070835 17862"
-  ];
-  let idx = 0;
-  const el = document.getElementById("announcementText");
-  if (el) {
-    setInterval(() => {
-      idx = (idx + 1) % announcements.length;
-      el.style.opacity = "0";
-      setTimeout(() => {
-        el.textContent = announcements[idx];
-        el.style.opacity = "1";
-      }, 300);
-    }, 4500);
-  }
-}
-
-// Mobile Navigation Handlers
-function openMobileNav() {
-  const drawer = document.getElementById("mobileNavDrawer");
-  if (drawer) {
-    drawer.classList.add("active");
-    document.body.style.overflow = "hidden";
-  }
-}
-
-function closeMobileNav() {
-  const drawer = document.getElementById("mobileNavDrawer");
-  if (drawer) {
-    drawer.classList.remove("active");
-    document.body.style.overflow = "auto";
-  }
-}
-
-// General Event Listeners
+// Global Event Listeners
 function setupEventListeners() {
-  // Close modals & mobile nav on escape key
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeMobileNav();
-      closeCartDrawer();
-      closeCakeBuilderModal();
-      closeQuickViewModal();
-    }
-  });
+  // Mobile Nav Toggle
+  const mobileToggle = document.getElementById("mobileToggle");
+  const navMenu = document.getElementById("navMenu");
+  if (mobileToggle && navMenu) {
+    mobileToggle.addEventListener("click", () => {
+      navMenu.classList.toggle("active");
+      mobileToggle.classList.toggle("active");
+    });
+  }
+
+  // Cart Drawer Trigger
+  const cartBtn = document.getElementById("cartBtn");
+  const cartDrawerClose = document.getElementById("cartDrawerClose");
+  const cartDrawerOverlay = document.getElementById("cartDrawerOverlay");
+
+  if (cartBtn) cartBtn.addEventListener("click", openCartDrawer);
+  if (cartDrawerClose) cartDrawerClose.addEventListener("click", closeCartDrawer);
+  if (cartDrawerOverlay) cartDrawerOverlay.addEventListener("click", closeCartDrawer);
+
+  // VIP Bloom Club Coupon Copy
+  const copyBtn = document.getElementById("copyCouponBtn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText("FLORA10");
+      showToast("🌸 Coupon code FLORA10 copied to clipboard!");
+      const cartInput = document.getElementById("cartPromoInput");
+      if (cartInput) {
+        cartInput.value = "FLORA10";
+      }
+    });
+  }
 }
