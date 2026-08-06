@@ -1,7 +1,8 @@
 /**
  * THE FLORA BAKERY - ADMIN SUITE CONTROLLER
  * High-performance, Apple-grade interface manager
- * Handles Authentication, Real-time CRUD, Categories Module, Customers CRM, Deep Analytics, Printable Slips & WhatsApp Dispatch
+ * Handles Authentication, Real-time CRUD, Categories Module, Live Notification Bell,
+ * Automated Email Receipt CRM, Customers CRM, Deep Analytics, Printable Slips & WhatsApp Logistics Dispatch
  */
 
 (function() {
@@ -11,6 +12,7 @@
     currentView: 'dashboard',
     editingProductId: null,
     editingCategoryId: null,
+    activeWhatsAppOrderId: null,
 
     init() {
       this.checkAuth();
@@ -151,6 +153,57 @@
         btnAddNewCategory.addEventListener('click', () => this.openCategoryDrawer());
       }
 
+      // Notifications Bell Button & Dropdown Toggle
+      const btnHeaderNotif = document.getElementById('btnHeaderNotif');
+      const notifDropdownMenu = document.getElementById('notifDropdownMenu');
+      const btnMarkAllNotifsRead = document.getElementById('btnMarkAllNotifsRead');
+
+      if (btnHeaderNotif && notifDropdownMenu) {
+        btnHeaderNotif.addEventListener('click', (e) => {
+          e.stopPropagation();
+          notifDropdownMenu.classList.toggle('active');
+        });
+
+        // Close when clicked outside
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.notif-wrapper')) {
+            notifDropdownMenu.classList.remove('active');
+          }
+        });
+      }
+
+      if (btnMarkAllNotifsRead) {
+        btnMarkAllNotifsRead.addEventListener('click', () => {
+          FloraDB.markAllNotificationsRead();
+          this.renderNotifications();
+          this.showToast('All notifications marked as read.', 'info');
+        });
+      }
+
+      // Refresh Analytics Button
+      const btnRefresh = document.getElementById('btnRefreshAnalytics');
+      if (btnRefresh) {
+        btnRefresh.addEventListener('click', () => {
+          this.loadAllData();
+          this.showToast('🔄 Real-time metrics refreshed!', 'info');
+        });
+      }
+
+      // Drawer Close Handlers (Product)
+      const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+      const drawerCancelBtn = document.getElementById('drawerCancelBtn');
+      const drawerOverlay = document.getElementById('drawerOverlay');
+
+      if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', () => this.closeProductDrawer());
+      if (drawerCancelBtn) drawerCancelBtn.addEventListener('click', () => this.closeProductDrawer());
+      if (drawerOverlay) drawerOverlay.addEventListener('click', () => this.closeProductDrawer());
+
+      // Product Form Save
+      const drawerSaveBtn = document.getElementById('drawerSaveBtn');
+      if (drawerSaveBtn) {
+        drawerSaveBtn.addEventListener('click', () => this.saveProduct());
+      }
+
       // Category Drawer Controls
       const categoryDrawerCloseBtn = document.getElementById('categoryDrawerCloseBtn');
       const categoryDrawerCancelBtn = document.getElementById('categoryDrawerCancelBtn');
@@ -160,42 +213,7 @@
       if (categoryDrawerCloseBtn) categoryDrawerCloseBtn.addEventListener('click', () => this.closeCategoryDrawer());
       if (categoryDrawerCancelBtn) categoryDrawerCancelBtn.addEventListener('click', () => this.closeCategoryDrawer());
       if (categoryDrawerOverlay) categoryDrawerOverlay.addEventListener('click', () => this.closeCategoryDrawer());
-      if (categoryDrawerSaveBtn) categoryDrawerSaveBtn.addEventListener('click', () => this.saveCategoryFromDrawer());
-
-      // Auto-slug generator for category name
-      const catNameInput = document.getElementById('catName');
-      const catSlugInput = document.getElementById('catSlug');
-      if (catNameInput && catSlugInput) {
-        catNameInput.addEventListener('input', () => {
-          if (!this.editingCategoryId) {
-            catSlugInput.value = catNameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-          }
-        });
-      }
-
-      // Refresh Analytics Button
-      const btnRefreshAnalytics = document.getElementById('btnRefreshAnalytics');
-      if (btnRefreshAnalytics) {
-        btnRefreshAnalytics.addEventListener('click', () => {
-          this.renderDashboard();
-          this.renderAnalyticsView();
-          this.showToast('Analytics refreshed with live store data.', 'info');
-        });
-      }
-
-      // Product Drawer Controls
-      const drawerCloseBtn = document.getElementById('drawerCloseBtn');
-      const drawerCancelBtn = document.getElementById('drawerCancelBtn');
-      const productDrawerOverlay = document.getElementById('productDrawerOverlay');
-      if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', () => this.closeProductDrawer());
-      if (drawerCancelBtn) drawerCancelBtn.addEventListener('click', () => this.closeProductDrawer());
-      if (productDrawerOverlay) productDrawerOverlay.addEventListener('click', () => this.closeProductDrawer());
-
-      // Product Save Form
-      const drawerSaveBtn = document.getElementById('drawerSaveBtn');
-      if (drawerSaveBtn) {
-        drawerSaveBtn.addEventListener('click', () => this.saveProductFromDrawer());
-      }
+      if (categoryDrawerSaveBtn) categoryDrawerSaveBtn.addEventListener('click', () => this.saveCategory());
 
       // Product Filters
       const prodSearch = document.getElementById('productSearchInput');
@@ -274,6 +292,26 @@
       if (invoiceModalOverlay) {
         invoiceModalOverlay.addEventListener('click', () => this.closeInvoice());
       }
+
+      // WhatsApp Logistics Modal Handlers
+      const btnCloseWhatsAppModal = document.getElementById('btnCloseWhatsAppModal');
+      const btnCancelWhatsApp = document.getElementById('btnCancelWhatsApp');
+      const whatsappModalOverlay = document.getElementById('whatsappModalOverlay');
+      const btnSendWhatsAppAction = document.getElementById('btnSendWhatsAppAction');
+
+      if (btnCloseWhatsAppModal) btnCloseWhatsAppModal.addEventListener('click', () => this.closeWhatsAppModal());
+      if (btnCancelWhatsApp) btnCancelWhatsApp.addEventListener('click', () => this.closeWhatsAppModal());
+      if (whatsappModalOverlay) whatsappModalOverlay.addEventListener('click', () => this.closeWhatsAppModal());
+      if (btnSendWhatsAppAction) btnSendWhatsAppAction.addEventListener('click', () => this.dispatchWhatsAppMessage());
+
+      // Admin Email Confirmation Modal Handlers
+      const btnCloseAdminEmailModal = document.getElementById('btnCloseAdminEmailModal');
+      const btnCloseAdminEmailModalBtn = document.getElementById('btnCloseAdminEmailModalBtn');
+      const adminEmailModalOverlay = document.getElementById('adminEmailModalOverlay');
+
+      if (btnCloseAdminEmailModal) btnCloseAdminEmailModal.addEventListener('click', () => this.closeAdminEmailModal());
+      if (btnCloseAdminEmailModalBtn) btnCloseAdminEmailModalBtn.addEventListener('click', () => this.closeAdminEmailModal());
+      if (adminEmailModalOverlay) adminEmailModalOverlay.addEventListener('click', () => this.closeAdminEmailModal());
 
       // Discount Modal Controls
       const btnCreateDiscount = document.getElementById('btnCreateDiscount');
@@ -451,65 +489,63 @@
 
     processUploadedImage(file) {
       if (!file.type.startsWith('image/')) {
-        this.showToast('Please select a valid image file (JPG, PNG, WEBP).', 'error');
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        this.showToast('Image is too large. Please choose an image under 5MB.', 'error');
+        this.showToast('Please upload a valid image file (JPG, PNG, WebP)', 'error');
         return;
       }
 
+      if (file.size > 5 * 1024 * 1024) {
+        this.showToast('Image is larger than 5MB. Compressing...', 'info');
+      }
+
       const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64Data = event.target.result;
+      reader.onload = (e) => {
+        const base64Data = e.target.result;
         this.setImagePreview(base64Data);
-        this.showToast('📷 Photo uploaded and set for this bake!', 'success');
+        this.showToast('📸 Custom product photo loaded successfully!', 'success');
       };
       reader.readAsDataURL(file);
     },
 
     setImagePreview(src) {
-      const promptBox = document.getElementById('uploadPrompt');
-      const previewBox = document.getElementById('imagePreviewContainer');
-      const previewImg = document.getElementById('imagePreviewImg');
-      const hiddenInput = document.getElementById('prodImage');
+      const previewImg = document.getElementById('uploadedImgPreview');
+      const hiddenInput = document.getElementById('prodImageValue');
+      const emptyState = document.getElementById('uploaderEmptyState');
+      const activeState = document.getElementById('uploaderActivePreview');
 
-      if (!hiddenInput) return;
+      if (hiddenInput) hiddenInput.value = src;
+      if (previewImg) previewImg.src = src;
 
-      hiddenInput.value = src || 'images/cat-cakes.jpg';
-
-      if (previewImg && promptBox && previewBox) {
-        if (src) {
-          previewImg.src = src;
-          previewBox.style.display = 'block';
-          promptBox.style.display = 'none';
-        } else {
-          previewBox.style.display = 'none';
-          promptBox.style.display = 'flex';
-        }
+      if (src && src.length > 0) {
+        if (emptyState) emptyState.style.display = 'none';
+        if (activeState) activeState.style.display = 'block';
+      } else {
+        if (emptyState) emptyState.style.display = 'block';
+        if (activeState) activeState.style.display = 'none';
       }
     },
 
     // =========================================================================
-    // 4. MOBILE SIDEBAR CONTROL
+    // 4. MOBILE SIDEBAR DRAWER CONTROLS
     // =========================================================================
     openMobileSidebar() {
       const sidebar = document.getElementById('adminSidebar');
       const backdrop = document.getElementById('sidebarBackdrop');
-      if (sidebar) sidebar.classList.add('mobile-open');
+      if (sidebar) sidebar.classList.add('active');
       if (backdrop) backdrop.classList.add('active');
+      document.body.style.overflow = 'hidden';
     },
 
     closeMobileSidebar() {
       const sidebar = document.getElementById('adminSidebar');
       const backdrop = document.getElementById('sidebarBackdrop');
-      if (sidebar) sidebar.classList.remove('mobile-open');
+      if (sidebar) sidebar.classList.remove('active');
       if (backdrop) backdrop.classList.remove('active');
+      document.body.style.overflow = '';
     },
 
     toggleMobileSidebar() {
       const sidebar = document.getElementById('adminSidebar');
-      if (sidebar && sidebar.classList.contains('mobile-open')) {
+      if (sidebar && sidebar.classList.contains('active')) {
         this.closeMobileSidebar();
       } else {
         this.openMobileSidebar();
@@ -517,29 +553,44 @@
     },
 
     // =========================================================================
-    // 5. VIEW ROUTING & DATA RENDERING
+    // 5. VIEW SWITCHER & TAB MANAGEMENT
     // =========================================================================
     switchView(viewName) {
       this.currentView = viewName;
 
+      // Update Desktop Nav Active State
       document.querySelectorAll('.sidebar-menu .nav-item').forEach(item => {
-        item.classList.toggle('active', item.getAttribute('data-view') === viewName);
+        if (item.getAttribute('data-view') === viewName) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
       });
 
+      // Update Mobile Nav Active State
       document.querySelectorAll('.admin-mobile-nav .mobile-nav-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.getAttribute('data-view') === viewName);
+        if (tab.getAttribute('data-view') === viewName) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
       });
 
-      document.querySelectorAll('.view-section').forEach(section => {
-        section.classList.remove('active');
+      // Show Selected Section
+      document.querySelectorAll('.view-section').forEach(sec => {
+        sec.classList.remove('active');
       });
 
-      const targetView = document.getElementById(`view-${viewName}`);
-      if (targetView) {
-        targetView.classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      const targetSec = document.getElementById(`view-${viewName}`);
+      if (targetSec) {
+        targetSec.classList.add('active');
       }
 
+      // Scroll to top
+      const content = document.querySelector('.admin-content');
+      if (content) content.scrollTop = 0;
+
+      // Trigger Specific Render
       if (viewName === 'dashboard') this.renderDashboard();
       if (viewName === 'products') this.renderProductsTable();
       if (viewName === 'categories') this.renderCategoriesView();
@@ -564,6 +615,7 @@
       this.renderDiscountsTable();
       this.renderInquiriesTable();
       this.renderSettingsView();
+      this.renderNotifications();
       this.updateSidebarCounters();
     },
 
@@ -621,7 +673,78 @@
     },
 
     // =========================================================================
-    // 6. DASHBOARD VIEW
+    // 6. LIVE NOTIFICATIONS BELL & DROPDOWN PANEL
+    // =========================================================================
+    renderNotifications() {
+      const notifs = FloraDB.getNotifications();
+      const unreadCount = notifs.filter(n => !n.read).length;
+
+      const badgeCountEl = document.getElementById('notifBadgeCount');
+      const unreadBadgeEl = document.getElementById('notifUnreadBadge');
+      const listContainer = document.getElementById('notifDropdownList');
+
+      if (badgeCountEl) {
+        if (unreadCount > 0) {
+          badgeCountEl.textContent = unreadCount;
+          badgeCountEl.style.display = 'flex';
+        } else {
+          badgeCountEl.style.display = 'none';
+        }
+      }
+
+      if (unreadBadgeEl) {
+        unreadBadgeEl.textContent = `${unreadCount} New`;
+      }
+
+      if (!listContainer) return;
+
+      if (notifs.length === 0) {
+        listContainer.innerHTML = `
+          <div style="text-align:center; padding: 28px 16px; color:var(--cocoa-muted);">
+            <div style="font-size: 2rem; margin-bottom: 6px;">🔔</div>
+            <strong style="font-size:0.88rem; color:var(--cocoa-dark);">No Activity Yet</strong>
+            <p style="font-size:0.78rem; margin:4px 0 0;">New customer orders & bespoke cake requests will ping here live.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = notifs.map(n => {
+        let iconClass = 'notif-icon-order';
+        let iconSymbol = '🛍️';
+        if (n.type === 'inquiry') {
+          iconClass = 'notif-icon-inquiry';
+          iconSymbol = '🎂';
+        } else if (n.type === 'stock') {
+          iconClass = 'notif-icon-stock';
+          iconSymbol = '⚠️';
+        }
+
+        return `
+          <div class="notif-item ${n.read ? '' : 'unread'}" onclick="AdminApp.handleNotifClick('${n.id}', '${n.linkView || 'orders'}')">
+            <div class="notif-icon-circle ${iconClass}">
+              ${iconSymbol}
+            </div>
+            <div class="notif-content">
+              <div class="notif-title">${this.escapeHTML(n.title)}</div>
+              <div class="notif-desc">${this.escapeHTML(n.message)}</div>
+              <div class="notif-time">${n.timeAgo || 'Just now'}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    },
+
+    handleNotifClick(notifId, targetView) {
+      FloraDB.markNotificationRead(notifId);
+      this.renderNotifications();
+      const notifMenu = document.getElementById('notifDropdownMenu');
+      if (notifMenu) notifMenu.classList.remove('active');
+      if (targetView) this.switchView(targetView);
+    },
+
+    // =========================================================================
+    // 7. DASHBOARD VIEW
     // =========================================================================
     renderDashboard() {
       const stats = FloraDB.getAnalytics();
@@ -656,24 +779,24 @@
               <td colspan="7" style="text-align: center; padding: 36px 16px; color: var(--cocoa-muted);">
                 <div style="font-size: 1.8rem; margin-bottom: 8px;">🌸</div>
                 <strong style="display: block; color: var(--cocoa-dark); margin-bottom: 4px;">No customer orders logged yet</strong>
-                <span style="font-size: 0.84rem;">Orders placed via WhatsApp checkout will appear here in real time.</span>
+                <span style="font-size: 0.84rem;">Orders placed via storefront checkout will appear here in real time.</span>
               </td>
             </tr>
           `;
         } else {
           recentBody.innerHTML = stats.recentOrders.map(o => `
             <tr>
-              <td><strong>${o.id}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${o.date || o.timeAgo || 'Recent'}</span></td>
+              <td><strong>#${o.id}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${o.date || o.timeAgo || 'Recent'}</span></td>
               <td><strong>${this.escapeHTML(o.customerName)}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${o.phone}</span></td>
               <td>${Array.isArray(o.items) ? o.items.map(i => `${i.name} (x${i.qty})`).join(', ') : 'Custom Bake'}</td>
               <td><strong>₹${(o.total || 0).toLocaleString('en-IN')}</strong></td>
               <td><span class="status-pill status-${o.status}">${this.formatStatus(o.status)}</span></td>
-              <td>${o.paymentStatus || 'WhatsApp Order'}</td>
+              <td><span class="badge-cod">💵 COD</span></td>
               <td>
                 <div class="table-actions">
                   <button class="action-icon-btn" onclick="AdminApp.openInvoice('${o.id}')" title="Print Kitchen Slip">🖨️</button>
-                  <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppOrder('${o.id}')">
-                    <span>📱 WA</span>
+                  <button class="btn-whatsapp-pill" onclick="AdminApp.openWhatsAppModal('${o.id}', '${o.status}')" title="Dispatch Status Update">
+                    <i class="fab fa-whatsapp"></i> Dispatch
                   </button>
                 </div>
               </td>
@@ -686,7 +809,7 @@
     },
 
     // =========================================================================
-    // 7. CATEGORIES / COLLECTIONS MODULE (Shopify-Grade)
+    // 8. CATEGORIES / COLLECTIONS MODULE
     // =========================================================================
     populateCategoryDropdowns() {
       const categories = FloraDB.getCategories();
@@ -748,121 +871,117 @@
       const tbody = document.getElementById('categoriesTableBody');
       const counter = document.getElementById('categoryCounterText');
 
-      if (counter) counter.textContent = `${categories.length} Collections`;
+      if (counter) counter.textContent = `Showing ${categories.length} category collections`;
       if (!tbody) return;
 
       tbody.innerHTML = categories.map(c => `
         <tr>
           <td>
-            <div class="table-product-cell">
-              <img src="${c.image || 'images/cat-cakes.jpg'}" class="table-product-thumb" alt="${this.escapeHTML(c.name)}" onerror="this.src='images/cat-cakes.jpg'">
+            <div class="table-prod-cell">
+              <img src="${c.image || 'images/cat-cakes.jpg'}" alt="${this.escapeHTML(c.name)}" class="table-prod-img" onerror="this.src='images/cat-cakes.jpg'">
               <div>
-                <strong>${c.icon || '🌸'} ${this.escapeHTML(c.name)}</strong>
-                <div style="font-size: 0.75rem; color: var(--cocoa-muted);">${this.escapeHTML(c.description || '')}</div>
+                <strong>${c.icon || '🌸'} ${this.escapeHTML(c.name)}</strong><br>
+                <span style="font-size:0.75rem; color:var(--cocoa-muted);">${this.escapeHTML(c.categoryLabel || '')}</span>
               </div>
             </div>
           </td>
           <td><code>${c.slug}</code></td>
-          <td>${this.escapeHTML(c.categoryLabel || '—')}</td>
-          <td><strong>${c.productCount || 0} products</strong></td>
-          <td><span class="status-pill status-${c.status || 'active'}">${c.status === 'active' ? '● Active' : '○ Draft'}</span></td>
-          <td>#${c.order || 1}</td>
+          <td><span style="font-size:0.82rem; color:var(--cocoa-muted);">${this.escapeHTML(c.description || '-')}</span></td>
+          <td><strong>${c.productCount || 0} bakes</strong></td>
+          <td><span class="status-pill status-${c.status || 'active'}">${c.status === 'active' ? 'Active' : 'Draft'}</span></td>
           <td>
             <div class="table-actions">
               <button class="action-icon-btn" onclick="AdminApp.openEditCategory('${c.id}')">✏️ Edit</button>
-              <button class="action-icon-btn" style="color: var(--danger);" onclick="AdminApp.deleteCategory('${c.id}')">🗑️ Delete</button>
+              <button class="action-icon-btn" style="color: var(--danger);" onclick="AdminApp.deleteCategory('${c.id}')">🗑️</button>
             </div>
           </td>
         </tr>
       `).join('');
     },
 
-    openCategoryDrawer(cat = null) {
-      this.editingCategoryId = cat ? (cat.id || cat.slug) : null;
-      const drawer = document.getElementById('categoryDrawer');
-      const overlay = document.getElementById('categoryDrawerOverlay');
-      const title = document.getElementById('categoryDrawerTitle');
+    openCategoryDrawer() {
+      this.editingCategoryId = null;
+      document.getElementById('categoryDrawerTitle').textContent = 'Add New Category Collection';
+      document.getElementById('categoryForm').reset();
+      document.getElementById('catId').value = '';
 
-      if (!drawer || !overlay) return;
-
-      if (cat) {
-        title.textContent = `Edit Collection "${cat.name}"`;
-        document.getElementById('catId').value = cat.id || cat.slug;
-        document.getElementById('catName').value = cat.name;
-        document.getElementById('catSlug').value = cat.slug;
-        document.getElementById('catIcon').value = cat.icon || '🌸';
-        document.getElementById('catLabel').value = cat.categoryLabel || '';
-        document.getElementById('catDesc').value = cat.description || '';
-        document.getElementById('catImage').value = cat.image || 'images/cat-cakes.jpg';
-        document.getElementById('catOrder').value = cat.order || 1;
-        document.getElementById('catStatus').value = cat.status || 'active';
-      } else {
-        title.textContent = "Add New Category Collection";
-        document.getElementById('categoryForm').reset();
-        document.getElementById('catId').value = '';
-        document.getElementById('catIcon').value = '🌸';
-        document.getElementById('catOrder').value = FloraDB.getCategories().length + 1;
-      }
-
-      overlay.classList.add('active');
-      drawer.classList.add('active');
+      document.getElementById('categoryDrawer').classList.add('active');
+      document.getElementById('categoryDrawerOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
     },
 
-    openEditCategory(id) {
-      const cat = FloraDB.getCategoryById(id);
-      if (cat) this.openCategoryDrawer(cat);
+    openEditCategory(categoryId) {
+      const c = FloraDB.getCategoryById(categoryId);
+      if (!c) return;
+
+      this.editingCategoryId = categoryId;
+      document.getElementById('categoryDrawerTitle').textContent = `Edit Collection: ${c.name}`;
+      document.getElementById('catId').value = c.id;
+      document.getElementById('catName').value = c.name;
+      document.getElementById('catSlug').value = c.slug;
+      document.getElementById('catIcon').value = c.icon || '🌸';
+      document.getElementById('catLabel').value = c.categoryLabel || '';
+      document.getElementById('catDesc').value = c.description || '';
+      document.getElementById('catImage').value = c.image || 'images/cat-cakes.jpg';
+      document.getElementById('catOrder').value = c.order || 1;
+      document.getElementById('catStatus').value = c.status || 'active';
+
+      document.getElementById('categoryDrawer').classList.add('active');
+      document.getElementById('categoryDrawerOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
     },
 
     closeCategoryDrawer() {
-      const drawer = document.getElementById('categoryDrawer');
-      const overlay = document.getElementById('categoryDrawerOverlay');
-      if (drawer) drawer.classList.remove('active');
-      if (overlay) overlay.classList.remove('active');
+      document.getElementById('categoryDrawer').classList.remove('active');
+      document.getElementById('categoryDrawerOverlay').classList.remove('active');
+      document.body.style.overflow = '';
       this.editingCategoryId = null;
     },
 
-    saveCategoryFromDrawer() {
+    saveCategory() {
       const name = document.getElementById('catName').value.trim();
-      const slug = document.getElementById('catSlug').value.trim();
+      const slug = document.getElementById('catSlug').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '-');
+      const icon = document.getElementById('catIcon').value.trim() || '🌸';
+      const categoryLabel = document.getElementById('catLabel').value.trim();
+      const description = document.getElementById('catDesc').value.trim();
+      const image = document.getElementById('catImage').value;
+      const order = Number(document.getElementById('catOrder').value) || 1;
+      const status = document.getElementById('catStatus').value;
 
       if (!name || !slug) {
-        this.showToast('Please enter a category name and slug identifier.', 'error');
+        this.showToast('Please fill in Category Name and Slug!', 'error');
         return;
       }
 
-      const catData = {
-        id: this.editingCategoryId || slug,
-        name: name,
-        slug: slug.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-        icon: document.getElementById('catIcon').value || '🌸',
-        categoryLabel: document.getElementById('catLabel').value || name,
-        description: document.getElementById('catDesc').value || '',
-        image: document.getElementById('catImage').value || 'images/cat-cakes.jpg',
-        order: Number(document.getElementById('catOrder').value) || 1,
-        status: document.getElementById('catStatus').value || 'active'
-      };
+      FloraDB.saveCategory({
+        id: this.editingCategoryId,
+        name,
+        slug,
+        icon,
+        categoryLabel,
+        description,
+        image,
+        order,
+        status
+      });
 
-      FloraDB.saveCategory(catData);
       this.closeCategoryDrawer();
+      this.showToast(`✨ Category "${name}" saved and live!`, 'success');
       this.populateCategoryDropdowns();
       this.renderCategoriesView();
-      this.showToast(`✨ Collection "${name}" saved and synced live!`, 'success');
     },
 
-    deleteCategory(id) {
-      const cat = FloraDB.getCategoryById(id);
-      if (!cat) return;
-
-      if (confirm(`Are you sure you want to delete category "${cat.name}"?`)) {
-        FloraDB.deleteCategory(id);
-        this.showToast(`Deleted category "${cat.name}".`, 'info');
+    deleteCategory(categoryId) {
+      if (confirm('Are you sure you want to delete this category collection?')) {
+        FloraDB.deleteCategory(categoryId);
+        this.showToast('Category deleted.', 'info');
         this.populateCategoryDropdowns();
         this.renderCategoriesView();
       }
     },
 
     // =========================================================================
-    // 8. PRODUCTS CATALOG CRUD
+    // 9. PRODUCTS CATALOG & DRAWER CRUD
     // =========================================================================
     renderProductsTable() {
       const search = (document.getElementById('productSearchInput')?.value || '').trim();
@@ -871,231 +990,183 @@
 
       const products = FloraDB.getProducts({ search, category, status });
       const tbody = document.getElementById('productsTableBody');
-      const counterEl = document.getElementById('productCounterText');
+      const counter = document.getElementById('productCounterText');
 
-      if (counterEl) counterEl.textContent = `Showing ${products.length} products`;
-
+      if (counter) counter.textContent = `Showing ${products.length} products`;
       if (!tbody) return;
-
-      if (products.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="8" style="text-align: center; padding: 40px; color: var(--cocoa-muted);">
-              No products found matching filters. <button class="btn-primary" style="margin-left: 10px;" onclick="AdminApp.openProductDrawer()">+ Add First Bake</button>
-            </td>
-          </tr>
-        `;
-        return;
-      }
 
       tbody.innerHTML = products.map(p => `
         <tr>
           <td>
-            <div class="table-product-cell">
-              <img src="${p.image || 'images/cat-cakes.jpg'}" alt="${this.escapeHTML(p.name)}" class="table-product-thumb" onerror="this.src='images/cat-cakes.jpg'">
-              <div class="table-product-meta">
-                <h4>${this.escapeHTML(p.name)}</h4>
-                <span>SKU: ${p.sku || 'N/A'} &bull; ${p.unit || '0.5 kg'}</span>
+            <div class="table-prod-cell">
+              <img src="${p.image}" alt="${this.escapeHTML(p.name)}" class="table-prod-img" onerror="this.src='images/cat-cakes.jpg'">
+              <div>
+                <strong>${this.escapeHTML(p.name)}</strong><br>
+                <span style="font-size:0.75rem; color:var(--cocoa-muted);">${p.sku || 'SKU-FLORA'}</span>
               </div>
             </div>
           </td>
-          <td><span style="font-size:0.8rem; font-weight:600; text-transform:capitalize;">${p.category}</span></td>
+          <td>${p.categoryLabel || p.category}</td>
+          <td><strong>₹${p.price}</strong></td>
           <td>
-            <strong>₹${p.price.toLocaleString('en-IN')}</strong>
-            ${p.comparePrice ? `<br><span style="text-decoration: line-through; font-size:0.75rem; color:var(--cocoa-muted);">₹${p.comparePrice}</span>` : ''}
+            <span style="font-weight:700; color: ${p.stock <= 3 ? 'var(--danger)' : 'var(--text-dark)'};">
+              ${p.stock} units
+            </span>
           </td>
-          <td>
-            <span style="font-weight:700; ${p.stock <= 5 ? 'color: var(--danger);' : ''}">${p.stock} units</span>
-          </td>
-          <td>
-            ${p.eggless ? '<span class="status-pill" style="background:#D1FAE5; color:#065F46;">🟢 100% Veg</span>' : '<span class="status-pill">Contains Egg</span>'}
-          </td>
-          <td>
-            ${p.badge ? `<span class="status-pill status-baking">${this.escapeHTML(p.badge)}</span>` : '<span style="color:var(--cocoa-light); font-size:0.75rem;">—</span>'}
-          </td>
-          <td>
-            <span class="status-pill status-${p.status || 'active'}">${p.status === 'active' ? '● Active' : '○ Draft'}</span>
-          </td>
+          <td><span class="diet-veg">100% Pure Veg</span></td>
+          <td>${p.badge ? `<span class="product-tag-badge">${p.badge}</span>` : '-'}</td>
+          <td><span class="status-pill status-${p.status || 'active'}">${p.status === 'active' ? 'Active' : 'Draft'}</span></td>
           <td>
             <div class="table-actions">
-              <button class="action-icon-btn" onclick="AdminApp.openEditProduct(${p.id})" title="Edit Bake">✏️ Edit</button>
-              <button class="action-icon-btn" onclick="AdminApp.duplicateProduct(${p.id})" title="Duplicate">📋</button>
-              <button class="action-icon-btn" style="color: var(--danger);" onclick="AdminApp.deleteProduct(${p.id})" title="Delete">🗑️</button>
+              <button class="action-icon-btn" onclick="AdminApp.openEditProduct(${p.id})">✏️ Edit</button>
+              <button class="action-icon-btn" style="color: var(--danger);" onclick="AdminApp.deleteProduct(${p.id})">🗑️</button>
             </div>
           </td>
         </tr>
       `).join('');
     },
 
-    openProductDrawer(product = null) {
-      this.editingProductId = product ? product.id : null;
-      const drawer = document.getElementById('productDrawer');
-      const overlay = document.getElementById('productDrawerOverlay');
-      const drawerTitle = document.getElementById('drawerTitle');
+    openProductDrawer() {
+      this.editingProductId = null;
+      document.getElementById('drawerTitle').textContent = 'Add Signature Bake';
+      document.getElementById('productForm').reset();
+      document.getElementById('prodId').value = '';
+      this.setImagePreview('images/cat-cakes.jpg');
 
-      if (!drawer || !overlay) return;
-
-      this.populateCategoryDropdowns();
-
-      if (product) {
-        drawerTitle.textContent = `Edit "${product.name}"`;
-        document.getElementById('prodId').value = product.id;
-        document.getElementById('prodName').value = product.name;
-        document.getElementById('prodCategory').value = product.category || 'cakes';
-        document.getElementById('prodCategoryLabel').value = product.categoryLabel || '';
-        document.getElementById('prodPrice').value = product.price;
-        document.getElementById('prodComparePrice').value = product.comparePrice || '';
-        document.getElementById('prodStock').value = product.stock;
-        document.getElementById('prodUnit').value = product.unit || '';
-        document.getElementById('prodBadge').value = product.badge || '';
-        document.getElementById('prodSku').value = product.sku || '';
-        document.getElementById('prodDesc').value = product.description || '';
-        document.getElementById('prodEggless').checked = product.eggless !== false;
-        this.setImagePreview(product.image || 'images/cat-cakes.jpg');
-      } else {
-        drawerTitle.textContent = "Add New Signature Bake";
-        document.getElementById('productForm').reset();
-        document.getElementById('prodId').value = '';
-        document.getElementById('prodEggless').checked = true;
-        this.setImagePreview('images/cat-cakes.jpg');
-      }
-
-      overlay.classList.add('active');
-      drawer.classList.add('active');
+      document.getElementById('productDrawer').classList.add('active');
+      document.getElementById('drawerOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
     },
 
-    openEditProduct(id) {
-      const product = FloraDB.getProductById(id);
-      if (product) this.openProductDrawer(product);
+    openEditProduct(productId) {
+      const p = FloraDB.getProductById(productId);
+      if (!p) return;
+
+      this.editingProductId = productId;
+      document.getElementById('drawerTitle').textContent = `Edit Bake: ${p.name}`;
+      document.getElementById('prodId').value = p.id;
+      document.getElementById('prodName').value = p.name;
+      document.getElementById('prodCategory').value = p.category;
+      document.getElementById('prodPrice').value = p.price;
+      document.getElementById('prodComparePrice').value = p.comparePrice || '';
+      document.getElementById('prodStock').value = p.stock;
+      document.getElementById('prodUnit').value = p.unit || '0.5 kg';
+      document.getElementById('prodBadge').value = p.badge || '';
+      document.getElementById('prodStatus').value = p.status || 'active';
+      document.getElementById('prodDesc').value = p.description || '';
+
+      this.setImagePreview(p.image || 'images/cat-cakes.jpg');
+
+      document.getElementById('productDrawer').classList.add('active');
+      document.getElementById('drawerOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
     },
 
     closeProductDrawer() {
-      const drawer = document.getElementById('productDrawer');
-      const overlay = document.getElementById('productDrawerOverlay');
-      if (drawer) drawer.classList.remove('active');
-      if (overlay) overlay.classList.remove('active');
+      document.getElementById('productDrawer').classList.remove('active');
+      document.getElementById('drawerOverlay').classList.remove('active');
+      document.body.style.overflow = '';
       this.editingProductId = null;
     },
 
-    saveProductFromDrawer() {
+    saveProduct() {
       const name = document.getElementById('prodName').value.trim();
+      const category = document.getElementById('prodCategory').value;
       const price = Number(document.getElementById('prodPrice').value);
+      const comparePrice = Number(document.getElementById('prodComparePrice').value) || null;
       const stock = Number(document.getElementById('prodStock').value);
+      const unit = document.getElementById('prodUnit').value.trim() || '0.5 kg';
+      const badge = document.getElementById('prodBadge').value.trim();
+      const status = document.getElementById('prodStatus').value;
+      const description = document.getElementById('prodDesc').value.trim();
+      const image = document.getElementById('prodImageValue').value || 'images/cat-cakes.jpg';
 
-      if (!name || isNaN(price) || price <= 0) {
-        this.showToast('Please enter a valid product title and price.', 'error');
+      if (!name || !price) {
+        this.showToast('Please fill in Name and Price!', 'error');
         return;
       }
 
-      const productData = {
+      FloraDB.saveProduct({
         id: this.editingProductId,
-        name: name,
-        category: document.getElementById('prodCategory').value,
-        categoryLabel: document.getElementById('prodCategoryLabel').value,
-        price: price,
-        comparePrice: document.getElementById('prodComparePrice').value ? Number(document.getElementById('prodComparePrice').value) : null,
-        stock: isNaN(stock) ? 10 : stock,
-        unit: document.getElementById('prodUnit').value || '0.5 kg',
-        badge: document.getElementById('prodBadge').value,
-        sku: document.getElementById('prodSku').value,
-        image: document.getElementById('prodImage').value || 'images/cat-cakes.jpg',
-        description: document.getElementById('prodDesc').value,
-        eggless: document.getElementById('prodEggless').checked,
-        status: 'active'
-      };
+        name,
+        category,
+        price,
+        comparePrice,
+        stock,
+        unit,
+        badge,
+        status,
+        description,
+        image,
+        eggless: true
+      });
 
-      FloraDB.saveProduct(productData);
       this.closeProductDrawer();
-      this.showToast(`🎂 Bake "${name}" saved to catalog & synced live!`, 'success');
+      this.showToast(`✨ Bake "${name}" saved and synced to storefront!`, 'success');
       this.renderProductsTable();
-      this.renderInventoryTable();
+      this.renderDashboard();
     },
 
-    deleteProduct(id) {
-      const p = FloraDB.getProductById(id);
-      if (!p) return;
-
-      if (confirm(`Are you sure you want to delete "${p.name}" from the bakery catalog?`)) {
-        FloraDB.deleteProduct(id);
-        this.showToast(`Deleted "${p.name}".`, 'info');
-        this.renderProductsTable();
-        this.renderInventoryTable();
-      }
-    },
-
-    duplicateProduct(id) {
-      const clone = FloraDB.duplicateProduct(id);
-      if (clone) {
-        this.showToast(`📋 Duplicated bake: "${clone.name}"`, 'success');
-        this.renderProductsTable();
-      }
-    },
-
-    // =========================================================================
-    // 9. INVENTORY RADAR
-    // =========================================================================
-    renderInventoryTable() {
-      const search = (document.getElementById('inventorySearchInput')?.value || '').trim();
-      const stockFilter = document.getElementById('inventoryStockFilter')?.value || 'all';
-
-      let products = FloraDB.getProducts({ search });
-      if (stockFilter === 'low') {
-        products = products.filter(p => p.stock <= 5 && p.stock > 0);
-      } else if (stockFilter === 'out') {
-        products = products.filter(p => p.stock === 0);
-      }
-
-      const tbody = document.getElementById('inventoryTableBody');
-      if (!tbody) return;
-
-      if (products.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--cocoa-muted);">No inventory records found.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = products.map(p => `
-        <tr>
-          <td>
-            <div class="table-product-cell">
-              <img src="${p.image || 'images/cat-cakes.jpg'}" alt="${this.escapeHTML(p.name)}" class="table-product-thumb" onerror="this.src='images/cat-cakes.jpg'">
-              <div>
-                <strong>${this.escapeHTML(p.name)}</strong>
-                <div style="font-size:0.75rem; color:var(--cocoa-muted); text-transform:capitalize;">${p.category}</div>
-              </div>
-            </div>
-          </td>
-          <td><code>${p.sku || 'N/A'}</code></td>
-          <td>
-            <span style="font-size:1.1rem; font-weight:800; ${p.stock <= 5 ? 'color:var(--danger);' : ''}">${p.stock}</span> units
-          </td>
-          <td>
-            <div class="stock-stepper">
-              <button class="stepper-btn" onclick="AdminApp.adjustStock(${p.id}, -1)">-</button>
-              <span class="stepper-val">${p.stock}</span>
-              <button class="stepper-btn" onclick="AdminApp.adjustStock(${p.id}, 1)">+</button>
-            </div>
-          </td>
-          <td>
-            ${p.stock === 0 ? '<span class="status-pill" style="background:#FEE2E2; color:#DC2626;">❌ Sold Out</span>' :
-              p.stock <= 5 ? '<span class="status-pill" style="background:#FEF3C7; color:#B45309;">⚠️ Low Stock</span>' :
-              '<span class="status-pill status-active">✓ In Stock</span>'}
-          </td>
-          <td><span style="font-size:0.8rem; color:var(--cocoa-muted);">${p.unit || 'Standard'}</span></td>
-        </tr>
-      `).join('');
-    },
-
-    adjustStock(id, delta) {
-      const newStock = FloraDB.adjustStock(id, delta);
-      if (newStock !== null) {
-        this.renderInventoryTable();
+    deleteProduct(productId) {
+      if (confirm('Are you sure you want to delete this signature bake?')) {
+        FloraDB.deleteProduct(productId);
+        this.showToast('Bake removed from catalog.', 'info');
         this.renderProductsTable();
         this.renderDashboard();
       }
     },
 
     // =========================================================================
-    // 10. ORDERS PIPELINE, PRINTABLE SLIPS & WHATSAPP LOGISTICS
+    // 10. INVENTORY RADAR
+    // =========================================================================
+    renderInventoryTable() {
+      const search = (document.getElementById('inventorySearchInput')?.value || '').trim();
+      const filter = document.getElementById('inventoryStockFilter')?.value || 'all';
+
+      let products = FloraDB.getProducts({ search });
+      if (filter === 'low') products = products.filter(p => p.stock > 0 && p.stock <= 3);
+      if (filter === 'out') products = products.filter(p => p.stock <= 0);
+
+      const tbody = document.getElementById('inventoryTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = products.map(p => `
+        <tr>
+          <td>
+            <div class="table-prod-cell">
+              <img src="${p.image}" alt="${this.escapeHTML(p.name)}" class="table-prod-img">
+              <strong>${this.escapeHTML(p.name)}</strong>
+            </div>
+          </td>
+          <td>${p.sku || 'SKU-FLORA'}</td>
+          <td><strong>${p.stock} units</strong></td>
+          <td>
+            <div class="stock-adjust-group">
+              <button class="btn-stock-adjust" onclick="AdminApp.adjustStock(${p.id}, -1)">-1</button>
+              <button class="btn-stock-adjust" onclick="AdminApp.adjustStock(${p.id}, 1)">+1</button>
+              <button class="btn-stock-adjust" onclick="AdminApp.adjustStock(${p.id}, 5)">+5</button>
+            </div>
+          </td>
+          <td>
+            ${p.stock <= 0 
+              ? '<span class="status-pill status-out">Sold Out (0)</span>' 
+              : p.stock <= 3 
+                ? '<span class="status-pill status-low">Low Stock</span>' 
+                : '<span class="status-pill status-active">Optimal</span>'}
+          </td>
+          <td>${p.unit || '0.5 kg'}</td>
+        </tr>
+      `).join('');
+    },
+
+    adjustStock(productId, delta) {
+      FloraDB.adjustStock(productId, delta);
+      this.renderInventoryTable();
+      this.renderDashboard();
+    },
+
+    // =========================================================================
+    // 11. ORDERS PIPELINE & LIVE LOGISTICS DISPATCH
     // =========================================================================
     renderOrdersTable() {
       const search = (document.getElementById('orderSearchInput')?.value || '').trim();
@@ -1112,7 +1183,7 @@
               <div style="font-size: 2.2rem; margin-bottom: 8px;">🛍️</div>
               <h3 style="font-size: 1.1rem; color: var(--cocoa-dark); margin-bottom: 6px;">Zero Orders in Queue</h3>
               <p style="font-size: 0.85rem; max-width: 420px; margin: 0 auto 14px;">
-                Your bakery order pipeline is completely clean. When customers place orders via the storefront WhatsApp checkout, they will instantly appear here.
+                Your bakery order pipeline is clean. When customers place orders via the storefront on-site checkout, they will instantly appear here with email receipts & notification alerts.
               </p>
               <a href="index.html" target="_blank" class="btn-primary btn-touch">🌸 Open Storefront to Test Order</a>
             </td>
@@ -1124,23 +1195,26 @@
       tbody.innerHTML = orders.map(o => `
         <tr>
           <td>
-            <strong>${o.id}</strong><br>
+            <strong>#${o.id}</strong><br>
             <span style="font-size:0.75rem; color:var(--cocoa-muted);">${o.date || o.timeAgo || 'Recent'}</span>
           </td>
           <td>
             <strong>${this.escapeHTML(o.customerName)}</strong><br>
             <span style="font-size:0.78rem; color:var(--cocoa-muted);">📞 ${o.phone}</span><br>
-            <span style="font-size:0.75rem; color:var(--cocoa-light);">${this.escapeHTML(o.address)}</span>
+            <span style="font-size:0.75rem; color:var(--rose-deep);">${this.escapeHTML(o.email || '')}</span><br>
+            <span style="font-size:0.75rem; color:var(--cocoa-light);">${this.escapeHTML(o.address || 'Nashik')}</span>
+            ${o.deliveryDate ? `<div style="font-size:0.74rem; font-weight:700; color:#059669; margin-top:2px;">📅 ${o.deliveryDate} (${o.timeSlot || 'Afternoon'})</div>` : ''}
           </td>
           <td>
             <div style="font-size:0.85rem;">
               ${Array.isArray(o.items) ? o.items.map(i => `<div>&bull; ${i.name} <strong>x${i.qty}</strong></div>`).join('') : 'Custom Order'}
             </div>
-            ${o.notes ? `<div style="font-size:0.74rem; color:var(--rose-hover); margin-top:4px;">Note: "${this.escapeHTML(o.notes)}"</div>` : ''}
+            ${o.cakeMessage ? `<div style="font-size:0.74rem; color:var(--rose-deep); font-weight:700; margin-top:3px;">Cake Msg: "${this.escapeHTML(o.cakeMessage)}"</div>` : ''}
+            ${o.notes ? `<div style="font-size:0.74rem; color:var(--cocoa-muted); margin-top:2px;">Notes: "${this.escapeHTML(o.notes)}"</div>` : ''}
           </td>
           <td>
             <strong>₹${(o.total || 0).toLocaleString('en-IN')}</strong><br>
-            <span style="font-size:0.72rem; color:var(--cocoa-muted);">${o.paymentStatus || 'Pending'}</span>
+            <span class="badge-cod" style="margin-top:4px;">💵 COD</span>
           </td>
           <td>
             <select class="select-filter" style="padding: 6px 10px; font-size: 0.8rem;" onchange="AdminApp.changeOrderStatus('${o.id}', this.value)">
@@ -1152,9 +1226,10 @@
           </td>
           <td>
             <div class="table-actions">
-              <button class="action-icon-btn" onclick="AdminApp.openInvoice('${o.id}')" title="Print Kitchen Slip & Invoice">🖨️ Slip</button>
-              <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppOrder('${o.id}')">
-                <span>📱 WA</span>
+              <button class="action-icon-btn" onclick="AdminApp.openInvoice('${o.id}')" title="Print Kitchen Slip">🖨️ Slip</button>
+              <button class="action-icon-btn" onclick="AdminApp.openAdminEmailPreview('${o.id}')" title="View Customer Email Receipt">✉️ Email</button>
+              <button class="btn-whatsapp-pill" onclick="AdminApp.openWhatsAppModal('${o.id}', '${o.status}')" title="Dispatch Status Update via WhatsApp">
+                <i class="fab fa-whatsapp"></i> WA
               </button>
             </div>
           </td>
@@ -1164,28 +1239,91 @@
 
     changeOrderStatus(orderId, newStatus) {
       FloraDB.updateOrderStatus(orderId, newStatus);
-      this.showToast(`Order ${orderId} updated to "${this.formatStatus(newStatus)}"`, 'success');
+      this.showToast(`Order #${orderId} status updated to "${this.formatStatus(newStatus)}"`, 'success');
       this.renderDashboard();
-    },
+      this.renderOrdersTable();
 
-    openWhatsAppOrder(orderId) {
-      const orders = FloraDB.getOrders();
-      const o = orders.find(ord => ord.id === orderId);
-      if (!o) return;
-
-      const cleanPhone = (o.phone || '').replace(/\D/g, '');
-      const phoneNum = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-
-      const itemsSummary = Array.isArray(o.items) ? o.items.map(i => `• ${i.name} (x${i.qty})`).join('%0A') : 'Handcrafted Bakery Item';
-      const statusText = this.formatStatus(o.status);
-
-      const msg = `🌸 *The Flora Bakery, Nashik* - Order Update%0A%0AHello *${encodeURIComponent(o.customerName)}*,%0AYour order *#${o.id}* status is: *${encodeURIComponent(statusText)}*%0A%0A*Order Summary:*%0A${itemsSummary}%0A%0A*Total Amount:* ₹${o.total}%0A*Delivery Location:* ${encodeURIComponent(o.address)}%0A%0AThank you for choosing The Flora Bakery! ✨`;
-
-      window.open(`https://wa.me/${phoneNum}?text=${msg}`, '_blank');
+      // Offer 1-click prompt to dispatch status via WhatsApp
+      setTimeout(() => {
+        if (confirm(`Would you like to send a real-time WhatsApp status update to the customer for "${this.formatStatus(newStatus)}"?`)) {
+          this.openWhatsAppModal(orderId, newStatus);
+        }
+      }, 300);
     },
 
     // =========================================================================
-    // 11. PRINTABLE KITCHEN INVOICE & SLIP GENERATOR
+    // 12. WHATSAPP LOGISTICS STATUS DISPATCHER
+    // =========================================================================
+    openWhatsAppModal(orderId, templateType = 'baking') {
+      const order = FloraDB.getOrderById(orderId);
+      if (!order) return;
+
+      this.activeWhatsAppOrderId = orderId;
+
+      const modal = document.getElementById('whatsappModal');
+      const overlay = document.getElementById('whatsappModalOverlay');
+      const phoneInput = document.getElementById('waRecipientPhone');
+      const select = document.getElementById('waTemplateSelect');
+
+      if (!modal) return;
+
+      if (phoneInput) phoneInput.value = `${order.customerName} (${order.phone})`;
+      if (select) select.value = templateType || 'baking';
+
+      this.handleWATemplateChange(templateType || 'baking');
+
+      if (overlay) overlay.classList.add('active');
+      modal.classList.add('active');
+    },
+
+    closeWhatsAppModal() {
+      const modal = document.getElementById('whatsappModal');
+      const overlay = document.getElementById('whatsappModalOverlay');
+      if (modal) modal.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+      this.activeWhatsAppOrderId = null;
+    },
+
+    handleWATemplateChange(templateType) {
+      const order = FloraDB.getOrderById(this.activeWhatsAppOrderId);
+      if (!order) return;
+
+      const textarea = document.getElementById('waMessageText');
+      if (!textarea) return;
+
+      let msg = "";
+
+      if (templateType === 'baking') {
+        msg = `🌸 *The Flora Bakery, Nashik* - Baking in Progress! 👩‍🍳\n\nHello *${order.customerName}*,\n\nGreat news! Our pastry chef has started handcrafting your order *#${order.id}* using 100% pure butter and fresh edible blooms.\n\n📅 *Scheduled Delivery:* ${order.deliveryDate || 'Today'} (${order.timeSlot || 'Afternoon Slot'})\n📍 *Delivery To:* ${order.address}\n\nWe will notify you once your bake heads out for chilled doorstep delivery! ✨`;
+      } else if (templateType === 'shipped') {
+        msg = `🚚 *The Flora Bakery, Nashik* - Out for Chilled Delivery! 🌸\n\nHello *${order.customerName}*,\n\nYour order *#${order.id}* is safely packed in our specialized chilled box and is out for delivery with our courier partner in Nashik!\n\n💵 *Payment Mode:* Cash on Delivery (COD)\n💰 *Total Amount Due:* ₹${(order.total || 0).toLocaleString('en-IN')}\n📍 *Destination:* ${order.address}\n\nPlease keep the exact cash ready or you can pay via UPI on delivery. Thank you! 🍰`;
+      } else if (templateType === 'delivered') {
+        msg = `💖 *The Flora Bakery, Nashik* - Delivered with Love! 🌸\n\nHello *${order.customerName}*,\n\nYour fresh artisanal bakes (Order *#${order.id}*) have been delivered!\n\n❄️ *Chef's Storage Tip:* For the best taste & floral freshness, refrigerate at 4°C - 6°C and consume within 24-48 hours.\n\nWe hope you love every bite! Feel free to tag us on Instagram *@theflorabakery*. 🍰✨`;
+      } else {
+        msg = `🌸 *The Flora Bakery, Nashik* - Order Update\n\nHello *${order.customerName}*,\n\nRegarding your order *#${order.id}*:\n\nThank you for choosing The Flora Bakery! ✨`;
+      }
+
+      textarea.value = msg;
+    },
+
+    dispatchWhatsAppMessage() {
+      const order = FloraDB.getOrderById(this.activeWhatsAppOrderId);
+      if (!order) return;
+
+      const textarea = document.getElementById('waMessageText');
+      const text = textarea ? textarea.value : '';
+
+      const cleanPhone = (order.phone || '').replace(/\D/g, '');
+      const phoneNum = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+
+      this.closeWhatsAppModal();
+      this.showToast(`🚀 Opening WhatsApp to dispatch update to ${order.customerName}...`, 'success');
+
+      window.open(`https://wa.me/${phoneNum}?text=${encodeURIComponent(text)}`, '_blank');
+    },
+
+    // =========================================================================
+    // 13. PRINTABLE KITCHEN INVOICE & SLIP GENERATOR
     // =========================================================================
     openInvoice(orderId) {
       const o = FloraDB.getOrderById(orderId);
@@ -1214,11 +1352,14 @@
             <strong>Deliver To:</strong><br>
             <span>${this.escapeHTML(o.customerName)}</span><br>
             <span>📞 ${o.phone}</span><br>
+            <span>✉️ ${this.escapeHTML(o.email || '')}</span><br>
             <span>📍 ${this.escapeHTML(o.address)}</span>
+            ${o.deliveryDate ? `<div style="font-weight:700; color:#059669; margin-top:4px;">Delivery: ${o.deliveryDate} (${o.timeSlot || 'Afternoon'})</div>` : ''}
           </div>
           <div style="text-align: right;">
             <strong>Status:</strong> <span class="status-pill status-${o.status}">${this.formatStatus(o.status)}</span><br>
-            <strong style="margin-top: 4px; display: inline-block;">Payment:</strong> ${o.paymentStatus || 'WhatsApp Order'}
+            <strong style="margin-top: 4px; display: inline-block;">Payment:</strong> Cash on Delivery (COD)<br>
+            <span style="color:#059669; font-weight:700;">Collect ₹${(o.total || 0).toLocaleString('en-IN')}</span>
           </div>
         </div>
 
@@ -1247,6 +1388,12 @@
           </tbody>
         </table>
 
+        ${o.cakeMessage ? `
+          <div class="invoice-note-box" style="border-left:3px solid #D44E72; margin-bottom:8px;">
+            <strong>🎂 Message on Cake:</strong> "${this.escapeHTML(o.cakeMessage)}"
+          </div>
+        ` : ''}
+
         ${o.notes ? `
           <div class="invoice-note-box">
             <strong>👩‍🍳 Special Baker Notes:</strong> ${this.escapeHTML(o.notes)}
@@ -1256,7 +1403,7 @@
         <div class="invoice-total-row">
           <span>Subtotal: ₹${o.subtotal || o.total}</span>
           ${o.discount ? `<span style="color: #D44E72;">Discount: -₹${o.discount}</span>` : ''}
-          <span style="color: #3E2723;">Grand Total: ₹${(o.total || 0).toLocaleString('en-IN')}</span>
+          <span style="color: #3E2723;">Grand Total (COD): ₹${(o.total || 0).toLocaleString('en-IN')}</span>
         </div>
       `;
 
@@ -1272,7 +1419,43 @@
     },
 
     // =========================================================================
-    // 12. CUSTOMERS DIRECTORY & CRM (Shopify-Grade)
+    // 14. ADMIN EMAIL RECEIPT PREVIEW (CRM)
+    // =========================================================================
+    openAdminEmailPreview(orderId) {
+      const order = FloraDB.getOrderById(orderId);
+      if (!order) return;
+
+      const modal = document.getElementById('adminEmailModal');
+      const overlay = document.getElementById('adminEmailModalOverlay');
+      const meta = document.getElementById('adminEmailModalMeta');
+      const body = document.getElementById('adminEmailModalBody');
+
+      if (!modal) return;
+
+      if (meta) {
+        meta.innerHTML = `
+          <div><strong>To:</strong> ${this.escapeHTML(order.customerName)} &lt;${this.escapeHTML(order.email || 'N/A')}&gt;</div>
+          <div><strong>Dispatched:</strong> ${order.date || 'Today'} &bull; <strong>Status:</strong> Delivered to Mailbox</div>
+        `;
+      }
+
+      if (body && typeof FloraDB.generateEmailHTML === 'function') {
+        body.innerHTML = FloraDB.generateEmailHTML(order);
+      }
+
+      if (overlay) overlay.classList.add('active');
+      modal.classList.add('active');
+    },
+
+    closeAdminEmailModal() {
+      const modal = document.getElementById('adminEmailModal');
+      const overlay = document.getElementById('adminEmailModalOverlay');
+      if (modal) modal.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+    },
+
+    // =========================================================================
+    // 15. CUSTOMERS DIRECTORY & CRM
     // =========================================================================
     renderCustomersTable() {
       const search = (document.getElementById('customerSearchInput')?.value || '').trim();
@@ -1320,12 +1503,11 @@
     },
 
     // =========================================================================
-    // 13. ANALYTICS & SHOPIFY REPORTS
+    // 16. ANALYTICS & REPORTS
     // =========================================================================
     renderAnalyticsView() {
       const stats = FloraDB.getAnalytics();
 
-      // Render Top Selling Table
       const topBody = document.getElementById('topSellingTableBody');
       if (topBody) {
         if (stats.topSelling.length === 0) {
@@ -1341,7 +1523,6 @@
         }
       }
 
-      // Render Category Revenue Share Bars
       const shareContainer = document.getElementById('categoryShareBars');
       if (shareContainer) {
         const categories = FloraDB.getCategories();
@@ -1375,7 +1556,7 @@
     },
 
     // =========================================================================
-    // 14. DISCOUNTS & COUPONS
+    // 17. DISCOUNTS & COUPONS
     // =========================================================================
     renderDiscountsTable() {
       const discounts = FloraDB.getDiscounts();
@@ -1398,61 +1579,52 @@
     },
 
     deleteDiscount(code) {
-      if (confirm(`Delete coupon "${code}"?`)) {
-        FloraDB.deleteDiscount(code);
-        this.showToast(`Coupon "${code}" deleted.`, 'info');
-        this.renderDiscountsTable();
-      }
+      FloraDB.deleteDiscount(code);
+      this.showToast(`Coupon ${code} removed.`, 'info');
+      this.renderDiscountsTable();
     },
 
     // =========================================================================
-    // 15. INQUIRIES LOG
+    // 18. CUSTOM CAKE INQUIRIES
     // =========================================================================
     renderInquiriesTable() {
-      const inquiries = FloraDB.getInquiries();
+      const inqs = FloraDB.getInquiries();
       const tbody = document.getElementById('inquiriesTableBody');
       if (!tbody) return;
 
-      if (inquiries.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:36px; color:var(--cocoa-muted);">Zero custom cake inquiries logged. Custom builder submissions will appear here.</td></tr>`;
+      if (inqs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align:center; padding: 40px 16px; color: var(--cocoa-muted);">
+              Zero custom inquiries logged. Custom cake builder submissions from the storefront appear here.
+            </td>
+          </tr>
+        `;
         return;
       }
 
-      tbody.innerHTML = inquiries.map(i => `
+      tbody.innerHTML = inqs.map(i => `
         <tr>
-          <td><strong>${i.id}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${i.date || 'Recent'}</span></td>
-          <td><strong>${this.escapeHTML(i.customerName)}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">📞 ${i.phone}</span></td>
-          <td><strong>${this.escapeHTML(i.occasion)}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">Date: ${i.requiredDate}</span></td>
-          <td>${i.flavor}<br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${i.size}</span></td>
-          <td>${i.palette || 'Blush'}<br><span style="font-size:0.75rem; color:var(--rose-hover);">"${this.escapeHTML(i.message || '')}"</span></td>
-          <td><span class="status-pill status-${i.status}">${i.status}</span></td>
+          <td><strong>#${i.id}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${i.date || 'Recent'}</span></td>
+          <td><strong>${this.escapeHTML(i.customerName)}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${i.phone}</span></td>
+          <td>${this.escapeHTML(i.occasion || 'Celebration')} &bull; ${i.size || '1.0 kg'}</td>
+          <td>${this.escapeHTML(i.flavor || 'Floral Chiffon')} &bull; ${this.escapeHTML(i.palette || 'Blush')}</td>
+          <td>${i.requiredDate || 'TBD'}</td>
+          <td><span class="status-pill status-${i.status || 'new'}">${this.formatStatus(i.status || 'new')}</span></td>
           <td>
-            <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppInquiry('${i.id}')">
-              <span>💬 Consult</span>
+            <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppCustomer('${encodeURIComponent(i.phone)}', '${encodeURIComponent(i.customerName)}')">
+              <span>💬 Quote</span>
             </button>
           </td>
         </tr>
       `).join('');
     },
 
-    openWhatsAppInquiry(inquiryId) {
-      const inquiries = FloraDB.getInquiries();
-      const inq = inquiries.find(i => i.id === inquiryId);
-      if (!inq) return;
-
-      const cleanPhone = (inq.phone || '').replace(/\D/g, '');
-      const phoneNum = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-
-      const msg = `🌸 *The Flora Bakery, Nashik* - Custom Cake Consultation%0A%0AHello *${encodeURIComponent(inq.customerName)}*,%0AWe received your custom cake inquiry for *${encodeURIComponent(inq.occasion)}*!%0A%0A*Flavor:* ${encodeURIComponent(inq.flavor)}%0A*Size:* ${encodeURIComponent(inq.size)}%0A*Palette:* ${encodeURIComponent(inq.palette)}%0A*Message:* "${encodeURIComponent(inq.message || '')}"%0A%0ALet's finalize your bespoke floral design and schedule delivery! 🎂✨`;
-
-      window.open(`https://wa.me/${phoneNum}?text=${msg}`, '_blank');
-    },
-
     // =========================================================================
-    // 16. SETTINGS VIEW
+    // 19. SETTINGS & MARKETING
     // =========================================================================
     renderSettingsView() {
-      const settings = FloraDB.getSettings();
+      const s = FloraDB.getSettings();
       const setStoreName = document.getElementById('setStoreName');
       const setAnnouncement = document.getElementById('setAnnouncement');
       const setStoreNotice = document.getElementById('setStoreNotice');
@@ -1460,16 +1632,16 @@
       const setFreeShipping = document.getElementById('setFreeShipping');
       const setAddress = document.getElementById('setAddress');
 
-      if (setStoreName) setStoreName.value = settings.storeName || "The Flora Bakery";
-      if (setAnnouncement) setAnnouncement.value = settings.announcementText || "";
-      if (setStoreNotice) setStoreNotice.value = settings.storeNotice || "";
-      if (setWhatsApp) setWhatsApp.value = settings.whatsapp || "917083517862";
-      if (setFreeShipping) setFreeShipping.value = settings.freeShippingThreshold || 999;
-      if (setAddress) setAddress.value = settings.address || "";
+      if (setStoreName) setStoreName.value = s.storeName || 'The Flora Bakery';
+      if (setAnnouncement) setAnnouncement.value = s.announcementText || '';
+      if (setStoreNotice) setStoreNotice.value = s.storeNotice || '';
+      if (setWhatsApp) setWhatsApp.value = s.whatsapp || '917083517862';
+      if (setFreeShipping) setFreeShipping.value = s.freeShippingThreshold || 999;
+      if (setAddress) setAddress.value = s.address || 'Ibadat Villa, Sai Nath Nagar, Nashik';
     },
 
     // =========================================================================
-    // 17. COMMAND PALETTE (⌘K / Ctrl+K)
+    // 20. COMMAND PALETTE (⌘K / CTRL+K)
     // =========================================================================
     setupKeyboardShortcuts() {
       const palette = document.getElementById('commandPalette');
@@ -1496,7 +1668,7 @@
       window.addEventListener('keydown', (e) => {
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
           e.preventDefault();
-          if (palette.classList.contains('active')) closePalette();
+          if (palette && palette.classList.contains('active')) closePalette();
           else openPalette();
         }
         if (e.key === 'Escape' && palette && palette.classList.contains('active')) {
@@ -1616,7 +1788,7 @@
     },
 
     // =========================================================================
-    // 18. UTILITIES & TOAST ENGINE
+    // 21. UTILITIES & TOAST ENGINE
     // =========================================================================
     showToast(message, type = 'success') {
       const container = document.getElementById('adminToastContainer');

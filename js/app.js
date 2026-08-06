@@ -1,13 +1,14 @@
 /**
  * THE FLORA BAKERY - E-COMMERCE & INTERACTIVE LOGIC
  * Connected in real-time to FloraDB Unified Storage Engine
- * High-Converting CRO Features, Cart Drawer, Modals, Dynamic Admin Sync & WhatsApp Checkout
+ * Features: On-Site E-Commerce Checkout (COD & Gateway-Ready), Confirmation Email Dispatch, 
+ * Cart Drawer, Custom Cake Consultation, QuickView & Real-Time Sync
  */
 
-// Helper to get active products from FloraDB or fallback
+// Helper to get active products from FloraDB
 function getStoreProducts() {
   if (window.FloraDB && typeof window.FloraDB.getProducts === 'function') {
-    return window.FloraDB.getProducts();
+    return window.FloraDB.getProducts({ status: 'active' });
   }
   return [];
 }
@@ -18,6 +19,7 @@ let cart = [
 ];
 let appliedDiscountData = null;
 let currentFilterCategory = "all";
+let currentCompletedOrder = null;
 
 // DOM Elements Initialization
 document.addEventListener("DOMContentLoaded", () => {
@@ -26,13 +28,40 @@ document.addEventListener("DOMContentLoaded", () => {
   setupStickyHeader();
   setupAnnouncements();
   setupEventListeners();
+  setupCheckoutDateDefaults();
 
-  // Listen for real-time changes from Admin Panel
+  // Listen for real-time changes from Admin Panel or across tabs
   window.addEventListener('flora:data-changed', (e) => {
     renderProducts(currentFilterCategory);
     updateCartUI();
   });
 });
+
+// Setup Default & Min Date for Checkout
+function setupCheckoutDateDefaults() {
+  const dateInput = document.getElementById("checkoutDate");
+  const customDateInput = document.getElementById("cakeDate");
+  const today = new Date();
+  
+  // Format to YYYY-MM-DD
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const minDateStr = `${yyyy}-${mm}-${dd}`;
+
+  if (dateInput) {
+    dateInput.min = minDateStr;
+    dateInput.value = minDateStr;
+  }
+  if (customDateInput) {
+    const tmrw = new Date(today);
+    tmrw.setDate(tmrw.getDate() + 1);
+    const tmrwDD = String(tmrw.getDate()).padStart(2, '0');
+    const tmrwMM = String(tmrw.getMonth() + 1).padStart(2, '0');
+    customDateInput.min = `${tmrw.getFullYear()}-${tmrwMM}-${tmrwDD}`;
+    customDateInput.value = `${tmrw.getFullYear()}-${tmrwMM}-${tmrwDD}`;
+  }
+}
 
 // Render Products Grid
 function renderProducts(filterCategory = "all") {
@@ -98,40 +127,47 @@ function renderProducts(filterCategory = "all") {
         </div>
 
         <!-- Product Information Body -->
-        <div class="product-info">
-          <div class="product-meta-row">
-            <span class="product-category-meta">${product.categoryLabel || product.category}</span>
-            <div class="product-rating-pill">
-              <i class="fas fa-star"></i>
-              <span>${product.rating || 5.0}</span>
-            </div>
-          </div>
-
-          <h4 class="product-name" onclick="openQuickView(${product.id})">${product.name}</h4>
+        <div class="product-info-wrap">
+          <span class="product-category">${product.categoryLabel || product.category}</span>
+          <h3 class="product-name font-serif" onclick="openQuickView(${product.id})">${product.name}</h3>
           
-          <div class="product-unit-pill">
-            <i class="fas fa-scale-balanced" style="font-size:0.68rem; opacity:0.7;"></i> ${product.unit || '0.5 kg'}
+          <div class="product-rating">
+            <span class="star" style="color:#FFB800;"><i class="fas fa-star"></i></span>
+            <span>${product.rating || 5.0}</span>
+            <span class="rating-count">(${product.reviews || 20})</span>
           </div>
 
-          <!-- Price & Add Action -->
-          <div class="product-pricing-action">
-            <div class="price-box">
-              <span class="price-currency">₹</span><span class="price-current">${product.price}</span>
-              ${product.comparePrice ? `<span style="font-size:0.75rem; text-decoration:line-through; color:var(--text-muted); margin-left:4px;">₹${product.comparePrice}</span>` : ''}
-            </div>
-            
+          <div class="product-pricing">
+            <span class="price-current">₹${product.price}</span>
+            ${product.comparePrice ? `<span class="price-original">₹${product.comparePrice}</span>` : ''}
+            <span class="product-unit">/ ${product.unit || '0.5 kg'}</span>
+          </div>
+
+          <!-- Stock Radar Indicator -->
+          <div style="font-size:0.75rem; margin-bottom:12px; color: ${product.stock <= 5 ? '#D97706' : 'var(--text-muted)'}; font-weight:600;">
+            ${isOutOfStock 
+              ? '❌ Sold Out for Today' 
+              : product.stock <= 5 
+                ? `⚡ Only ${product.stock} units remaining today` 
+                : `✓ Freshly Baked & Available`}
+          </div>
+
+          <!-- Action Button Area -->
+          <div class="product-card-actions">
             ${isOutOfStock ? `
-              <button class="add-to-cart-btn" style="background:#E2E8F0; color:#64748B; cursor:not-allowed;" disabled>
-                <span>Sold Out</span>
+              <button class="btn btn-secondary" style="width:100%; opacity:0.6; cursor:not-allowed;" disabled>
+                Sold Out
+              </button>
+            ` : inCartQty === 0 ? `
+              <button class="btn btn-primary" style="width:100%;" onclick="addToCart(${product.id})">
+                <i class="fas fa-plus"></i> Add to Cart
               </button>
             ` : `
-              <button class="add-to-cart-btn ${inCartQty > 0 ? 'in-cart' : ''}" 
-                      id="addBtn-${product.id}" 
-                      onclick="addToCart(${product.id})" 
-                      title="Add ${product.name} to cart" 
-                      aria-label="Add ${product.name} to cart">
-                ${inCartQty > 0 ? `<i class="fas fa-check"></i> <span>${inCartQty} in cart</span>` : `<i class="fas fa-plus"></i> <span>ADD</span>`}
-              </button>
+              <div class="qty-control-row">
+                <button class="qty-btn" onclick="changeQty(${product.id}, -1)">-</button>
+                <span class="qty-num">${inCartQty} in Cart</span>
+                <button class="qty-btn" onclick="changeQty(${product.id}, 1)">+</button>
+              </div>
             `}
           </div>
 
@@ -141,30 +177,11 @@ function renderProducts(filterCategory = "all") {
   }).join('');
 }
 
-// Filter Tab Switcher
-function filterProducts(category, btnElement) {
-  document.querySelectorAll(".filter-tab-btn").forEach(btn => {
-    btn.classList.remove("active");
-    btn.setAttribute("aria-selected", "false");
-    if (!btnElement && btn.getAttribute("data-category") === category) {
-      btn.classList.add("active");
-      btn.setAttribute("aria-selected", "true");
-    }
-  });
-  if (btnElement) {
-    btnElement.classList.add("active");
-    btnElement.setAttribute("aria-selected", "true");
-  }
+// Category Tab Filter
+function filterCategory(category, buttonEl) {
+  document.querySelectorAll(".cat-tab-btn").forEach(btn => btn.classList.remove("active"));
+  if (buttonEl) buttonEl.classList.add("active");
   renderProducts(category);
-}
-
-// 1-Tap Category Hub Navigator
-function selectCategory(category) {
-  filterProducts(category);
-  const target = document.getElementById("bestsellers");
-  if (target) {
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
 }
 
 // Add Item to Cart
@@ -174,14 +191,14 @@ function addToCart(productId) {
   if (!product) return;
 
   if (product.stock <= 0) {
-    showToast("This item is currently sold out for baking.");
+    showToast("This item is currently sold out for today!");
     return;
   }
 
   const existing = cart.find(item => item.id === productId);
   if (existing) {
     if (existing.qty >= product.stock) {
-      showToast(`Only ${product.stock} units available in stock right now.`);
+      showToast(`Only ${product.stock} units available in stock.`);
       return;
     }
     existing.qty += 1;
@@ -190,39 +207,27 @@ function addToCart(productId) {
       id: product.id,
       name: product.name,
       price: product.price,
-      qty: 1,
-      image: product.image
+      image: product.image,
+      qty: 1
     });
   }
 
-  // Instant card button feedback
-  const btn = document.getElementById(`addBtn-${productId}`);
-  if (btn) {
-    const updatedQty = existing ? existing.qty : 1;
-    btn.classList.add("in-cart");
-    btn.innerHTML = `<i class="fas fa-check"></i> <span>${updatedQty} in cart</span>`;
-  }
-
   updateCartUI();
-  showToast(`🌸 "${product.name}" added to your cart!`);
-  openCartDrawer();
+  showToast(`🌸 Added "${product.name}" to cart!`);
 }
 
-// Update Cart Drawer UI
+// Update Cart User Interface & Calculations
 function updateCartUI() {
-  const cartItemsContainer = document.getElementById("cartItemsBody");
-  const cartBadge = document.getElementById("cartCountBadge");
-  const subtotalEl = document.getElementById("cartSubtotal");
-  const grandTotalEl = document.getElementById("cartGrandTotal");
-  const progressFill = document.getElementById("freeShippingFill");
-  const progressText = document.getElementById("freeShippingText");
-  const freeThreshold = window.FloraDB ? (window.FloraDB.getSettings().freeShippingThreshold || 999) : 999;
-
-  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-  if (cartBadge) cartBadge.textContent = totalItems;
+  const badge = document.getElementById("cartBadge");
+  const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+  if (badge) {
+    badge.textContent = totalCount;
+    badge.style.display = totalCount > 0 ? "flex" : "none";
+  }
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   
+  // Calculate Promo Discount
   let discountAmount = 0;
   if (appliedDiscountData) {
     if (appliedDiscountData.type === 'percent') {
@@ -234,47 +239,59 @@ function updateCartUI() {
 
   const grandTotal = Math.max(0, subtotal - discountAmount);
 
-  if (subtotalEl) subtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
-  if (grandTotalEl) grandTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
-
-  // Free shipping calculation
-  if (progressFill && progressText) {
-    if (subtotal >= freeThreshold) {
-      progressFill.style.width = "100%";
-      progressFill.style.background = "#2E7D32";
-      progressText.innerHTML = `🎉 You unlocked <strong>FREE Nashik Delivery</strong>!`;
+  // Update Free Shipping Progress Bar (Threshold ₹999)
+  const freeThreshold = 999;
+  const progressPercent = Math.min(100, Math.round((subtotal / freeThreshold) * 100));
+  const diff = freeThreshold - subtotal;
+  
+  const fillEl = document.getElementById("freeShippingFill");
+  const textEl = document.getElementById("freeShippingText");
+  
+  if (fillEl) fillEl.style.width = `${progressPercent}%`;
+  if (textEl) {
+    if (subtotal === 0) {
+      textEl.innerHTML = `Add <strong>₹${freeThreshold}</strong> for <strong>FREE Delivery</strong> in Nashik 🌸`;
+    } else if (subtotal >= freeThreshold) {
+      textEl.innerHTML = `🎉 You unlocked <strong>FREE Chilled Delivery</strong> in Nashik!`;
     } else {
-      const remaining = freeThreshold - subtotal;
-      const pct = Math.min(100, Math.round((subtotal / freeThreshold) * 100));
-      progressFill.style.width = `${pct}%`;
-      progressFill.style.background = "var(--rose-deep)";
-      progressText.innerHTML = `Add <strong>₹${remaining}</strong> more for <strong>FREE Delivery</strong> in Nashik`;
+      textEl.innerHTML = `Add <strong>₹${diff}</strong> more for <strong>FREE Delivery</strong> in Nashik`;
     }
   }
 
-  // Render items
-  if (cartItemsContainer) {
+  // Update Totals
+  const subtotalEl = document.getElementById("cartSubtotal");
+  const grandTotalEl = document.getElementById("cartGrandTotal");
+  if (subtotalEl) subtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+  if (grandTotalEl) grandTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
+
+  // Update Cart Drawer Items List
+  const itemsContainer = document.getElementById("cartItemsBody");
+  if (itemsContainer) {
     if (cart.length === 0) {
-      cartItemsContainer.innerHTML = `
-        <div style="text-align:center; padding: 40px 10px; color: var(--text-muted);">
-          <div style="font-size: 3rem; margin-bottom: 12px; color: var(--pink-blush);">🌸</div>
-          <p style="font-weight:700; color: var(--text-cocoa); font-size:1.1rem; margin-bottom:6px;">Your cart is blooming empty</p>
-          <p style="font-size:0.88rem; margin-bottom: 20px;">Treat yourself to handcrafted floral baked happiness.</p>
-          <button class="btn btn-primary btn-sm" onclick="closeCartDrawer(); window.location.href='#bestsellers';">Explore Cakes</button>
+      itemsContainer.innerHTML = `
+        <div class="cart-empty-state">
+          <div style="font-size:3.5rem; margin-bottom:12px;">🌸</div>
+          <h4 style="font-size:1.1rem; color:var(--text-cocoa); margin-bottom:6px;">Your sweet cart is empty</h4>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:16px;">
+            Explore our freshly picked floral cakes and melt-in-mouth French pastries.
+          </p>
+          <button class="btn btn-secondary" onclick="closeCartDrawer(); window.location.hash='#categories';">
+            Explore Menu
+          </button>
         </div>
       `;
     } else {
-      cartItemsContainer.innerHTML = cart.map(item => `
-        <div class="cart-item">
-          <img src="${item.image}" alt="${item.name}" class="cart-item-img">
+      itemsContainer.innerHTML = cart.map(item => `
+        <div class="cart-item-row">
+          <img src="${item.image || 'images/cat-cakes.jpg'}" alt="${item.name}" class="cart-item-thumb">
           <div class="cart-item-info">
             <h5 class="cart-item-title">${item.name}</h5>
-            <div class="cart-item-price">₹${item.price}</div>
+            <div class="cart-item-price">₹${item.price.toLocaleString('en-IN')}</div>
             <div class="cart-item-qty">
               <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
               <span style="font-weight:700; font-size:0.9rem; min-width:20px; text-align:center;">${item.qty}</span>
               <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-              <button style="margin-left:auto; background:none; color:#C62828; font-size:0.85rem; font-weight:600;" onclick="removeFromCart(${item.id})">
+              <button style="margin-left:auto; background:none; color:#C62828; font-size:0.85rem; font-weight:600; cursor:pointer;" onclick="removeFromCart(${item.id})">
                 <i class="fas fa-trash-alt"></i> Remove
               </button>
             </div>
@@ -301,16 +318,18 @@ function changeQty(productId, delta) {
     cart = cart.filter(i => i.id !== productId);
   }
   updateCartUI();
+  renderProducts(currentFilterCategory);
 }
 
 // Remove from Cart
 function removeFromCart(productId) {
   cart = cart.filter(i => i.id !== productId);
   updateCartUI();
+  renderProducts(currentFilterCategory);
   showToast("Item removed from cart");
 }
 
-// Drawer Controls
+// Cart Drawer Controls
 function openCartDrawer() {
   document.getElementById("cartDrawerOverlay")?.classList.add("active");
   document.body.style.overflow = "hidden";
@@ -327,10 +346,15 @@ function applyPromoCode() {
   const code = input ? input.value.trim().toUpperCase() : "";
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
-  if (window.FloraDB) {
-    const result = window.FloraDB.validateDiscount(code, subtotal);
+  if (!code) {
+    showToast("Please enter a promo code (e.g. FLORA10)");
+    return;
+  }
+
+  if (window.FloraDB && typeof window.FloraDB.applyDiscount === 'function') {
+    const result = window.FloraDB.applyDiscount(code, subtotal);
     if (result.valid) {
-      appliedDiscountData = result.discount;
+      appliedDiscountData = { code: result.code, value: result.value, type: result.type, amount: result.discountAmount };
       updateCartUI();
       showToast(result.message);
     } else {
@@ -347,25 +371,39 @@ function applyPromoCode() {
   }
 }
 
-// WhatsApp Direct Checkout
-function checkoutWhatsApp() {
+// =============================================================================
+// ON-SITE E-COMMERCE CHECKOUT FLOW (SHOPIFY-GRADE)
+// =============================================================================
+
+function openCheckoutModal() {
   if (cart.length === 0) {
     showToast("Your cart is empty! Add some delicious floral bakes first.");
     return;
   }
 
-  const settings = window.FloraDB ? window.FloraDB.getSettings() : { whatsapp: "917083517862" };
-  const phone = settings.whatsapp || "917083517862";
+  closeCartDrawer();
+  updateCheckoutSummary();
+  setupCheckoutDateDefaults();
 
-  let message = `*🌸 NEW ORDER INQUIRY - THE FLORA BAKERY NASHIK* 🌸\n\n`;
-  message += `Hello! I would like to place an order:\n\n`;
+  const modal = document.getElementById("checkoutModal");
+  if (modal) {
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+}
 
-  let subtotal = 0;
-  cart.forEach((item, index) => {
-    const itemTotal = item.price * item.qty;
-    subtotal += itemTotal;
-    message += `${index + 1}. *${item.name}* (Qty: ${item.qty}) - ₹${itemTotal}\n`;
-  });
+function closeCheckoutModal() {
+  const modal = document.getElementById("checkoutModal");
+  if (modal) {
+    modal.classList.remove("active");
+    document.body.style.overflow = "auto";
+  }
+}
+
+function updateCheckoutSummary() {
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const freeThreshold = 999;
+  const deliveryFee = subtotal >= freeThreshold || subtotal === 0 ? 0 : 99;
 
   let discountAmount = 0;
   if (appliedDiscountData) {
@@ -376,32 +414,194 @@ function checkoutWhatsApp() {
     }
   }
 
-  const grandTotal = Math.max(0, subtotal - discountAmount);
+  const grandTotal = Math.max(0, subtotal - discountAmount + deliveryFee);
 
-  message += `\n*Subtotal:* ₹${subtotal}`;
-  if (discountAmount > 0) {
-    message += `\n*Discount (${appliedDiscountData.code}):* -₹${discountAmount}`;
-  }
-  message += `\n*Total Amount:* ₹${grandTotal}`;
-  message += `\n*Delivery Location:* Nashik, Maharashtra`;
-  message += `\n\nPlease confirm availability and payment details. Thank you! 🍰`;
-
-  // Auto-record order in Admin Database FloraDB
-  if (window.FloraDB) {
-    window.FloraDB.addOrder({
-      customerName: "Website WhatsApp Order",
-      phone: "070835 17862",
-      address: "Nashik Delivery Zone",
-      items: [...cart],
-      subtotal,
-      discount: discountAmount,
-      total: grandTotal,
-      notes: `Applied Coupon: ${appliedDiscountData ? appliedDiscountData.code : 'None'}`
-    });
+  // Update Summary Rows
+  const itemsContainer = document.getElementById("checkoutItemsList");
+  if (itemsContainer) {
+    itemsContainer.innerHTML = cart.map(item => `
+      <div class="checkout-summary-item">
+        <img src="${item.image || 'images/cat-cakes.jpg'}" alt="${item.name}" class="summary-item-img">
+        <div class="summary-item-info">
+          <div class="summary-item-name">${item.name}</div>
+          <div class="summary-item-qty">Qty: ${item.qty} &bull; ₹${item.price.toLocaleString('en-IN')} each</div>
+        </div>
+        <div class="summary-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}</div>
+      </div>
+    `).join('');
   }
 
-  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
+  const subtotalEl = document.getElementById("checkoutSubtotal");
+  const deliveryFeeEl = document.getElementById("checkoutDeliveryFee");
+  const grandTotalEl = document.getElementById("checkoutGrandTotal");
+  const btnTotalEl = document.getElementById("checkoutBtnTotal");
+  const discountRow = document.getElementById("checkoutDiscountRow");
+  const discountCodeEl = document.getElementById("checkoutDiscountCode");
+  const discountValEl = document.getElementById("checkoutDiscountVal");
+
+  if (subtotalEl) subtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+  if (deliveryFeeEl) {
+    deliveryFeeEl.textContent = deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`;
+    deliveryFeeEl.style.color = deliveryFee === 0 ? "#059669" : "var(--text-cocoa)";
+  }
+  if (grandTotalEl) grandTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
+  if (btnTotalEl) btnTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
+
+  if (discountRow) {
+    if (discountAmount > 0 && appliedDiscountData) {
+      discountRow.style.display = "flex";
+      if (discountCodeEl) discountCodeEl.textContent = appliedDiscountData.code;
+      if (discountValEl) discountValEl.textContent = `-₹${discountAmount.toLocaleString('en-IN')}`;
+    } else {
+      discountRow.style.display = "none";
+    }
+  }
+}
+
+// Process Checkout Form Submission (COD E-Commerce Order)
+function processCheckoutOrder(event) {
+  event.preventDefault();
+
+  if (cart.length === 0) {
+    showToast("Your cart is empty!");
+    closeCheckoutModal();
+    return;
+  }
+
+  const name = document.getElementById("checkoutName")?.value.trim();
+  const phone = document.getElementById("checkoutPhone")?.value.trim();
+  const email = document.getElementById("checkoutEmail")?.value.trim();
+  const date = document.getElementById("checkoutDate")?.value;
+  const slot = document.getElementById("checkoutSlot")?.value;
+  const address = document.getElementById("checkoutAddress")?.value.trim();
+  const locality = document.getElementById("checkoutLocality")?.value;
+  const landmark = document.getElementById("checkoutLandmark")?.value.trim();
+  const cakeMessage = document.getElementById("checkoutCakeMessage")?.value.trim();
+  const notes = document.getElementById("checkoutNotes")?.value.trim();
+
+  // Basic validation
+  if (!name || !phone || !email || !address) {
+    showToast("Please fill in all required fields!");
+    return;
+  }
+
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const deliveryFee = subtotal >= 999 ? 0 : 99;
+
+  let discountAmount = 0;
+  if (appliedDiscountData) {
+    if (appliedDiscountData.type === 'percent') {
+      discountAmount = Math.round((subtotal * appliedDiscountData.value) / 100);
+    } else {
+      discountAmount = Math.min(subtotal, appliedDiscountData.value);
+    }
+  }
+
+  const grandTotal = Math.max(0, subtotal - discountAmount + deliveryFee);
+
+  const fullAddress = `${address}${landmark ? ` (Near ${landmark})` : ''}, ${locality}, Nashik`;
+
+  // Construct Order Object
+  const orderPayload = {
+    customerName: name,
+    phone: phone,
+    email: email,
+    address: fullAddress,
+    locality: locality,
+    deliveryDate: date,
+    timeSlot: slot,
+    cakeMessage: cakeMessage,
+    notes: notes,
+    items: [...cart],
+    subtotal: subtotal,
+    deliveryFee: deliveryFee,
+    discount: discountAmount,
+    total: grandTotal,
+    paymentMethod: "COD"
+  };
+
+  // Add Order to Unified DB (Triggers notifications, email logs, stock decrement)
+  let createdOrder = null;
+  if (window.FloraDB && typeof window.FloraDB.addOrder === 'function') {
+    createdOrder = window.FloraDB.addOrder(orderPayload);
+  } else {
+    createdOrder = { ...orderPayload, id: `FB-${Math.floor(Math.random()*1000 + 1000)}` };
+  }
+
+  currentCompletedOrder = createdOrder;
+
+  // Clear Cart
+  cart = [];
+  appliedDiscountData = null;
+  updateCartUI();
+  renderProducts(currentFilterCategory);
+
+  // Close Checkout Modal & Open Order Success Screen
+  closeCheckoutModal();
+  openOrderSuccessModal(createdOrder);
+
+  // Sound chime / toast celebration
+  showToast(`🎉 Order #${createdOrder.id} confirmed! Confirmation email dispatched.`);
+}
+
+// Order Success Modal Handler
+function openOrderSuccessModal(order) {
+  const modal = document.getElementById("orderSuccessModal");
+  if (!modal || !order) return;
+
+  const idEl = document.getElementById("successOrderId");
+  const nameEl = document.getElementById("successCustomerName");
+  const dateEl = document.getElementById("successDeliveryDate");
+  const totalEl = document.getElementById("successTotal");
+  const emailEl = document.getElementById("successCustomerEmail");
+
+  if (idEl) idEl.textContent = `#${order.id}`;
+  if (nameEl) nameEl.textContent = order.customerName;
+  if (dateEl) dateEl.textContent = `${order.deliveryDate || 'Scheduled'} (${order.timeSlot || 'Afternoon'})`;
+  if (totalEl) totalEl.textContent = `₹${order.total.toLocaleString('en-IN')}`;
+  if (emailEl) emailEl.textContent = order.email;
+
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeOrderSuccessModal() {
+  const modal = document.getElementById("orderSuccessModal");
+  if (modal) {
+    modal.classList.remove("active");
+    document.body.style.overflow = "auto";
+  }
+}
+
+// Simulated Email Receipt Modal Viewer
+function openEmailReceiptModal() {
+  if (!currentCompletedOrder) return;
+  const order = currentCompletedOrder;
+
+  const modal = document.getElementById("emailReceiptModal");
+  if (!modal) return;
+
+  const subjectEl = document.getElementById("emailModalSubject");
+  const toEl = document.getElementById("emailModalTo");
+  const dateEl = document.getElementById("emailModalDate");
+  const bodyEl = document.getElementById("emailRenderedBody");
+
+  if (subjectEl) subjectEl.textContent = `🌸 Order Confirmed! The Flora Bakery Order #${order.id}`;
+  if (toEl) toEl.textContent = `${order.customerName} <${order.email}>`;
+  if (dateEl) dateEl.textContent = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+
+  if (bodyEl && window.FloraDB && typeof window.FloraDB.generateEmailHTML === 'function') {
+    bodyEl.innerHTML = window.FloraDB.generateEmailHTML(order);
+  }
+
+  modal.classList.add("active");
+}
+
+function closeEmailReceiptModal() {
+  const modal = document.getElementById("emailReceiptModal");
+  if (modal) {
+    modal.classList.remove("active");
+  }
 }
 
 // Custom Cake Builder Modal
@@ -455,7 +655,7 @@ function submitCustomCakeInquiry(event) {
   }
 
   closeCakeBuilderModal();
-  showToast("🎉 Custom cake inquiry prepared! Opening WhatsApp...");
+  showToast("🎉 Custom cake inquiry sent to studio!");
   setTimeout(() => {
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(waMsg)}`, "_blank");
   }, 600);
@@ -588,6 +788,16 @@ function showToast(message) {
     toast.style.animation = "toastOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards";
     setTimeout(() => toast.remove(), 400);
   }, 3200);
+}
+
+// Newsletter Subscription
+function submitNewsletter(event) {
+  event.preventDefault();
+  const input = document.getElementById("newsletterEmail");
+  if (input && input.value) {
+    showToast("🎉 Welcome to VIP Bloom Club! Use code FLORA10 for 10% off.");
+    input.value = "";
+  }
 }
 
 // Global Event Listeners

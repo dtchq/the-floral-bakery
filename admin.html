@@ -151,6 +151,36 @@
         </div>
 
         <div class="header-right">
+          
+          <!-- Notification Bell Trigger & Dropdown -->
+          <div class="notif-wrapper" style="position: relative;">
+            <button class="header-action-btn notif-btn" id="btnHeaderNotif" title="Order & Inquiries Alerts" aria-label="Notifications">
+              <span style="font-size: 1.1rem;">🔔</span>
+              <span class="notif-badge-count" id="notifBadgeCount" style="display:none;">0</span>
+            </button>
+
+            <!-- Floating Notification Dropdown -->
+            <div class="notif-dropdown-menu" id="notifDropdownMenu">
+              <div class="notif-dropdown-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <strong style="font-size:0.95rem; color:var(--text-dark);">Live Activity</strong>
+                  <span class="badge badge-active" id="notifUnreadBadge">0 New</span>
+                </div>
+                <button type="button" class="btn-text-action" id="btnMarkAllNotifsRead" style="font-size:0.75rem; color:var(--rose-deep); background:none; border:none; cursor:pointer; font-weight:700;">
+                  Mark all read
+                </button>
+              </div>
+
+              <div class="notif-dropdown-list" id="notifDropdownList">
+                <!-- Injected dynamically by admin.js -->
+              </div>
+
+              <div class="notif-dropdown-footer">
+                <small style="color:var(--cocoa-muted); font-size:0.75rem;">Real-time sync across storefront checkouts</small>
+              </div>
+            </div>
+          </div>
+
           <button class="header-action-btn" id="btnHeaderNewProduct">
             <span>+</span>
             <span class="btn-text-full">New Bake</span>
@@ -1003,6 +1033,77 @@
           <button type="submit" class="btn-primary btn-touch">Save & Activate</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       8. WHATSAPP LOGISTICS DISPATCH MODAL (ONE-CLICK STATUS UPDATES)
+       ========================================================================= -->
+  <div class="admin-drawer-overlay" id="whatsappModalOverlay"></div>
+  <div class="command-palette-modal" id="whatsappModal" style="align-items: center;">
+    <div class="palette-box" style="max-width: 540px; padding: 26px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size: 1.5rem; color:#25D366;">💬</span>
+          <h2 class="font-serif" style="font-size: 1.3rem; margin:0;" id="waModalTitle">Send WhatsApp Update</h2>
+        </div>
+        <button class="drawer-close-btn" id="btnCloseWhatsAppModal" style="position:static;">&times;</button>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--cocoa-muted); margin-bottom: 16px;">
+        Select a real-time status template below or customize the message before dispatching to the customer's phone number.
+      </p>
+
+      <div class="form-group" style="margin-bottom: 14px;">
+        <label>Select Status Template</label>
+        <select id="waTemplateSelect" class="form-input" onchange="AdminApp.handleWATemplateChange(this.value)">
+          <option value="baking">👩‍🍳 Baking in Oven (Order in preparation)</option>
+          <option value="shipped">🚚 Out for Delivery (Partner dispatched & COD reminder)</option>
+          <option value="delivered">💖 Delivered with Care (Freshness & refrigeration tip)</option>
+          <option value="custom">💬 Custom Message</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 14px;">
+        <label>Recipient WhatsApp Number</label>
+        <input type="text" id="waRecipientPhone" class="form-input" readonly style="background:var(--cream-bg); font-weight:700;">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 18px;">
+        <label>Message Content</label>
+        <textarea id="waMessageText" class="form-input" rows="6" style="font-family: inherit; font-size:0.85rem; line-height:1.45;"></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button type="button" class="btn-secondary btn-touch" id="btnCancelWhatsApp">Cancel</button>
+        <button type="button" class="btn-primary btn-touch" id="btnSendWhatsAppAction" style="background:#25D366; border-color:#25D366; color:#FFF;">
+          <i class="fab fa-whatsapp"></i> Send via WhatsApp 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       9. SIMULATED EMAIL RECEIPT PREVIEW (ADMIN CRM)
+       ========================================================================= -->
+  <div class="admin-drawer-overlay" id="adminEmailModalOverlay"></div>
+  <div class="command-palette-modal" id="adminEmailModal" style="align-items: center;">
+    <div class="palette-box" style="max-width: 650px; padding: 0; overflow: hidden; background:#FAF6F0;">
+      <div style="background:#2D2421; padding: 14px 20px; color:#FFF; display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">
+          <span>✉️ Customer Confirmation Email (Sent on Checkout)</span>
+        </div>
+        <button class="drawer-close-btn" id="btnCloseAdminEmailModal" style="position:static; color:#FFF;">&times;</button>
+      </div>
+      <div style="padding: 12px 20px; background:#FFF; border-bottom:1px solid var(--cream-border); font-size:0.8rem; color:var(--cocoa-muted);" id="adminEmailModalMeta">
+        <!-- Meta info -->
+      </div>
+      <div style="padding: 20px; max-height: 65vh; overflow-y: auto;" id="adminEmailModalBody">
+        <!-- Email rendered HTML -->
+      </div>
+      <div style="padding: 12px 20px; background:#FFF; border-top:1px solid var(--cream-border); display:flex; justify-content:flex-end;">
+        <button type="button" class="btn-secondary btn-touch" id="btnCloseAdminEmailModalBtn">Close Preview</button>
+      </div>
     </div>
   </div>
 
