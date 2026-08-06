@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 90" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="gradC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6A9C2" />
+      <stop offset="100%" stop-color="#E8698A" />
+    </linearGradient>
+  </defs>
+
+  <!-- French Arch Minimalist Badge -->
+  <g transform="translate(15, 6)">
+    <!-- Arch Outline -->
+    <path d="M 12,68 L 12,28 A 24,24 0 0 1 60,28 L 60,68 Z" fill="#FFF9F4" stroke="#4A3B36" stroke-width="1.5"/>
+    <path d="M 17,68 L 17,30 A 19,19 0 0 1 55,30 L 55,68 Z" fill="none" stroke="#F6A9C2" stroke-width="1"/>
+    
+    <!-- Minimalist Petite Rose Outline inside Arch -->
+    <path d="M 36,36 C 42,32 46,38 42,44 C 38,50 32,48 30,42 C 28,36 34,32 36,36 Z" fill="url(#gradC)" stroke="#E8698A" stroke-width="1.2"/>
+    <circle cx="36" cy="40" r="1.5" fill="#FFD966"/>
+    <!-- Stem -->
+    <path d="M 36,46 L 36,58" stroke="#4A3B36" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 36,52 Q 40,50 42,52" stroke="#8DA372" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Ultra Clean Modern Typography -->
+  <g transform="translate(95, 12)">
+    <text x="0" y="32" font-family="'Playfair Display', Georgia, serif" font-size="22" font-weight="600" fill="#4A3B36" letter-spacing="2">
+      THE FLORA BAKERY
+    </text>
+    <text x="1" y="52" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#E8698A" letter-spacing="3.5">
+      BOUTIQUE CAKES &amp; FLORAL DESIGN
+    </text>
+    <text x="1" y="66" font-family="'Plus Jakarta Sans', sans-serif" font-size="8" font-weight="600" fill="#745F56" letter-spacing="1.5">
+      NASHIK, MAHARASHTRA
+    </text>
+  </g>
+</svg>

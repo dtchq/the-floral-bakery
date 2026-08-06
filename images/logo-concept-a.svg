@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="roseGradA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6A9C2" />
+      <stop offset="60%" stop-color="#E8698A" />
+      <stop offset="100%" stop-color="#D45274" />
+    </linearGradient>
+    
+    <linearGradient id="goldGradA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEBA0" />
+      <stop offset="50%" stop-color="#FFD966" />
+      <stop offset="100%" stop-color="#E5BE44" />
+    </linearGradient>
+
+    <linearGradient id="softBgGradA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF9F4" />
+      <stop offset="100%" stop-color="#FDE8EE" />
+    </linearGradient>
+
+    <filter id="softGlowA" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#E8698A" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <g transform="translate(10, 10)">
+    <circle cx="40" cy="40" r="38" fill="url(#softBgGradA)" stroke="#F6A9C2" stroke-width="1.5" />
+    <circle cx="40" cy="40" r="34" fill="none" stroke="url(#goldGradA)" stroke-width="1" stroke-dasharray="3,3" opacity="0.85" />
+
+    <g transform="translate(40, 40) scale(0.95)" filter="url(#softGlowA)">
+      <path d="M 0,-24 C 12,-16 18,-4 14,8 C 10,18 -4,22 -14,14 C -22,6 -18,-12 0,-24 Z" fill="url(#roseGradA)" fill-opacity="0.25" stroke="#E8698A" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M 0,-24 C -12,-16 -18,-4 -14,8 C -10,18 4,22 14,14 C 22,6 18,-12 0,-24 Z" fill="url(#roseGradA)" fill-opacity="0.25" stroke="#E8698A" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <path d="M -24,0 C -16,-12 -4,-18 8,-14 C 18,-10 22,4 14,14 C 6,22 -12,18 -24,0 Z" fill="url(#roseGradA)" fill-opacity="0.35" stroke="#E8698A" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M 24,0 C 16,-12 4,-18 -8,-14 C -18,-10 -22,4 -14,14 C -6,22 12,18 24,0 Z" fill="url(#roseGradA)" fill-opacity="0.35" stroke="#E8698A" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <path d="M 0,-12 C 7,-12 12,-7 12,0 C 12,8 6,13 0,13 C -6,13 -12,8 -12,0 C -12,-6 -7,-10 0,-10 C 5,-10 8,-6 8,-2 C 8,2 5,5 1,5 C -2,5 -4,3 -4,0" fill="none" stroke="#D45274" stroke-width="2" stroke-linecap="round"/>
+
+      <circle cx="0" cy="0" r="3" fill="url(#goldGradA)" stroke="#4A3B36" stroke-width="0.75" />
+
+      <circle cx="0" cy="-28" r="1.5" fill="#E5BE44" />
+      <circle cx="28" cy="0" r="1.5" fill="#E5BE44" />
+      <circle cx="0" cy="28" r="1.5" fill="#E5BE44" />
+      <circle cx="-28" cy="0" r="1.5" fill="#E5BE44" />
+    </g>
+  </g>
+
+  <g transform="translate(105, 0)">
+    <text x="0" y="44" font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="700" fill="#4A3B36" letter-spacing="2">
+      THE FLORA
+    </text>
+
+    <text x="1" y="66" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="14" font-weight="800" fill="#E8698A" letter-spacing="6">
+      BAKERY
+    </text>
+
+    <line x1="1" y1="77" x2="65" y2="77" stroke="#F6A9C2" stroke-width="1" />
+    <circle cx="72" cy="77" r="2" fill="#FFD966" />
+    <line x1="79" y1="77" x2="280" y2="77" stroke="#F6A9C2" stroke-width="1" />
+
+    <text x="1" y="90" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="9" font-weight="600" fill="#745F56" letter-spacing="1.8">
+      ARTISANAL PATISSERIE &amp; FLORAL DESIGN • NASHIK
+    </text>
+  </g>
+</svg>

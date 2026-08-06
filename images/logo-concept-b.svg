@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 90" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="gradB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6A9C2" />
+      <stop offset="100%" stop-color="#E8698A" />
+    </linearGradient>
+    <linearGradient id="goldB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEBA0" />
+      <stop offset="100%" stop-color="#FFD966" />
+    </linearGradient>
+  </defs>
+
+  <!-- Clean Minimalist Monogram Hexagon/Circle -->
+  <g transform="translate(10, 5)">
+    <circle cx="40" cy="40" r="36" fill="#FFF9F4" stroke="#E8698A" stroke-width="1.5"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#FFD966" stroke-width="1" stroke-dasharray="2,2"/>
+    
+    <!-- Clean Stylized "F" with blooming branch -->
+    <path d="M 30,22 L 30,58 M 30,24 L 52,24 M 30,38 L 48,38" stroke="#4A3B36" stroke-width="2.5" stroke-linecap="round"/>
+    
+    <!-- Tiny Rosebud on F -->
+    <circle cx="53" cy="24" r="4" fill="url(#gradB)"/>
+    <circle cx="53" cy="24" r="1.5" fill="#FFF"/>
+    <path d="M 48,40 Q 52,43 50,47" stroke="#8DA372" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Clean Modern Text -->
+  <g transform="translate(100, 10)">
+    <text x="0" y="36" font-family="'Playfair Display', Georgia, serif" font-size="24" font-weight="700" fill="#4A3B36" letter-spacing="3">
+      FLORA
+    </text>
+    <text x="120" y="36" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="800" fill="#E8698A" letter-spacing="4">
+      BAKERY
+    </text>
+    <text x="0" y="58" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="600" fill="#745F56" letter-spacing="2.5">
+      HANDCRAFTED FLORAL PATISSERIE • NASHIK
+    </text>
+  </g>
+</svg>

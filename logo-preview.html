@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Flora Bakery | Clean Modern Logo Concepts Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --pink-blush: #F6A9C2;
+      --rose-deep: #E8698A;
+      --bg-cream: #FFF9F4;
+      --bg-cream-warm: #FFF5EC;
+      --yellow-butter: #FFD966;
+      --text-cocoa: #4A3B36;
+      --text-secondary: #745F56;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --shadow-lg: 0 20px 40px rgba(74, 59, 54, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-cream);
+      color: var(--text-cocoa);
+      padding: 60px 20px;
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    .header-banner {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 18px;
+      background: #FDE8EE;
+      color: var(--rose-deep);
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      border: 1px solid var(--pink-blush);
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      color: var(--text-cocoa);
+    }
+
+    p.subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .palette-strip {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 32px 0 50px 0;
+      flex-wrap: wrap;
+    }
+
+    .palette-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #FFFFFF;
+      padding: 8px 16px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(74, 59, 54, 0.05);
+      border: 1px solid #F6A9C2;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .grid-concepts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-bottom: 60px;
+    }
+
+    .concept-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      border: 2px solid #F6A9C2;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+
+    .concept-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .concept-card.active-choice {
+      border-color: var(--rose-deep);
+      position: relative;
+    }
+
+    .concept-card.active-choice::before {
+      content: '★ Currently Active on Homepage';
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: var(--rose-deep);
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 999px;
+      z-index: 10;
+    }
+
+    .logo-preview-box {
+      background: var(--bg-cream-warm);
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      border-bottom: 1px solid #FDE8EE;
+    }
+
+    .logo-preview-box img {
+      max-width: 100%;
+      max-height: 120px;
+      object-fit: contain;
+    }
+
+    .concept-info {
+      padding: 24px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .concept-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--text-cocoa);
+      margin-bottom: 8px;
+    }
+
+    .concept-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--rose-deep);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background: #D45274;
+      transform: scale(1.03);
+    }
+
+    .btn-secondary {
+      background: var(--bg-cream);
+      color: var(--text-cocoa);
+      border: 1.5px solid #F6A9C2;
+    }
+
+    .btn-secondary:hover {
+      background: #FDE8EE;
+      color: var(--rose-deep);
+    }
+
+    .back-bar {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    @media(max-width: 900px) {
+      .grid-concepts { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <div class="header-banner">
+      <span class="tag"><i class="fas fa-sparkles"></i> Brand Identity &amp; Logo System</span>
+      <h1>Clean Modern Logo Concepts</h1>
+      <p class="subtitle">
+        Custom-designed minimalist vector logos for <strong>The Flora Bakery</strong> in Nashik using the requested boutique color palette.
+      </p>
+
+      <div class="palette-strip">
+        <div class="palette-item">
+          <span class="swatch" style="background: #F6A9C2;"></span> Blush Pink (#F6A9C2)
+        </div>
+        <div class="palette-item">
+          <span class="swatch" style="background: #E8698A;"></span> Deep Rose (#E8698A)
+        </div>
+        <div class="palette-item">
+          <span class="swatch" style="background: #FFF9F4; border:1px solid #CCC;"></span> Soft Cream (#FFF9F4)
+        </div>
+        <div class="palette-item">
+          <span class="swatch" style="background: #FFD966;"></span> Buttery Yellow (#FFD966)
+        </div>
+        <div class="palette-item">
+          <span class="swatch" style="background: #4A3B36;"></span> Warm Cocoa (#4A3B36)
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 Concepts Grid -->
+    <div class="grid-concepts">
+      
+      <!-- Concept A (Active) -->
+      <div class="concept-card active-choice">
+        <div class="logo-preview-box">
+          <img src="images/logo-concept-a.svg" alt="Concept A: Minimalist Line Bloom">
+        </div>
+        <div class="concept-info">
+          <h3 class="concept-title">Concept A: Minimalist Line Bloom</h3>
+          <p class="concept-desc">
+            Ultra-clean geometric botanical rose bloom with fine line strokes, gold stamen center, and modern high-end serif &amp; sans typography lockup.
+          </p>
+          <a href="index.html" class="btn btn-primary">
+            <i class="fas fa-check-circle"></i> Live on Homepage
+          </a>
+        </div>
+      </div>
+
+      <!-- Concept B -->
+      <div class="concept-card">
+        <div class="logo-preview-box">
+          <img src="images/logo-concept-b.svg" alt="Concept B: Monogram & Floral Branch">
+        </div>
+        <div class="concept-info">
+          <h3 class="concept-title">Concept B: Monogram &amp; Floral Branch</h3>
+          <p class="concept-desc">
+            Sleek lettermark with an organic floral bud blooming off the letter 'F' within a dotted gold frame and modern wide-spaced typography.
+          </p>
+          <button class="btn btn-secondary" onclick="alert('To switch to Concept B, change the logo src in index.html to images/logo-concept-b.svg')">
+            <i class="fas fa-eye"></i> View Details
+          </button>
+        </div>
+      </div>
+
+      <!-- Concept C -->
+      <div class="concept-card">
+        <div class="logo-preview-box">
+          <img src="images/logo-concept-c.svg" alt="Concept C: French Arch Minimalist">
+        </div>
+        <div class="concept-info">
+          <h3 class="concept-title">Concept C: French Arch Minimalist</h3>
+          <p class="concept-desc">
+            Contemporary French patisserie arch silhouette enclosing a delicate single rosebud with gold dewdrop accent and boutique Nashik subtitle.
+          </p>
+          <button class="btn btn-secondary" onclick="alert('To switch to Concept C, change the logo src in index.html to images/logo-concept-c.svg')">
+            <i class="fas fa-eye"></i> View Details
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="back-bar">
+      <a href="index.html" class="btn btn-primary btn-lg" style="font-size:1.05rem; padding:14px 32px;">
+        <i class="fas fa-store"></i> Return to Homepage Experience
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>
