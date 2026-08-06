@@ -2,7 +2,7 @@
  * THE FLORA BAKERY - E-COMMERCE & INTERACTIVE LOGIC
  * Connected in real-time to FloraDB Unified Storage Engine
  * Features: On-Site E-Commerce Checkout (COD & Gateway-Ready), Confirmation Email Dispatch, 
- * Cart Drawer, Custom Cake Consultation, QuickView & Real-Time Sync
+ * Cart Drawer, Custom Cake Consultation, QuickView, Mobile Navigation & Real-Time Sync
  */
 
 // Helper to get active products from FloraDB
@@ -77,7 +77,7 @@ function renderProducts(filterCategory = "all") {
   // Update Status Text
   const statusEl = document.getElementById("filterStatusText");
   if (statusEl) {
-    statusEl.innerHTML = `Showing <strong>${filtered.length} Handcrafted Bakes</strong>`;
+    statusEl.innerHTML = `Showing <strong>${filtered.length} Handcrafted Botanical Bakes</strong>`;
   }
 
   // Update Tab Badges
@@ -116,9 +116,8 @@ function renderProducts(filterCategory = "all") {
           
           <!-- Pure Veg Emblem & Badges -->
           <div class="card-top-badges">
-            ${product.eggless ? `<span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>` : ''}
-            ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : ''}
-            ${isOutOfStock ? `<span class="product-tag-badge" style="background:#EF4444; color:#FFF;">Sold Out</span>` : ''}
+            ${product.eggless ? `<span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>` : '<span></span>'}
+            ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : isOutOfStock ? `<span class="product-tag-badge sold-out">Sold Out</span>` : ''}
           </div>
 
           <button class="product-quickview-btn" onclick="event.stopPropagation(); openQuickView(${product.id})" title="View Details">
@@ -128,25 +127,27 @@ function renderProducts(filterCategory = "all") {
 
         <!-- Product Information Body -->
         <div class="product-info-wrap">
-          <span class="product-category">${product.categoryLabel || product.category}</span>
-          <h3 class="product-name font-serif" onclick="openQuickView(${product.id})">${product.name}</h3>
+          <div class="product-category-tag">${product.categoryLabel || product.category}</div>
+          <h3 class="product-name" onclick="openQuickView(${product.id})">${product.name}</h3>
           
-          <div class="product-rating">
-            <span class="star" style="color:#FFB800;"><i class="fas fa-star"></i></span>
-            <span>${product.rating || 5.0}</span>
+          <div class="product-rating-row">
+            <span class="product-rating-pill">
+              <i class="fas fa-star"></i>
+              <span>${product.rating || 5.0}</span>
+            </span>
             <span class="rating-count">(${product.reviews || 20})</span>
           </div>
 
-          <div class="product-pricing">
+          <div class="product-pricing-row">
             <span class="price-current">₹${product.price}</span>
             ${product.comparePrice ? `<span class="price-original">₹${product.comparePrice}</span>` : ''}
             <span class="product-unit">/ ${product.unit || '0.5 kg'}</span>
           </div>
 
           <!-- Stock Radar Indicator -->
-          <div style="font-size:0.75rem; margin-bottom:12px; color: ${product.stock <= 5 ? '#D97706' : 'var(--text-muted)'}; font-weight:600;">
+          <div class="product-stock-status ${isOutOfStock ? 'out-of-stock' : product.stock <= 5 ? 'low-stock' : 'in-stock'}">
             ${isOutOfStock 
-              ? '❌ Sold Out for Today' 
+              ? '✕ Sold Out for Today' 
               : product.stock <= 5 
                 ? `⚡ Only ${product.stock} units remaining today` 
                 : `✓ Freshly Baked & Available`}
@@ -155,18 +156,22 @@ function renderProducts(filterCategory = "all") {
           <!-- Action Button Area -->
           <div class="product-card-actions">
             ${isOutOfStock ? `
-              <button class="btn btn-secondary" style="width:100%; opacity:0.6; cursor:not-allowed;" disabled>
+              <button class="btn btn-disabled" disabled>
                 Sold Out
               </button>
             ` : inCartQty === 0 ? `
-              <button class="btn btn-primary" style="width:100%;" onclick="addToCart(${product.id})">
+              <button class="btn btn-primary btn-add-cart" onclick="addToCart(${product.id})">
                 <i class="fas fa-plus"></i> Add to Cart
               </button>
             ` : `
-              <div class="qty-control-row">
-                <button class="qty-btn" onclick="changeQty(${product.id}, -1)">-</button>
-                <span class="qty-num">${inCartQty} in Cart</span>
-                <button class="qty-btn" onclick="changeQty(${product.id}, 1)">+</button>
+              <div class="qty-control-pill">
+                <button class="qty-stepper-btn" onclick="changeQty(${product.id}, -1)" aria-label="Decrease quantity">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <span class="qty-stepper-val">${inCartQty} in Cart</span>
+                <button class="qty-stepper-btn" onclick="changeQty(${product.id}, 1)" aria-label="Increase quantity">
+                  <i class="fas fa-plus"></i>
+                </button>
               </div>
             `}
           </div>
@@ -178,10 +183,55 @@ function renderProducts(filterCategory = "all") {
 }
 
 // Category Tab Filter
-function filterCategory(category, buttonEl) {
-  document.querySelectorAll(".cat-tab-btn").forEach(btn => btn.classList.remove("active"));
-  if (buttonEl) buttonEl.classList.add("active");
+function filterProducts(category, buttonEl) {
+  currentFilterCategory = category;
+  document.querySelectorAll(".filter-tab-btn").forEach(btn => {
+    btn.classList.remove("active");
+    btn.setAttribute("aria-selected", "false");
+  });
+  if (buttonEl) {
+    buttonEl.classList.add("active");
+    buttonEl.setAttribute("aria-selected", "true");
+  } else {
+    const matchingBtn = document.querySelector(`.filter-tab-btn[data-category="${category}"]`);
+    if (matchingBtn) {
+      matchingBtn.classList.add("active");
+      matchingBtn.setAttribute("aria-selected", "true");
+    }
+  }
   renderProducts(category);
+}
+
+// Select Category from Card Hub or Occasion Chips
+function selectCategory(category) {
+  const tabBtn = document.querySelector(`.filter-tab-btn[data-category="${category}"]`);
+  filterProducts(category, tabBtn);
+  const bestsellersSection = document.getElementById("bestsellers");
+  if (bestsellersSection) {
+    bestsellersSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+// Legacy alias
+function filterCategory(category, buttonEl) {
+  filterProducts(category, buttonEl);
+}
+
+// Mobile Navigation Drawer Controls
+function openMobileNav() {
+  const drawer = document.getElementById("mobileNavDrawer");
+  if (drawer) {
+    drawer.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+}
+
+function closeMobileNav() {
+  const drawer = document.getElementById("mobileNavDrawer");
+  if (drawer) {
+    drawer.classList.remove("active");
+    document.body.style.overflow = "auto";
+  }
 }
 
 // Add Item to Cart
@@ -213,17 +263,23 @@ function addToCart(productId) {
   }
 
   updateCartUI();
+  renderProducts(currentFilterCategory);
   showToast(`🌸 Added "${product.name}" to cart!`);
 }
 
 // Update Cart User Interface & Calculations
 function updateCartUI() {
-  const badge = document.getElementById("cartBadge");
   const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
-  if (badge) {
-    badge.textContent = totalCount;
-    badge.style.display = totalCount > 0 ? "flex" : "none";
-  }
+
+  // Update header badges
+  const badge1 = document.getElementById("cartCountBadge");
+  const badge2 = document.getElementById("cartBadge");
+  [badge1, badge2].forEach(b => {
+    if (b) {
+      b.textContent = totalCount;
+      b.style.display = totalCount > 0 ? "flex" : "none";
+    }
+  });
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   
@@ -498,7 +554,6 @@ function processCheckoutOrder(event) {
   }
 
   const grandTotal = Math.max(0, subtotal - discountAmount + deliveryFee);
-
   const fullAddress = `${address}${landmark ? ` (Near ${landmark})` : ''}, ${locality}, Nashik`;
 
   // Construct Order Object
@@ -540,7 +595,7 @@ function processCheckoutOrder(event) {
   closeCheckoutModal();
   openOrderSuccessModal(createdOrder);
 
-  // Sound chime / toast celebration
+  // Toast celebration
   showToast(`🎉 Order #${createdOrder.id} confirmed! Confirmation email dispatched.`);
 }
 
@@ -675,7 +730,7 @@ function openQuickView(productId) {
         <div class="quickview-img-wrap">
           <img src="${product.image}" alt="${product.name}" class="quickview-img">
           <div class="card-top-badges">
-            ${product.eggless ? `<span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>` : ''}
+            ${product.eggless ? `<span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>` : '<span></span>'}
             ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : ''}
             ${isOutOfStock ? `<span class="product-tag-badge" style="background:#EF4444; color:#FFF;">Sold Out</span>` : ''}
           </div>
@@ -734,7 +789,7 @@ function closeQuickViewModal() {
 
 // Sticky Header Setup
 function setupStickyHeader() {
-  const header = document.getElementById("header");
+  const header = document.getElementById("siteHeader") || document.getElementById("header");
   if (!header) return;
 
   window.addEventListener("scroll", () => {
@@ -772,8 +827,13 @@ function setupAnnouncements() {
 
 // Toast Alert Engine
 function showToast(message) {
-  const container = document.getElementById("toastContainer");
-  if (!container) return;
+  let container = document.getElementById("toastContainer");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toastContainer";
+    container.className = "toast-container";
+    document.body.appendChild(container);
+  }
 
   const toast = document.createElement("div");
   toast.className = "toast";
@@ -802,23 +862,17 @@ function submitNewsletter(event) {
 
 // Global Event Listeners
 function setupEventListeners() {
-  // Mobile Nav Toggle
-  const mobileToggle = document.getElementById("mobileToggle");
-  const navMenu = document.getElementById("navMenu");
-  if (mobileToggle && navMenu) {
-    mobileToggle.addEventListener("click", () => {
-      navMenu.classList.toggle("active");
-      mobileToggle.classList.toggle("active");
-    });
+  // Mobile Menu Toggle
+  const mobileToggle = document.getElementById("mobileMenuToggle") || document.getElementById("mobileToggle");
+  if (mobileToggle) {
+    mobileToggle.addEventListener("click", openMobileNav);
   }
 
-  // Cart Drawer Trigger
+  // Cart Drawer Triggers
   const cartBtn = document.getElementById("cartBtn");
-  const cartDrawerClose = document.getElementById("cartDrawerClose");
   const cartDrawerOverlay = document.getElementById("cartDrawerOverlay");
 
   if (cartBtn) cartBtn.addEventListener("click", openCartDrawer);
-  if (cartDrawerClose) cartDrawerClose.addEventListener("click", closeCartDrawer);
   if (cartDrawerOverlay) cartDrawerOverlay.addEventListener("click", closeCartDrawer);
 
   // VIP Bloom Club Coupon Copy
