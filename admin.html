@@ -2,49 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Admin Studio &bull; The Flora Bakery</title>
-  <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FAF6F0">
+  <title>Admin Studio | The Flora Bakery Nashik</title>
   
-  <!-- Apple & Modern Font Stack -->
+  <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Admin Stylesheet -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css">
 </head>
-<body>
+<body class="admin-body">
 
   <!-- =========================================================================
-       1. APPLE-STYLE AUTHENTICATION GATE (LOGIN SCREEN)
+       1. AUTHENTICATION / LOGIN SCREEN
        ========================================================================= -->
-  <div id="authScreen" class="admin-auth-screen">
+  <div class="admin-auth-overlay" id="authScreen">
     <div class="admin-auth-card">
-      <div class="auth-logo-badge">
-        <img src="images/logo.jpg" alt="The Flora Bakery Logo">
+      <div class="auth-brand">
+        <div class="auth-logo-circle">🌸</div>
+        <h1 class="font-serif">Flora Admin Studio</h1>
+        <p>Boutique Management & Shopify-Grade Control Suite</p>
       </div>
-      <h1 class="auth-title font-serif">The Flora Bakery</h1>
-      <p class="auth-subtitle">Artisanal Patisserie &bull; Admin Portal</p>
 
       <form id="loginForm" class="auth-form">
         <div class="form-group">
-          <label for="loginEmail">Staff Email</label>
-          <input type="email" id="loginEmail" class="form-input" value="admin@theflorabakery.com" required autocomplete="username">
+          <label for="loginEmail">Store Manager Email</label>
+          <input type="email" id="loginEmail" class="form-input" placeholder="admin@theflorabakery.com" required value="admin@theflorabakery.com">
         </div>
-
         <div class="form-group">
           <label for="loginPass">Password</label>
-          <input type="password" id="loginPass" class="form-input" value="floral2026" required autocomplete="current-password">
+          <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required value="floral2026">
         </div>
-
-        <button type="submit" class="auth-btn">
-          <span>Sign In to Dashboard</span> &rarr;
+        <button type="submit" class="btn-primary auth-submit-btn">
+          <span>Enter Admin Suite</span> &rarr;
         </button>
       </form>
 
-      <div class="quick-demo-chip" id="quickDemoLoginBtn" title="Click to fill and enter automatically">
-        <span>⚡ Demo 1-Click Quick Login</span>
+      <div class="auth-demo-hint">
+        <button type="button" class="btn-demo-fill" id="quickDemoLoginBtn">⚡ Demo 1-Click Login</button>
+        <span class="auth-secure-tag">🔒 256-bit Encrypted Session &bull; Real-time FloraDB Engine</span>
       </div>
     </div>
   </div>
@@ -52,69 +53,82 @@
   <!-- =========================================================================
        2. MAIN APPLICATION SHELL
        ========================================================================= -->
-  <div class="admin-app" id="adminApp" style="display: none;">
+  <div class="admin-layout" id="adminApp" style="display: none;">
 
-    <!-- Mobile Sidebar Backdrop Overlay -->
-    <div class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
+    <!-- BACKDROP FOR MOBILE SIDEBAR -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <!-- SIDEBAR NAVIGATION -->
     <aside class="admin-sidebar" id="adminSidebar">
-      <div class="sidebar-brand">
-        <div class="sidebar-logo">
-          <img src="images/logo.jpg" alt="Logo">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <span class="brand-flower">🌸</span>
+          <div class="brand-texts">
+            <span class="brand-title font-serif">The Flora Bakery</span>
+            <span class="brand-sub">Nashik &bull; Studio Suite</span>
+          </div>
         </div>
-        <div class="brand-text">
-          <h2 class="font-serif">Flora Bakery</h2>
-          <span>Admin Suite</span>
-        </div>
-        <button class="sidebar-close-mobile-btn" id="sidebarCloseMobileBtn" aria-label="Close Sidebar">&times;</button>
+        <button class="sidebar-close-mobile" id="sidebarCloseMobileBtn" aria-label="Close Sidebar">&times;</button>
       </div>
 
       <nav class="sidebar-menu">
-        <div class="menu-category-label">Overview</div>
+        <div class="menu-category-label">Overview & Reports</div>
         <a class="nav-item active" data-view="dashboard">
           <span class="nav-icon">📊</span>
           <span>Dashboard</span>
         </a>
+        <a class="nav-item" data-view="analytics">
+          <span class="nav-icon">📈</span>
+          <span>Analytics & Sales</span>
+        </a>
 
-        <div class="menu-category-label">Catalog & Sales</div>
+        <div class="menu-category-label">Catalog & Inventory</div>
         <a class="nav-item" data-view="products">
           <span class="nav-icon">🎂</span>
           <span>Products</span>
           <span class="nav-badge" id="sidebarProductCount">8</span>
         </a>
+        <a class="nav-item" data-view="categories">
+          <span class="nav-icon">🌸</span>
+          <span>Categories</span>
+          <span class="nav-badge" id="sidebarCategoryCount">4</span>
+        </a>
         <a class="nav-item" data-view="inventory">
           <span class="nav-icon">📋</span>
-          <span>Inventory</span>
+          <span>Stock & Radar</span>
           <span class="nav-badge badge-rose" id="sidebarLowStockBadge" style="display: none;">0</span>
         </a>
+
+        <div class="menu-category-label">Sales & Customers</div>
         <a class="nav-item" data-view="orders">
           <span class="nav-icon">🛍️</span>
-          <span>Orders</span>
+          <span>Orders Pipeline</span>
           <span class="nav-badge" id="sidebarOrdersBadge">0</span>
+        </a>
+        <a class="nav-item" data-view="customers">
+          <span class="nav-icon">👥</span>
+          <span>Customers CRM</span>
         </a>
         <a class="nav-item" data-view="discounts">
           <span class="nav-icon">🏷️</span>
-          <span>Discounts</span>
+          <span>Discounts & Promos</span>
         </a>
-
-        <div class="menu-category-label">Customer Studio</div>
         <a class="nav-item" data-view="inquiries">
           <span class="nav-icon">💌</span>
-          <span>Custom Inquiries</span>
+          <span>Custom Cake Leads</span>
           <span class="nav-badge badge-rose" id="sidebarInqBadge" style="display: none;">0</span>
         </a>
 
-        <div class="menu-category-label">System</div>
+        <div class="menu-category-label">Storefront & Config</div>
         <a class="nav-item" data-view="settings">
           <span class="nav-icon">⚙️</span>
-          <span>Settings & Backup</span>
+          <span>Settings & Marketing</span>
         </a>
       </nav>
 
       <div class="sidebar-footer">
         <a href="index.html" target="_blank" class="store-preview-btn">
-          <span>🌸 View Live Store</span> &nearr;
+          <span>🌸 Open Storefront</span> &nearr;
         </a>
       </div>
     </aside>
@@ -131,7 +145,7 @@
           
           <div class="global-search-trigger" id="globalSearchTrigger">
             <span>🔍</span>
-            <span class="search-label-text">Quick search or command...</span>
+            <span class="search-label-text">Quick search, commands, bakes...</span>
             <kbd class="kbd-shortcut">⌘K</kbd>
           </div>
         </div>
@@ -139,7 +153,7 @@
         <div class="header-right">
           <button class="header-action-btn" id="btnHeaderNewProduct">
             <span>+</span>
-            <span class="btn-text-full">New Product</span>
+            <span class="btn-text-full">New Bake</span>
           </button>
 
           <div class="admin-profile-pill" id="adminProfileBtn" title="Click to Sign Out">
@@ -160,10 +174,10 @@
           <div class="view-header">
             <div class="view-header-title">
               <h1 class="font-serif">Studio Overview</h1>
-              <p>Real-time orders, bakery revenue, and inventory health</p>
+              <p>Real-time order pipeline, revenue metrics, and inventory radar</p>
             </div>
             <div class="view-actions">
-              <button class="btn-secondary btn-touch" id="btnRefreshAnalytics">🔄 Refresh</button>
+              <button class="btn-secondary btn-touch" id="btnRefreshAnalytics">🔄 Refresh Data</button>
             </div>
           </div>
 
@@ -176,7 +190,7 @@
               </div>
               <div class="kpi-value" id="kpiRevenue">₹0</div>
               <div class="kpi-trend trend-up">
-                <span>Active Store</span>
+                <span>Active Store &bull; INR</span>
               </div>
             </div>
 
@@ -198,43 +212,47 @@
               </div>
               <div class="kpi-value" id="kpiAOV">₹0</div>
               <div class="kpi-trend trend-up">
-                <span>Nashik Patisserie</span>
+                <span>Healthy Basket</span>
               </div>
             </div>
 
             <div class="kpi-card">
               <div class="kpi-top">
-                <span class="kpi-label">Stock Alerts</span>
+                <span class="kpi-label">Low Stock Radar</span>
                 <div class="kpi-icon-pill" style="background: #FEE2E2; color: #DC2626;">⚠️</div>
               </div>
               <div class="kpi-value" id="kpiLowStockCount">0</div>
-              <div class="kpi-trend trend-warn" id="kpiLowStockSubtext">
+              <div class="kpi-trend" id="kpiLowStockSubtext">
                 <span>All items healthy</span>
               </div>
             </div>
           </div>
 
-          <!-- Recent Orders & Fast Actions Panel -->
+          <!-- Recent Orders Feed -->
           <div class="card-panel">
             <div class="card-panel-header">
-              <h2 class="card-panel-title">Recent Customer Orders</h2>
-              <button class="btn-secondary btn-touch" onclick="AdminApp.switchView('orders')">View All &rarr;</button>
+              <div>
+                <h2 class="card-panel-title">Recent Order Activity</h2>
+                <p style="font-size: 0.8rem; color: var(--cocoa-muted); margin-top: 2px;">Orders placed via WhatsApp checkout stream here instantly</p>
+              </div>
+              <button class="btn-link" onclick="AdminApp.switchView('orders')">View All Pipeline &rarr;</button>
             </div>
-            <div class="data-table-container">
+            
+            <div class="table-responsive">
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>Order ID</th>
+                    <th>Order #</th>
                     <th>Customer</th>
                     <th>Items</th>
                     <th>Total</th>
                     <th>Status</th>
                     <th>Payment</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="dashboardRecentOrdersBody">
-                  <!-- Rendered via JS -->
+                  <!-- Injected by JS -->
                 </tbody>
               </table>
             </div>
@@ -242,50 +260,43 @@
         </section>
 
         <!-- ===================================================================
-             VIEW 2: PRODUCTS STUDIO
+             VIEW 2: PRODUCTS CATALOG
              =================================================================== -->
         <section id="view-products" class="view-section">
           <div class="view-header">
             <div class="view-header-title">
               <h1 class="font-serif">Product Catalog</h1>
-              <p>Manage signature floral cakes, French pastries, muffins and gift sets</p>
+              <p>Manage signature floral cakes, French pastries, muffins, and gift hampers</p>
             </div>
             <div class="view-actions">
-              <button class="btn-primary btn-touch" id="btnAddNewProduct">
-                <span>+ Add Bake</span>
-              </button>
+              <button class="btn-secondary btn-touch" id="btnExportProductsCSV">📥 Export CSV</button>
+              <button class="btn-primary btn-touch" id="btnAddNewProduct">+ Add Signature Bake</button>
             </div>
           </div>
 
+          <!-- Filters Bar -->
+          <div class="filter-bar">
+            <div class="filter-search-box">
+              <span>🔍</span>
+              <input type="text" id="productSearchInput" placeholder="Search bakes by name, SKU or flavor...">
+            </div>
+            <select class="select-filter" id="productCategoryFilter">
+              <option value="all">All Categories</option>
+              <!-- Dynamic Category Options Injected Here -->
+            </select>
+            <select class="select-filter" id="productStatusFilter">
+              <option value="all">All Statuses</option>
+              <option value="active">Active in Store</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+
+          <!-- Product Table -->
           <div class="card-panel">
             <div class="card-panel-header">
-              <div class="table-filter-bar">
-                <div class="search-input-wrapper">
-                  <span class="search-input-icon">🔍</span>
-                  <input type="text" id="productSearchInput" placeholder="Search bakes or SKU...">
-                </div>
-
-                <select id="productCategoryFilter" class="select-filter">
-                  <option value="all">All Categories</option>
-                  <option value="cakes">🎂 Floral Cakes</option>
-                  <option value="pastries">🥐 French Pastries</option>
-                  <option value="muffins">🧁 Artisanal Muffins</option>
-                  <option value="combos">🎁 Gifting Hampers</option>
-                </select>
-
-                <select id="productStatusFilter" class="select-filter">
-                  <option value="all">All Statuses</option>
-                  <option value="active">Active on Store</option>
-                  <option value="draft">Drafts</option>
-                </select>
-              </div>
-
-              <div id="productCounterText" style="font-size: 0.85rem; color: var(--cocoa-muted); margin-top: 6px;">
-                Showing 8 products
-              </div>
+              <span id="productCounterText" style="font-size: 0.88rem; font-weight: 600; color: var(--cocoa-muted);">Showing 8 products</span>
             </div>
-
-            <div class="data-table-container">
+            <div class="table-responsive">
               <table class="admin-table">
                 <thead>
                   <tr>
@@ -300,7 +311,7 @@
                   </tr>
                 </thead>
                 <tbody id="productsTableBody">
-                  <!-- Rendered via JS -->
+                  <!-- Injected by JS -->
                 </tbody>
               </table>
             </div>
@@ -308,48 +319,93 @@
         </section>
 
         <!-- ===================================================================
-             VIEW 3: INVENTORY TRACKER
+             VIEW 3: CATEGORIES & COLLECTIONS MODULE (NEW)
+             =================================================================== -->
+        <section id="view-categories" class="view-section">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Category Collections Studio</h1>
+              <p>Organize bakes into storefront collections, customize banners, icons, and order</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn-primary btn-touch" id="btnAddNewCategory">+ Add New Category</button>
+            </div>
+          </div>
+
+          <!-- Category Cards Grid -->
+          <div class="category-cards-grid" id="categoryCardsContainer">
+            <!-- Injected by JS -->
+          </div>
+
+          <!-- Category Table -->
+          <div class="card-panel" style="margin-top: 24px;">
+            <div class="card-panel-header">
+              <h2 class="card-panel-title">All Storefront Collections</h2>
+              <span id="categoryCounterText" style="font-size: 0.85rem; color: var(--cocoa-muted);">4 Collections</span>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Collection</th>
+                    <th>Slug Identifier</th>
+                    <th>Sub-Label</th>
+                    <th>Products Count</th>
+                    <th>Status</th>
+                    <th>Display Order</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="categoriesTableBody">
+                  <!-- Injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 4: INVENTORY RADAR
              =================================================================== -->
         <section id="view-inventory" class="view-section">
           <div class="view-header">
             <div class="view-header-title">
-              <h1 class="font-serif">Inventory & Stock Radar</h1>
-              <p>Real-time stock controls, low-stock notifications and batch restock</p>
+              <h1 class="font-serif">Stock & Inventory Radar</h1>
+              <p>Real-time stock level steppers, low stock alerts, and instant restock</p>
             </div>
             <div class="view-actions">
-              <button class="btn-secondary btn-touch" id="btnRestockAll">📦 +10 Batch Restock</button>
+              <button class="btn-secondary btn-touch" id="btnRestockAll">📦 Batch Restock (+10 All)</button>
             </div>
           </div>
 
-          <div class="card-panel">
-            <div class="card-panel-header">
-              <div class="table-filter-bar">
-                <div class="search-input-wrapper">
-                  <span class="search-input-icon">🔍</span>
-                  <input type="text" id="inventorySearchInput" placeholder="Filter inventory item...">
-                </div>
-                <select id="inventoryStockFilter" class="select-filter">
-                  <option value="all">All Stock Levels</option>
-                  <option value="low">⚠️ Low Stock (&le; 5 units)</option>
-                  <option value="out">❌ Out of Stock (0 units)</option>
-                </select>
-              </div>
+          <!-- Filter Bar -->
+          <div class="filter-bar">
+            <div class="filter-search-box">
+              <span>🔍</span>
+              <input type="text" id="inventorySearchInput" placeholder="Filter inventory by title or SKU...">
             </div>
+            <select class="select-filter" id="inventoryStockFilter">
+              <option value="all">All Inventory</option>
+              <option value="low">Low Stock (≤ 5 units)</option>
+              <option value="out">Sold Out (0 units)</option>
+            </select>
+          </div>
 
-            <div class="data-table-container">
+          <div class="card-panel">
+            <div class="table-responsive">
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>Item</th>
+                    <th>Product</th>
                     <th>SKU</th>
-                    <th>Current Inventory</th>
+                    <th>Current Stock</th>
                     <th>Quick Adjust</th>
-                    <th>Availability Status</th>
-                    <th>Unit / Portion</th>
+                    <th>Health Status</th>
+                    <th>Unit Measure</th>
                   </tr>
                 </thead>
                 <tbody id="inventoryTableBody">
-                  <!-- Rendered via JS -->
+                  <!-- Injected by JS -->
                 </tbody>
               </table>
             </div>
@@ -357,50 +413,50 @@
         </section>
 
         <!-- ===================================================================
-             VIEW 4: ORDERS & LOGISTICS
+             VIEW 5: ORDERS PIPELINE & DISPATCH
              =================================================================== -->
         <section id="view-orders" class="view-section">
           <div class="view-header">
             <div class="view-header-title">
-              <h1 class="font-serif">Orders & Fulfillment</h1>
-              <p>Manage order pipeline, Nashik delivery status and WhatsApp notifications</p>
+              <h1 class="font-serif">Customer Orders Pipeline</h1>
+              <p>Manage status, print kitchen packing slips, and dispatch live WhatsApp order updates</p>
             </div>
             <div class="view-actions">
-              <button class="btn-secondary btn-touch" id="btnClearOrdersBtn" style="color: var(--danger);">🗑️ Clear Orders (0)</button>
+              <button class="btn-secondary btn-touch" id="btnExportOrdersCSV">📥 Export Orders CSV</button>
+              <button class="btn-secondary btn-touch" id="btnClearOrdersBtn" style="color: var(--danger);" title="Reset orders count to 0">🗑️ Clear Orders (0)</button>
             </div>
           </div>
 
-          <div class="card-panel">
-            <div class="card-panel-header">
-              <div class="table-filter-bar">
-                <div class="search-input-wrapper">
-                  <span class="search-input-icon">🔍</span>
-                  <input type="text" id="orderSearchInput" placeholder="Search customer, phone or ID...">
-                </div>
-                <select id="orderStatusFilter" class="select-filter">
-                  <option value="all">All Order Stages</option>
-                  <option value="pending">⏳ Pending</option>
-                  <option value="baking">👩‍🍳 Baking in Progress</option>
-                  <option value="shipped">🚚 Out for Delivery</option>
-                  <option value="delivered">✅ Delivered</option>
-                </select>
-              </div>
+          <!-- Order Filters -->
+          <div class="filter-bar">
+            <div class="filter-search-box">
+              <span>🔍</span>
+              <input type="text" id="orderSearchInput" placeholder="Search by Order ID, customer, address, or phone...">
             </div>
+            <select class="select-filter" id="orderStatusFilter">
+              <option value="all">All Statuses</option>
+              <option value="pending">⏳ Pending Confirmation</option>
+              <option value="baking">👩‍🍳 Baking in Oven</option>
+              <option value="shipped">🚚 Out for Delivery</option>
+              <option value="delivered">✅ Delivered</option>
+            </select>
+          </div>
 
-            <div class="data-table-container">
+          <div class="card-panel">
+            <div class="table-responsive">
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>Order</th>
-                    <th>Customer & Address</th>
-                    <th>Items Ordered</th>
-                    <th>Total</th>
-                    <th>Delivery Status</th>
-                    <th>WhatsApp Notify</th>
+                    <th>Order #</th>
+                    <th>Customer & Delivery</th>
+                    <th>Bakes Ordered</th>
+                    <th>Total (INR)</th>
+                    <th>Baking Status</th>
+                    <th>Print / WhatsApp</th>
                   </tr>
                 </thead>
                 <tbody id="ordersTableBody">
-                  <!-- Rendered via JS -->
+                  <!-- Injected by JS -->
                 </tbody>
               </table>
             </div>
@@ -408,40 +464,123 @@
         </section>
 
         <!-- ===================================================================
-             VIEW 5: DISCOUNTS & PROMOTIONS
+             VIEW 6: CUSTOMERS DIRECTORY & CRM (NEW)
              =================================================================== -->
-        <section id="view-discounts" class="view-section">
+        <section id="view-customers" class="view-section">
           <div class="view-header">
             <div class="view-header-title">
-              <h1 class="font-serif">Discounts & Promo Codes</h1>
-              <p>Create promotional coupons that instantly apply on the customer checkout cart</p>
+              <h1 class="font-serif">Customer Directory & CRM</h1>
+              <p>Track customer lifetime value (LTV), purchase frequency, VIP tags, and direct WhatsApp contact</p>
             </div>
             <div class="view-actions">
-              <button class="btn-primary btn-touch" id="btnCreateDiscount">
-                <span>+ Create Coupon</span>
-              </button>
+              <button class="btn-secondary btn-touch" id="btnExportCustomersCSV">📥 Export Customers</button>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-search-box">
+              <span>🔍</span>
+              <input type="text" id="customerSearchInput" placeholder="Search customers by name, phone or VIP status...">
             </div>
           </div>
 
           <div class="card-panel">
-            <div class="card-panel-header">
-              <h2 class="card-panel-title">Active Store Coupons</h2>
-            </div>
-            <div class="data-table-container">
+            <div class="table-responsive">
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>Coupon Code</th>
+                    <th>Customer Name</th>
+                    <th>Contact Phone</th>
+                    <th>Delivery Area</th>
+                    <th>Total Orders</th>
+                    <th>Total Spent (LTV)</th>
+                    <th>Customer Tier</th>
+                    <th>Direct Contact</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTableBody">
+                  <!-- Injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 7: ANALYTICS & SHOPIFY REPORTS (NEW)
+             =================================================================== -->
+        <section id="view-analytics" class="view-section">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Analytics & Sales Reports</h1>
+              <p>Top-selling flavors, category revenue breakdown, and conversion metrics</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn-secondary btn-touch" onclick="AdminApp.renderAnalyticsView()">🔄 Refresh Reports</button>
+            </div>
+          </div>
+
+          <!-- Top Sales Overview Grid -->
+          <div class="card-grid-2">
+            <!-- Top Selling Bakes -->
+            <div class="card-panel" style="padding: 20px;">
+              <h2 class="card-panel-title" style="margin-bottom: 12px;">🏆 Top-Selling Bakes Leaderboard</h2>
+              <div class="table-responsive">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Bake Name</th>
+                      <th>Units Sold</th>
+                      <th>Revenue Generated</th>
+                    </tr>
+                  </thead>
+                  <tbody id="topSellingTableBody">
+                    <!-- Injected by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Category Revenue Breakdown -->
+            <div class="card-panel" style="padding: 20px;">
+              <h2 class="card-panel-title" style="margin-bottom: 12px;">📊 Collection Share & Performance</h2>
+              <div id="categoryShareBars" style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
+                <!-- Injected by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 8: DISCOUNTS & PROMO ENGINE
+             =================================================================== -->
+        <section id="view-discounts" class="view-section">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h1 class="font-serif">Discounts & Promo Engine</h1>
+              <p>Create percentage & flat discount codes redeemable at storefront checkout</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn-primary btn-touch" id="btnCreateDiscount">+ Create New Coupon</button>
+            </div>
+          </div>
+
+          <div class="card-panel">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Code</th>
                     <th>Type & Value</th>
                     <th>Min. Order</th>
                     <th>Description</th>
-                    <th>Redemptions</th>
+                    <th>Times Used</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="discountsTableBody">
-                  <!-- Rendered via JS -->
+                  <!-- Injected by JS -->
                 </tbody>
               </table>
             </div>
@@ -449,35 +588,32 @@
         </section>
 
         <!-- ===================================================================
-             VIEW 6: CUSTOM CAKE INQUIRIES
+             VIEW 9: CUSTOM CAKE INQUIRIES & LEADS
              =================================================================== -->
         <section id="view-inquiries" class="view-section">
           <div class="view-header">
             <div class="view-header-title">
               <h1 class="font-serif">Custom Cake Inquiries</h1>
-              <p>Bespoke requests submitted via the interactive Custom Cake Studio Builder</p>
+              <p>Consultations submitted from the custom cake builder with 1-click WhatsApp chat</p>
             </div>
           </div>
 
           <div class="card-panel">
-            <div class="card-panel-header">
-              <h2 class="card-panel-title">Inquiry Log</h2>
-            </div>
-            <div class="data-table-container">
+            <div class="table-responsive">
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>Inquiry ID</th>
-                    <th>Client</th>
+                    <th>Inquiry #</th>
+                    <th>Customer</th>
                     <th>Occasion & Date</th>
                     <th>Flavor & Size</th>
-                    <th>Color Palette / Message</th>
+                    <th>Palette & Notes</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th>WhatsApp</th>
                   </tr>
                 </thead>
                 <tbody id="inquiriesTableBody">
-                  <!-- Rendered via JS -->
+                  <!-- Injected by JS -->
                 </tbody>
               </table>
             </div>
@@ -485,37 +621,47 @@
         </section>
 
         <!-- ===================================================================
-             VIEW 7: SETTINGS & DATA BACKUP
+             VIEW 10: SETTINGS, MARKETING & BACKUP
              =================================================================== -->
         <section id="view-settings" class="view-section">
           <div class="view-header">
             <div class="view-header-title">
-              <h1 class="font-serif">Settings & Data Backup</h1>
-              <p>Bakery metadata, WhatsApp checkout configuration, and 1-click JSON backup</p>
+              <h1 class="font-serif">Storefront Settings & Marketing</h1>
+              <p>Customize announcement banner, delivery thresholds, contact information, and backups</p>
             </div>
           </div>
 
-          <div class="form-grid-2">
+          <div class="card-grid-2">
             <div class="card-panel" style="padding: 20px;">
-              <h2 class="card-panel-title" style="margin-bottom: 16px;">Bakery Profile</h2>
+              <h2 class="card-panel-title" style="margin-bottom: 16px;">Bakery Profile & Marketing</h2>
               <form id="settingsForm" class="auth-form">
                 <div class="form-group">
                   <label>Bakery Name</label>
                   <input type="text" id="setStoreName" class="form-input" value="The Flora Bakery">
                 </div>
                 <div class="form-group">
-                  <label>WhatsApp Number (without +)</label>
-                  <input type="text" id="setWhatsApp" class="form-input" value="917083517862">
+                  <label>Top Announcement Bar Text (Live on Storefront)</label>
+                  <input type="text" id="setAnnouncement" class="form-input" value="🌸 FREE Refrigerator-Van Delivery on all Nashik orders over ₹999 | Code: FLORA10 for 10% OFF">
                 </div>
                 <div class="form-group">
-                  <label>Free Delivery Threshold (₹)</label>
-                  <input type="number" id="setFreeShipping" class="form-input" value="999">
+                  <label>Special Store Notice / Tagline</label>
+                  <input type="text" id="setStoreNotice" class="form-input" value="✨ Taking Pre-Orders for Bespoke Celebration Cakes">
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label>WhatsApp Number (without +)</label>
+                    <input type="text" id="setWhatsApp" class="form-input" value="917083517862">
+                  </div>
+                  <div class="form-group">
+                    <label>Free Delivery Threshold (₹)</label>
+                    <input type="number" id="setFreeShipping" class="form-input" value="999">
+                  </div>
                 </div>
                 <div class="form-group">
                   <label>Studio Address</label>
                   <input type="text" id="setAddress" class="form-input" value="Ibadat Villa, Plot No. 41, Sai Nath Nagar, Nashik, Maharashtra 422006">
                 </div>
-                <button type="submit" class="btn-primary btn-touch" style="margin-top: 8px;">Save Settings</button>
+                <button type="submit" class="btn-primary btn-touch" style="margin-top: 8px;">Save Settings & Live Updates</button>
               </form>
             </div>
 
@@ -523,7 +669,7 @@
               <div>
                 <h2 class="card-panel-title" style="margin-bottom: 12px;">Database Backup & Sync</h2>
                 <p style="font-size: 0.85rem; color: var(--cocoa-muted); margin-bottom: 18px;">
-                  Export full snapshot of your products, orders, inventory and coupons to a JSON file, or restore data at any time.
+                  Export full snapshot of your products, categories, orders, customers and coupons to JSON, or restore at any time.
                 </p>
 
                 <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -537,13 +683,13 @@
                   </label>
 
                   <button class="btn-secondary btn-touch" id="btnResetDefaults" style="color: var(--danger); text-align: left; padding: 12px 16px;">
-                    ⚠️ <strong>Reset to Clean Store Data</strong>
+                    ⚠️ <strong>Reset to Clean Store Data (0 Orders)</strong>
                   </button>
                 </div>
               </div>
 
               <div style="margin-top: 18px; font-size: 0.78rem; color: var(--cocoa-muted);">
-                Data synchronized across all devices & tabs via <code>FloraDB</code> reactive engine.
+                Data synchronized in real time via <code>FloraDB</code> reactive engine.
               </div>
             </div>
           </div>
@@ -563,9 +709,9 @@
           <span class="mobile-tab-icon">🎂</span>
           <span class="mobile-tab-label">Bakes</span>
         </button>
-        <button class="mobile-nav-tab" data-view="inventory">
-          <span class="mobile-tab-icon">📋</span>
-          <span class="mobile-tab-label">Stock</span>
+        <button class="mobile-nav-tab" data-view="categories">
+          <span class="mobile-tab-icon">🌸</span>
+          <span class="mobile-tab-label">Collections</span>
         </button>
         <button class="mobile-nav-tab" data-view="orders">
           <span class="mobile-tab-icon">🛍️</span>
@@ -574,7 +720,7 @@
         </button>
         <button class="mobile-nav-tab" id="mobileMoreBtn">
           <span class="mobile-tab-icon">☰</span>
-          <span class="mobile-tab-label">Menu</span>
+          <span class="mobile-tab-label">More</span>
         </button>
       </nav>
 
@@ -582,7 +728,7 @@
   </div>
 
   <!-- =========================================================================
-       3. SLIDE-OVER PRODUCT EDITOR DRAWER (WITH IMAGE UPLOAD)
+       3. SLIDE-OVER PRODUCT EDITOR DRAWER (WITH DIRECT PHOTO UPLOAD)
        ========================================================================= -->
   <div class="admin-drawer-overlay" id="productDrawerOverlay"></div>
   <div class="admin-drawer" id="productDrawer">
@@ -639,12 +785,9 @@
 
       <div class="form-grid-2">
         <div class="form-group">
-          <label for="prodCategory">Category *</label>
+          <label for="prodCategory">Category Collection *</label>
           <select id="prodCategory" class="form-input" required>
-            <option value="cakes">🎂 Floral Cake</option>
-            <option value="pastries">🥐 French Pastry</option>
-            <option value="muffins">🧁 Artisanal Muffin</option>
-            <option value="combos">🎁 Gifting Hamper</option>
+            <!-- Dynamically populated from FloraDB.getCategories() -->
           </select>
         </div>
 
@@ -714,13 +857,101 @@
   </div>
 
   <!-- =========================================================================
-       4. COMMAND PALETTE MODAL (⌘K)
+       4. SLIDE-OVER CATEGORY / COLLECTION DRAWER (NEW)
+       ========================================================================= -->
+  <div class="admin-drawer-overlay" id="categoryDrawerOverlay"></div>
+  <div class="admin-drawer" id="categoryDrawer">
+    <div class="drawer-header">
+      <h2 id="categoryDrawerTitle" class="font-serif">Add New Category</h2>
+      <button class="drawer-close-btn" id="categoryDrawerCloseBtn" aria-label="Close Category Drawer">&times;</button>
+    </div>
+
+    <form id="categoryForm" class="drawer-body">
+      <input type="hidden" id="catId">
+
+      <div class="form-group">
+        <label for="catName">Category Name *</label>
+        <input type="text" id="catName" class="form-input" placeholder="e.g. Artisanal Tarts" required>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="catSlug">Slug / Identifier *</label>
+          <input type="text" id="catSlug" class="form-input" placeholder="e.g. tarts" required>
+        </div>
+
+        <div class="form-group">
+          <label for="catIcon">Icon Emoji</label>
+          <input type="text" id="catIcon" class="form-input" placeholder="e.g. 🥧" value="🌸">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="catLabel">Sub-Label (Shown on Cards)</label>
+        <input type="text" id="catLabel" class="form-input" placeholder="e.g. French Tartlet">
+      </div>
+
+      <div class="form-group">
+        <label for="catDesc">Description / Tagline</label>
+        <textarea id="catDesc" class="form-input" rows="2" placeholder="Short appetizing description for storefront collection card..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="catImage">Cover Image Preset or URL</label>
+        <select id="catImage" class="form-input">
+          <option value="images/cat-cakes.jpg">🎂 Cakes Banner</option>
+          <option value="images/cat-pastries.jpg">🥐 Pastries Banner</option>
+          <option value="images/cat-muffins.jpg">🧁 Muffins Banner</option>
+          <option value="images/combo-banner.jpg">🎁 Gift Hamper Banner</option>
+          <option value="images/hero-cake.jpg">🌸 Hero Floral Cake Banner</option>
+        </select>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="catOrder">Display Order (1, 2, 3...)</label>
+          <input type="number" id="catOrder" class="form-input" value="1" min="1">
+        </div>
+        <div class="form-group">
+          <label for="catStatus">Status</label>
+          <select id="catStatus" class="form-input">
+            <option value="active">Active on Storefront</option>
+            <option value="draft">Hidden / Draft</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <div class="drawer-footer">
+      <button type="button" class="btn-secondary btn-touch" id="categoryDrawerCancelBtn">Cancel</button>
+      <button type="button" class="btn-primary btn-touch" id="categoryDrawerSaveBtn">Save Category</button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       5. PRINTABLE KITCHEN INVOICE & PACKING SLIP MODAL (NEW)
+       ========================================================================= -->
+  <div class="admin-drawer-overlay" id="invoiceModalOverlay"></div>
+  <div class="command-palette-modal" id="invoiceModal" style="align-items: center;">
+    <div class="palette-box invoice-paper" style="max-width: 600px; padding: 28px;">
+      <div id="invoicePrintContent">
+        <!-- Rendered dynamically by AdminApp.openInvoice(orderId) -->
+      </div>
+      <div class="no-print" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; border-top: 1px solid var(--cream-border); padding-top: 16px;">
+        <button type="button" class="btn-secondary btn-touch" id="btnCloseInvoice">Close</button>
+        <button type="button" class="btn-primary btn-touch" onclick="window.print()">🖨️ Print Kitchen Slip / PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       6. COMMAND PALETTE MODAL (⌘K)
        ========================================================================= -->
   <div class="command-palette-modal" id="commandPalette">
     <div class="palette-box">
       <div class="palette-input-holder">
         <span>🔍</span>
-        <input type="text" id="paletteInput" placeholder="Type a command or product name...">
+        <input type="text" id="paletteInput" placeholder="Type a command, customer, category, or bake...">
         <kbd class="kbd-shortcut">ESC</kbd>
       </div>
       <div class="palette-results" id="paletteResults">
@@ -730,7 +961,7 @@
   </div>
 
   <!-- =========================================================================
-       5. CREATE DISCOUNT MODAL
+       7. CREATE DISCOUNT MODAL
        ========================================================================= -->
   <div class="admin-drawer-overlay" id="discountModalOverlay"></div>
   <div class="command-palette-modal" id="discountModal" style="align-items: center;">

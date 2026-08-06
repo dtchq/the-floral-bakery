@@ -1,7 +1,7 @@
 /**
  * THE FLORA BAKERY - ADMIN SUITE CONTROLLER
  * High-performance, Apple-grade interface manager
- * Handles Authentication, Real-time CRUD, Product Image Uploading, Mobile Nav, Inventory Steppers & WhatsApp Dispatch
+ * Handles Authentication, Real-time CRUD, Categories Module, Customers CRM, Deep Analytics, Printable Slips & WhatsApp Dispatch
  */
 
 (function() {
@@ -10,6 +10,7 @@
   const AdminApp = {
     currentView: 'dashboard',
     editingProductId: null,
+    editingCategoryId: null,
 
     init() {
       this.checkAuth();
@@ -144,11 +145,40 @@
         btnAddNewProduct.addEventListener('click', () => this.openProductDrawer());
       }
 
+      // Add Category Button
+      const btnAddNewCategory = document.getElementById('btnAddNewCategory');
+      if (btnAddNewCategory) {
+        btnAddNewCategory.addEventListener('click', () => this.openCategoryDrawer());
+      }
+
+      // Category Drawer Controls
+      const categoryDrawerCloseBtn = document.getElementById('categoryDrawerCloseBtn');
+      const categoryDrawerCancelBtn = document.getElementById('categoryDrawerCancelBtn');
+      const categoryDrawerOverlay = document.getElementById('categoryDrawerOverlay');
+      const categoryDrawerSaveBtn = document.getElementById('categoryDrawerSaveBtn');
+
+      if (categoryDrawerCloseBtn) categoryDrawerCloseBtn.addEventListener('click', () => this.closeCategoryDrawer());
+      if (categoryDrawerCancelBtn) categoryDrawerCancelBtn.addEventListener('click', () => this.closeCategoryDrawer());
+      if (categoryDrawerOverlay) categoryDrawerOverlay.addEventListener('click', () => this.closeCategoryDrawer());
+      if (categoryDrawerSaveBtn) categoryDrawerSaveBtn.addEventListener('click', () => this.saveCategoryFromDrawer());
+
+      // Auto-slug generator for category name
+      const catNameInput = document.getElementById('catName');
+      const catSlugInput = document.getElementById('catSlug');
+      if (catNameInput && catSlugInput) {
+        catNameInput.addEventListener('input', () => {
+          if (!this.editingCategoryId) {
+            catSlugInput.value = catNameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+          }
+        });
+      }
+
       // Refresh Analytics Button
       const btnRefreshAnalytics = document.getElementById('btnRefreshAnalytics');
       if (btnRefreshAnalytics) {
         btnRefreshAnalytics.addEventListener('click', () => {
           this.renderDashboard();
+          this.renderAnalyticsView();
           this.showToast('Analytics refreshed with live store data.', 'info');
         });
       }
@@ -208,6 +238,43 @@
         });
       }
 
+      // Customer Filter
+      const custSearch = document.getElementById('customerSearchInput');
+      if (custSearch) custSearch.addEventListener('input', () => this.renderCustomersTable());
+
+      // CSV Export Handlers
+      const btnExportProductsCSV = document.getElementById('btnExportProductsCSV');
+      if (btnExportProductsCSV) {
+        btnExportProductsCSV.addEventListener('click', () => this.downloadCSV(FloraDB.exportProductsCSV(), 'flora-products.csv'));
+      }
+
+      const btnExportOrdersCSV = document.getElementById('btnExportOrdersCSV');
+      if (btnExportOrdersCSV) {
+        btnExportOrdersCSV.addEventListener('click', () => this.downloadCSV(FloraDB.exportOrdersCSV(), 'flora-orders.csv'));
+      }
+
+      const btnExportCustomersCSV = document.getElementById('btnExportCustomersCSV');
+      if (btnExportCustomersCSV) {
+        btnExportCustomersCSV.addEventListener('click', () => {
+          const custs = FloraDB.getCustomers();
+          let csv = "Name,Phone,Address,OrdersCount,TotalSpent,Tier\n";
+          custs.forEach(c => {
+            csv += `"${c.name}","${c.phone||''}","${(c.address||'').replace(/"/g, '""')}","${c.ordersCount}","${c.totalSpent}","${c.tag}"\n`;
+          });
+          this.downloadCSV(csv, 'flora-customers.csv');
+        });
+      }
+
+      // Invoice Modal Close Handlers
+      const btnCloseInvoice = document.getElementById('btnCloseInvoice');
+      const invoiceModalOverlay = document.getElementById('invoiceModalOverlay');
+      if (btnCloseInvoice) {
+        btnCloseInvoice.addEventListener('click', () => this.closeInvoice());
+      }
+      if (invoiceModalOverlay) {
+        invoiceModalOverlay.addEventListener('click', () => this.closeInvoice());
+      }
+
       // Discount Modal Controls
       const btnCreateDiscount = document.getElementById('btnCreateDiscount');
       const discountModal = document.getElementById('discountModal');
@@ -258,12 +325,14 @@
           e.preventDefault();
           const newSettings = {
             storeName: document.getElementById('setStoreName').value,
+            announcementText: document.getElementById('setAnnouncement').value,
+            storeNotice: document.getElementById('setStoreNotice').value,
             whatsapp: document.getElementById('setWhatsApp').value,
             freeShippingThreshold: Number(document.getElementById('setFreeShipping').value) || 999,
             address: document.getElementById('setAddress').value
           };
           FloraDB.saveSettings(newSettings);
-          this.showToast('Bakery settings saved successfully.', 'success');
+          this.showToast('✨ Store settings & announcement bar updated live!', 'success');
         });
       }
 
@@ -321,22 +390,16 @@
     setupImageUploader() {
       const dropZone = document.getElementById('imageDropZone');
       const fileInput = document.getElementById('prodImageFileInput');
-      const promptBox = document.getElementById('uploadPrompt');
-      const previewBox = document.getElementById('imagePreviewContainer');
-      const previewImg = document.getElementById('imagePreviewImg');
       const removeBtn = document.getElementById('btnRemovePreview');
-      const hiddenInput = document.getElementById('prodImage');
 
       if (!dropZone || !fileInput) return;
 
-      // Click dropzone triggers file selector
       dropZone.addEventListener('click', (e) => {
         if (e.target !== removeBtn && !e.target.closest('#btnRemovePreview')) {
           fileInput.click();
         }
       });
 
-      // Handle File Selection
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -344,7 +407,6 @@
         }
       });
 
-      // Drag & Drop Handlers
       dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropZone.style.borderColor = 'var(--rose-primary)';
@@ -366,7 +428,6 @@
         }
       });
 
-      // Remove Preview
       if (removeBtn) {
         removeBtn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -375,7 +436,6 @@
         });
       }
 
-      // Preset Chips Click Handler
       document.querySelectorAll('.preset-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
           e.preventDefault();
@@ -394,8 +454,6 @@
         this.showToast('Please select a valid image file (JPG, PNG, WEBP).', 'error');
         return;
       }
-
-      // Check max size (5MB)
       if (file.size > 5 * 1024 * 1024) {
         this.showToast('Image is too large. Please choose an image under 5MB.', 'error');
         return;
@@ -464,17 +522,14 @@
     switchView(viewName) {
       this.currentView = viewName;
 
-      // Update Desktop Nav Active States
       document.querySelectorAll('.sidebar-menu .nav-item').forEach(item => {
         item.classList.toggle('active', item.getAttribute('data-view') === viewName);
       });
 
-      // Update Mobile Nav Active States
       document.querySelectorAll('.admin-mobile-nav .mobile-nav-tab').forEach(tab => {
         tab.classList.toggle('active', tab.getAttribute('data-view') === viewName);
       });
 
-      // Switch Main View Sections
       document.querySelectorAll('.view-section').forEach(section => {
         section.classList.remove('active');
       });
@@ -485,39 +540,51 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // Re-render target data
       if (viewName === 'dashboard') this.renderDashboard();
       if (viewName === 'products') this.renderProductsTable();
+      if (viewName === 'categories') this.renderCategoriesView();
       if (viewName === 'inventory') this.renderInventoryTable();
       if (viewName === 'orders') this.renderOrdersTable();
+      if (viewName === 'customers') this.renderCustomersTable();
+      if (viewName === 'analytics') this.renderAnalyticsView();
       if (viewName === 'discounts') this.renderDiscountsTable();
       if (viewName === 'inquiries') this.renderInquiriesTable();
+      if (viewName === 'settings') this.renderSettingsView();
     },
 
     loadAllData() {
+      this.populateCategoryDropdowns();
       this.renderDashboard();
       this.renderProductsTable();
+      this.renderCategoriesView();
       this.renderInventoryTable();
       this.renderOrdersTable();
+      this.renderCustomersTable();
+      this.renderAnalyticsView();
       this.renderDiscountsTable();
       this.renderInquiriesTable();
+      this.renderSettingsView();
       this.updateSidebarCounters();
     },
 
     listenToDataChanges() {
-      window.addEventListener('flora:data-changed', (e) => {
+      window.addEventListener('flora:data-changed', () => {
         this.loadAllData();
       });
     },
 
     updateSidebarCounters() {
       const products = FloraDB.getProducts();
+      const categories = FloraDB.getCategories();
       const analytics = FloraDB.getAnalytics();
       const orders = FloraDB.getOrders();
       const inqs = FloraDB.getInquiries();
 
       const prodCountEl = document.getElementById('sidebarProductCount');
       if (prodCountEl) prodCountEl.textContent = products.length;
+
+      const catCountEl = document.getElementById('sidebarCategoryCount');
+      if (catCountEl) catCountEl.textContent = categories.length;
 
       const lowStockBadge = document.getElementById('sidebarLowStockBadge');
       if (lowStockBadge) {
@@ -603,9 +670,12 @@
               <td><span class="status-pill status-${o.status}">${this.formatStatus(o.status)}</span></td>
               <td>${o.paymentStatus || 'WhatsApp Order'}</td>
               <td>
-                <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppOrder('${o.id}')">
-                  <span>📱 Update</span>
-                </button>
+                <div class="table-actions">
+                  <button class="action-icon-btn" onclick="AdminApp.openInvoice('${o.id}')" title="Print Kitchen Slip">🖨️</button>
+                  <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppOrder('${o.id}')">
+                    <span>📱 WA</span>
+                  </button>
+                </div>
               </td>
             </tr>
           `).join('');
@@ -616,7 +686,183 @@
     },
 
     // =========================================================================
-    // 7. PRODUCTS CATALOG CRUD
+    // 7. CATEGORIES / COLLECTIONS MODULE (Shopify-Grade)
+    // =========================================================================
+    populateCategoryDropdowns() {
+      const categories = FloraDB.getCategories();
+      
+      // 1. In Product Drawer
+      const prodCategory = document.getElementById('prodCategory');
+      if (prodCategory) {
+        prodCategory.innerHTML = categories.map(c => `
+          <option value="${c.slug}">${c.icon || '🌸'} ${this.escapeHTML(c.name)}</option>
+        `).join('');
+      }
+
+      // 2. In Product Catalog Filter
+      const productCategoryFilter = document.getElementById('productCategoryFilter');
+      if (productCategoryFilter) {
+        const currentVal = productCategoryFilter.value;
+        productCategoryFilter.innerHTML = `<option value="all">All Categories</option>` + categories.map(c => `
+          <option value="${c.slug}">${c.icon || '🌸'} ${this.escapeHTML(c.name)}</option>
+        `).join('');
+        if (currentVal) productCategoryFilter.value = currentVal;
+      }
+    },
+
+    renderCategoriesView() {
+      this.renderCategoryCards();
+      this.renderCategoriesTable();
+    },
+
+    renderCategoryCards() {
+      const categories = FloraDB.getCategories();
+      const container = document.getElementById('categoryCardsContainer');
+      if (!container) return;
+
+      container.innerHTML = categories.map(c => `
+        <div class="category-admin-card">
+          <div class="category-card-cover">
+            <img src="${c.image || 'images/cat-cakes.jpg'}" alt="${this.escapeHTML(c.name)}" onerror="this.src='images/cat-cakes.jpg'">
+            <div class="category-card-icon-badge">${c.icon || '🌸'}</div>
+            <div class="category-card-count-badge">${c.productCount || 0} bakes</div>
+          </div>
+          <div class="category-card-body">
+            <h3 class="category-card-title">${this.escapeHTML(c.name)}</h3>
+            <span class="category-card-sub">${this.escapeHTML(c.categoryLabel || c.name)}</span>
+            <p class="category-card-desc">${this.escapeHTML(c.description || 'Artisanal patisserie collection')}</p>
+            <div class="category-card-footer">
+              <span class="status-pill status-${c.status || 'active'}">${c.status === 'active' ? '● Active' : '○ Draft'}</span>
+              <div class="table-actions">
+                <button class="action-icon-btn" onclick="AdminApp.openEditCategory('${c.id}')">✏️ Edit</button>
+                <button class="action-icon-btn" style="color: var(--danger);" onclick="AdminApp.deleteCategory('${c.id}')">🗑️</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    },
+
+    renderCategoriesTable() {
+      const categories = FloraDB.getCategories();
+      const tbody = document.getElementById('categoriesTableBody');
+      const counter = document.getElementById('categoryCounterText');
+
+      if (counter) counter.textContent = `${categories.length} Collections`;
+      if (!tbody) return;
+
+      tbody.innerHTML = categories.map(c => `
+        <tr>
+          <td>
+            <div class="table-product-cell">
+              <img src="${c.image || 'images/cat-cakes.jpg'}" class="table-product-thumb" alt="${this.escapeHTML(c.name)}" onerror="this.src='images/cat-cakes.jpg'">
+              <div>
+                <strong>${c.icon || '🌸'} ${this.escapeHTML(c.name)}</strong>
+                <div style="font-size: 0.75rem; color: var(--cocoa-muted);">${this.escapeHTML(c.description || '')}</div>
+              </div>
+            </div>
+          </td>
+          <td><code>${c.slug}</code></td>
+          <td>${this.escapeHTML(c.categoryLabel || '—')}</td>
+          <td><strong>${c.productCount || 0} products</strong></td>
+          <td><span class="status-pill status-${c.status || 'active'}">${c.status === 'active' ? '● Active' : '○ Draft'}</span></td>
+          <td>#${c.order || 1}</td>
+          <td>
+            <div class="table-actions">
+              <button class="action-icon-btn" onclick="AdminApp.openEditCategory('${c.id}')">✏️ Edit</button>
+              <button class="action-icon-btn" style="color: var(--danger);" onclick="AdminApp.deleteCategory('${c.id}')">🗑️ Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    },
+
+    openCategoryDrawer(cat = null) {
+      this.editingCategoryId = cat ? (cat.id || cat.slug) : null;
+      const drawer = document.getElementById('categoryDrawer');
+      const overlay = document.getElementById('categoryDrawerOverlay');
+      const title = document.getElementById('categoryDrawerTitle');
+
+      if (!drawer || !overlay) return;
+
+      if (cat) {
+        title.textContent = `Edit Collection "${cat.name}"`;
+        document.getElementById('catId').value = cat.id || cat.slug;
+        document.getElementById('catName').value = cat.name;
+        document.getElementById('catSlug').value = cat.slug;
+        document.getElementById('catIcon').value = cat.icon || '🌸';
+        document.getElementById('catLabel').value = cat.categoryLabel || '';
+        document.getElementById('catDesc').value = cat.description || '';
+        document.getElementById('catImage').value = cat.image || 'images/cat-cakes.jpg';
+        document.getElementById('catOrder').value = cat.order || 1;
+        document.getElementById('catStatus').value = cat.status || 'active';
+      } else {
+        title.textContent = "Add New Category Collection";
+        document.getElementById('categoryForm').reset();
+        document.getElementById('catId').value = '';
+        document.getElementById('catIcon').value = '🌸';
+        document.getElementById('catOrder').value = FloraDB.getCategories().length + 1;
+      }
+
+      overlay.classList.add('active');
+      drawer.classList.add('active');
+    },
+
+    openEditCategory(id) {
+      const cat = FloraDB.getCategoryById(id);
+      if (cat) this.openCategoryDrawer(cat);
+    },
+
+    closeCategoryDrawer() {
+      const drawer = document.getElementById('categoryDrawer');
+      const overlay = document.getElementById('categoryDrawerOverlay');
+      if (drawer) drawer.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+      this.editingCategoryId = null;
+    },
+
+    saveCategoryFromDrawer() {
+      const name = document.getElementById('catName').value.trim();
+      const slug = document.getElementById('catSlug').value.trim();
+
+      if (!name || !slug) {
+        this.showToast('Please enter a category name and slug identifier.', 'error');
+        return;
+      }
+
+      const catData = {
+        id: this.editingCategoryId || slug,
+        name: name,
+        slug: slug.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        icon: document.getElementById('catIcon').value || '🌸',
+        categoryLabel: document.getElementById('catLabel').value || name,
+        description: document.getElementById('catDesc').value || '',
+        image: document.getElementById('catImage').value || 'images/cat-cakes.jpg',
+        order: Number(document.getElementById('catOrder').value) || 1,
+        status: document.getElementById('catStatus').value || 'active'
+      };
+
+      FloraDB.saveCategory(catData);
+      this.closeCategoryDrawer();
+      this.populateCategoryDropdowns();
+      this.renderCategoriesView();
+      this.showToast(`✨ Collection "${name}" saved and synced live!`, 'success');
+    },
+
+    deleteCategory(id) {
+      const cat = FloraDB.getCategoryById(id);
+      if (!cat) return;
+
+      if (confirm(`Are you sure you want to delete category "${cat.name}"?`)) {
+        FloraDB.deleteCategory(id);
+        this.showToast(`Deleted category "${cat.name}".`, 'info');
+        this.populateCategoryDropdowns();
+        this.renderCategoriesView();
+      }
+    },
+
+    // =========================================================================
+    // 8. PRODUCTS CATALOG CRUD
     // =========================================================================
     renderProductsTable() {
       const search = (document.getElementById('productSearchInput')?.value || '').trim();
@@ -688,6 +934,8 @@
       const drawerTitle = document.getElementById('drawerTitle');
 
       if (!drawer || !overlay) return;
+
+      this.populateCategoryDropdowns();
 
       if (product) {
         drawerTitle.textContent = `Edit "${product.name}"`;
@@ -784,7 +1032,7 @@
     },
 
     // =========================================================================
-    // 8. INVENTORY RADAR
+    // 9. INVENTORY RADAR
     // =========================================================================
     renderInventoryTable() {
       const search = (document.getElementById('inventorySearchInput')?.value || '').trim();
@@ -847,7 +1095,7 @@
     },
 
     // =========================================================================
-    // 9. ORDERS PIPELINE & WHATSAPP LOGISTICS
+    // 10. ORDERS PIPELINE, PRINTABLE SLIPS & WHATSAPP LOGISTICS
     // =========================================================================
     renderOrdersTable() {
       const search = (document.getElementById('orderSearchInput')?.value || '').trim();
@@ -903,9 +1151,12 @@
             </select>
           </td>
           <td>
-            <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppOrder('${o.id}')">
-              <span>📱 Notify WA</span>
-            </button>
+            <div class="table-actions">
+              <button class="action-icon-btn" onclick="AdminApp.openInvoice('${o.id}')" title="Print Kitchen Slip & Invoice">🖨️ Slip</button>
+              <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppOrder('${o.id}')">
+                <span>📱 WA</span>
+              </button>
+            </div>
           </td>
         </tr>
       `).join('');
@@ -934,7 +1185,197 @@
     },
 
     // =========================================================================
-    // 10. DISCOUNTS & COUPONS
+    // 11. PRINTABLE KITCHEN INVOICE & SLIP GENERATOR
+    // =========================================================================
+    openInvoice(orderId) {
+      const o = FloraDB.getOrderById(orderId);
+      if (!o) return;
+
+      const modal = document.getElementById('invoiceModal');
+      const overlay = document.getElementById('invoiceModalOverlay');
+      const content = document.getElementById('invoicePrintContent');
+
+      if (!modal || !content) return;
+
+      content.innerHTML = `
+        <div class="invoice-header">
+          <div>
+            <div class="invoice-brand-title">🌸 THE FLORA BAKERY</div>
+            <div style="font-size: 0.78rem; color: #666;">Ibadat Villa, Sai Nath Nagar, Nashik &bull; 070835 17862</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="invoice-order-num">KITCHEN SLIP #${o.id}</div>
+            <div style="font-size: 0.78rem; color: #666;">Date: ${o.date || new Date().toLocaleDateString('en-IN')}</div>
+          </div>
+        </div>
+
+        <div class="invoice-details-grid">
+          <div>
+            <strong>Deliver To:</strong><br>
+            <span>${this.escapeHTML(o.customerName)}</span><br>
+            <span>📞 ${o.phone}</span><br>
+            <span>📍 ${this.escapeHTML(o.address)}</span>
+          </div>
+          <div style="text-align: right;">
+            <strong>Status:</strong> <span class="status-pill status-${o.status}">${this.formatStatus(o.status)}</span><br>
+            <strong style="margin-top: 4px; display: inline-block;">Payment:</strong> ${o.paymentStatus || 'WhatsApp Order'}
+          </div>
+        </div>
+
+        <table class="invoice-items-table">
+          <thead>
+            <tr>
+              <th>Bake Item</th>
+              <th style="text-align: center;">Qty</th>
+              <th style="text-align: right;">Rate</th>
+              <th style="text-align: right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Array.isArray(o.items) && o.items.length > 0 ? o.items.map(i => `
+              <tr>
+                <td><strong>${this.escapeHTML(i.name)}</strong></td>
+                <td style="text-align: center;">${i.qty}</td>
+                <td style="text-align: right;">₹${i.price}</td>
+                <td style="text-align: right;">₹${(i.price * i.qty).toLocaleString('en-IN')}</td>
+              </tr>
+            `).join('') : `
+              <tr>
+                <td colspan="4">Custom Celebration Bake</td>
+              </tr>
+            `}
+          </tbody>
+        </table>
+
+        ${o.notes ? `
+          <div class="invoice-note-box">
+            <strong>👩‍🍳 Special Baker Notes:</strong> ${this.escapeHTML(o.notes)}
+          </div>
+        ` : ''}
+
+        <div class="invoice-total-row">
+          <span>Subtotal: ₹${o.subtotal || o.total}</span>
+          ${o.discount ? `<span style="color: #D44E72;">Discount: -₹${o.discount}</span>` : ''}
+          <span style="color: #3E2723;">Grand Total: ₹${(o.total || 0).toLocaleString('en-IN')}</span>
+        </div>
+      `;
+
+      if (overlay) overlay.classList.add('active');
+      modal.classList.add('active');
+    },
+
+    closeInvoice() {
+      const modal = document.getElementById('invoiceModal');
+      const overlay = document.getElementById('invoiceModalOverlay');
+      if (modal) modal.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+    },
+
+    // =========================================================================
+    // 12. CUSTOMERS DIRECTORY & CRM (Shopify-Grade)
+    // =========================================================================
+    renderCustomersTable() {
+      const search = (document.getElementById('customerSearchInput')?.value || '').trim();
+      const customers = FloraDB.getCustomers({ search });
+      const tbody = document.getElementById('customersTableBody');
+      if (!tbody) return;
+
+      if (customers.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align:center; padding: 40px 16px; color: var(--cocoa-muted);">
+              No customers logged yet. As customers order or submit custom cake consultations, their profiles and Lifetime Value (LTV) will track automatically here.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = customers.map(c => `
+        <tr>
+          <td><strong>${this.escapeHTML(c.name)}</strong></td>
+          <td>📞 ${c.phone || 'N/A'}</td>
+          <td><span style="font-size:0.82rem; color:var(--cocoa-muted);">${this.escapeHTML(c.address || 'Nashik')}</span></td>
+          <td><strong>${c.ordersCount}</strong></td>
+          <td><strong>₹${(c.totalSpent || 0).toLocaleString('en-IN')}</strong></td>
+          <td>
+            <span class="status-pill ${c.tag === 'VIP Patron' ? 'tag-vip' : c.tag === 'Repeat Client' ? 'tag-repeat' : 'tag-first'}">
+              ${c.tag}
+            </span>
+          </td>
+          <td>
+            <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppCustomer('${encodeURIComponent(c.phone)}', '${encodeURIComponent(c.name)}')">
+              <span>💬 WhatsApp</span>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    },
+
+    openWhatsAppCustomer(phone, name) {
+      const cleanPhone = decodeURIComponent(phone).replace(/\D/g, '');
+      const phoneNum = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+      const msg = `🌸 *The Flora Bakery, Nashik*%0A%0AHello *${name}*,%0AThank you for being a valued patron of The Flora Bakery! Let us know if you would like to explore our fresh floral bakes today! ✨`;
+      window.open(`https://wa.me/${phoneNum}?text=${msg}`, '_blank');
+    },
+
+    // =========================================================================
+    // 13. ANALYTICS & SHOPIFY REPORTS
+    // =========================================================================
+    renderAnalyticsView() {
+      const stats = FloraDB.getAnalytics();
+
+      // Render Top Selling Table
+      const topBody = document.getElementById('topSellingTableBody');
+      if (topBody) {
+        if (stats.topSelling.length === 0) {
+          topBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:24px; color:var(--cocoa-muted);">No sales data available yet.</td></tr>`;
+        } else {
+          topBody.innerHTML = stats.topSelling.map((item, idx) => `
+            <tr>
+              <td><strong>#${idx + 1}</strong> ${this.escapeHTML(item.name)}</td>
+              <td>${item.units} units</td>
+              <td><strong>₹${item.revenue.toLocaleString('en-IN')}</strong></td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      // Render Category Revenue Share Bars
+      const shareContainer = document.getElementById('categoryShareBars');
+      if (shareContainer) {
+        const categories = FloraDB.getCategories();
+        shareContainer.innerHTML = categories.map(c => {
+          const count = c.productCount || 0;
+          const pct = stats.totalProducts > 0 ? Math.round((count / stats.totalProducts) * 100) : 25;
+          return `
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;">
+                <strong>${c.icon || '🌸'} ${this.escapeHTML(c.name)}</strong>
+                <span>${count} bakes (${pct}%)</span>
+              </div>
+              <div style="height: 8px; background: var(--admin-surface-subtle); border-radius: 4px; overflow:hidden;">
+                <div style="height: 100%; width: ${pct}%; background: var(--rose-primary); border-radius: 4px;"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    },
+
+    downloadCSV(csvContent, fileName) {
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+      this.showToast(`📥 Exported ${fileName}!`, 'success');
+    },
+
+    // =========================================================================
+    // 14. DISCOUNTS & COUPONS
     // =========================================================================
     renderDiscountsTable() {
       const discounts = FloraDB.getDiscounts();
@@ -965,7 +1406,7 @@
     },
 
     // =========================================================================
-    // 11. INQUIRIES LOG
+    // 15. INQUIRIES LOG
     // =========================================================================
     renderInquiriesTable() {
       const inquiries = FloraDB.getInquiries();
@@ -1008,7 +1449,27 @@
     },
 
     // =========================================================================
-    // 12. COMMAND PALETTE (⌘K / Ctrl+K)
+    // 16. SETTINGS VIEW
+    // =========================================================================
+    renderSettingsView() {
+      const settings = FloraDB.getSettings();
+      const setStoreName = document.getElementById('setStoreName');
+      const setAnnouncement = document.getElementById('setAnnouncement');
+      const setStoreNotice = document.getElementById('setStoreNotice');
+      const setWhatsApp = document.getElementById('setWhatsApp');
+      const setFreeShipping = document.getElementById('setFreeShipping');
+      const setAddress = document.getElementById('setAddress');
+
+      if (setStoreName) setStoreName.value = settings.storeName || "The Flora Bakery";
+      if (setAnnouncement) setAnnouncement.value = settings.announcementText || "";
+      if (setStoreNotice) setStoreNotice.value = settings.storeNotice || "";
+      if (setWhatsApp) setWhatsApp.value = settings.whatsapp || "917083517862";
+      if (setFreeShipping) setFreeShipping.value = settings.freeShippingThreshold || 999;
+      if (setAddress) setAddress.value = settings.address || "";
+    },
+
+    // =========================================================================
+    // 17. COMMAND PALETTE (⌘K / Ctrl+K)
     // =========================================================================
     setupKeyboardShortcuts() {
       const palette = document.getElementById('commandPalette');
@@ -1062,24 +1523,31 @@
 
       const q = query.toLowerCase().trim();
       const products = FloraDB.getProducts();
+      const categories = FloraDB.getCategories();
 
       const defaultCommands = [
         { icon: '📊', label: 'Go to Dashboard', action: () => this.switchView('dashboard') },
         { icon: '🎂', label: 'View Products Catalog', action: () => this.switchView('products') },
-        { icon: '➕', label: 'Add New Product Bake', action: () => this.openProductDrawer() },
+        { icon: '🌸', label: 'Category Collections Studio', action: () => this.switchView('categories') },
+        { icon: '➕', label: 'Add New Signature Bake', action: () => this.openProductDrawer() },
+        { icon: '📁', label: 'Create New Category Collection', action: () => this.openCategoryDrawer() },
         { icon: '📋', label: 'Stock & Inventory Radar', action: () => this.switchView('inventory') },
-        { icon: '🛍️', label: 'Customer Orders & Logistics', action: () => this.switchView('orders') },
+        { icon: '🛍️', label: 'Customer Orders Pipeline', action: () => this.switchView('orders') },
+        { icon: '👥', label: 'Customer Directory & CRM', action: () => this.switchView('customers') },
+        { icon: '📈', label: 'Analytics & Sales Reports', action: () => this.switchView('analytics') },
         { icon: '🏷️', label: 'Discounts & Promo Engine', action: () => this.switchView('discounts') },
         { icon: '💌', label: 'Custom Cake Consultations', action: () => this.switchView('inquiries') },
-        { icon: '⚙️', label: 'Store Settings & Backup', action: () => this.switchView('settings') },
+        { icon: '⚙️', label: 'Store Settings & Marketing', action: () => this.switchView('settings') },
         { icon: '🌸', label: 'Open Public Storefront', action: () => window.open('index.html', '_blank') }
       ];
 
       let filteredCommands = defaultCommands.filter(c => c.label.toLowerCase().includes(q));
 
       let matchedProducts = [];
+      let matchedCategories = [];
       if (q) {
         matchedProducts = products.filter(p => p.name.toLowerCase().includes(q) || (p.sku && p.sku.toLowerCase().includes(q)));
+        matchedCategories = categories.filter(c => c.name.toLowerCase().includes(q) || c.slug.includes(q));
       }
 
       let html = '';
@@ -1090,6 +1558,17 @@
           <div class="palette-item" data-cmd-idx="${idx}">
             <span>${cmd.icon}</span>
             <span>${cmd.label}</span>
+          </div>
+        `).join('');
+      }
+
+      if (matchedCategories.length > 0) {
+        html += `<div style="font-size: 0.7rem; font-weight:700; color:var(--cocoa-light); text-transform:uppercase; padding: 10px 12px 6px;">Matching Categories (${matchedCategories.length})</div>`;
+        html += matchedCategories.map(c => `
+          <div class="palette-item" data-cat-id="${c.id}">
+            <span>${c.icon || '🌸'}</span>
+            <span>${this.escapeHTML(c.name)}</span>
+            <span style="margin-left:auto; font-size:0.75rem; color:var(--cocoa-muted);">${c.productCount || 0} items</span>
           </div>
         `).join('');
       }
@@ -1106,16 +1585,23 @@
       }
 
       if (!html) {
-        html = `<div style="text-align:center; padding: 24px; color:var(--cocoa-muted); font-size:0.88rem;">No matching commands or products for "${this.escapeHTML(q)}"</div>`;
+        html = `<div style="text-align:center; padding: 24px; color:var(--cocoa-muted); font-size:0.88rem;">No matching commands or bakes for "${this.escapeHTML(q)}"</div>`;
       }
 
       resultsBox.innerHTML = html;
 
-      // Attach Click Listeners
       resultsBox.querySelectorAll('[data-cmd-idx]').forEach(el => {
         el.addEventListener('click', () => {
           const idx = Number(el.getAttribute('data-cmd-idx'));
           filteredCommands[idx].action();
+          document.getElementById('commandPalette').classList.remove('active');
+        });
+      });
+
+      resultsBox.querySelectorAll('[data-cat-id]').forEach(el => {
+        el.addEventListener('click', () => {
+          const cid = el.getAttribute('data-cat-id');
+          this.switchView('categories');
           document.getElementById('commandPalette').classList.remove('active');
         });
       });
@@ -1130,7 +1616,7 @@
     },
 
     // =========================================================================
-    // 13. UTILITIES & TOAST ENGINE
+    // 18. UTILITIES & TOAST ENGINE
     // =========================================================================
     showToast(message, type = 'success') {
       const container = document.getElementById('adminToastContainer');
@@ -1161,7 +1647,7 @@
         delivered: 'Delivered',
         active: 'Active',
         draft: 'Draft',
-        new: 'New Inquiry'
+        new: 'New Lead'
       };
       return map[status] || status;
     },

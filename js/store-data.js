@@ -9,12 +9,61 @@
 
   const STORAGE_KEYS = {
     PRODUCTS: 'flora_products_v2',
+    CATEGORIES: 'flora_categories_v2',
     ORDERS: 'flora_orders_v2',
     DISCOUNTS: 'flora_discounts_v2',
     INQUIRIES: 'flora_inquiries_v2',
     SETTINGS: 'flora_settings_v2',
     AUTH: 'flora_admin_auth_v2'
   };
+
+  // Initial Seed Categories / Collections
+  const DEFAULT_CATEGORIES = [
+    {
+      id: "cakes",
+      name: "Floral Cakes",
+      slug: "cakes",
+      categoryLabel: "Signature Cake",
+      description: "Artisanal chiffon & Lambeth vintage cakes crowned with edible florals",
+      icon: "🎂",
+      image: "images/cat-cakes.jpg",
+      status: "active",
+      order: 1
+    },
+    {
+      id: "pastries",
+      name: "French Pastries",
+      slug: "pastries",
+      categoryLabel: "Designer Pastry",
+      description: "Crispy craquelin choux, lavender eclairs and fresh fruit tarts",
+      icon: "🥐",
+      image: "images/cat-pastries.jpg",
+      status: "active",
+      order: 2
+    },
+    {
+      id: "muffins",
+      name: "Artisanal Muffins",
+      slug: "muffins",
+      categoryLabel: "Artisanal Muffin",
+      description: "Golden honey muffins with piped blossom buttercream frosting",
+      icon: "🧁",
+      image: "images/cat-muffins.jpg",
+      status: "active",
+      order: 3
+    },
+    {
+      id: "combos",
+      name: "Gifting Hampers",
+      slug: "combos",
+      categoryLabel: "Luxury Gift Set",
+      description: "Curated floral bakes paired with hand-tied fresh garden rose bouquets",
+      icon: "🎁",
+      image: "images/combo-banner.jpg",
+      status: "active",
+      order: 4
+    }
+  ];
 
   // Initial Seed Products
   const DEFAULT_PRODUCTS = [
@@ -172,10 +221,10 @@
     }
   ];
 
-  // Orders initialized to clean ZERO (Empty array)
+  // Orders initialized to clean ZERO
   const DEFAULT_ORDERS = [];
 
-  // Inquiries initialized to clean ZERO (Empty array)
+  // Inquiries initialized to clean ZERO
   const DEFAULT_INQUIRIES = [];
 
   const DEFAULT_DISCOUNTS = [
@@ -217,6 +266,9 @@
     whatsapp: "917083517862",
     instagram: "the.flora.bakery",
     freeShippingThreshold: 999,
+    deliveryFee: 99,
+    announcementText: "🌸 FREE Refrigerator-Van Delivery on all Nashik orders over ₹999 | Code: FLORA10 for 10% OFF",
+    storeNotice: "✨ Taking Pre-Orders for Bespoke Celebration Cakes",
     currencySymbol: "₹",
     pureVegGuaranteed: true,
     lastBackup: new Date().toISOString()
@@ -252,12 +304,9 @@
   // Central Database Interface
   const FloraDB = {
     init() {
-      // Clear legacy storage if present to ensure clean zero orders
-      try {
-        localStorage.removeItem('flora_orders_v1');
-        localStorage.removeItem('flora_inquiries_v1');
-      } catch(e) {}
-
+      if (!localStorage.getItem(STORAGE_KEYS.CATEGORIES)) {
+        Storage.set(STORAGE_KEYS.CATEGORIES, DEFAULT_CATEGORIES);
+      }
       if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
         Storage.set(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS);
       }
@@ -290,7 +339,82 @@
     },
 
     // =========================================================================
-    // 1. PRODUCTS CRUD
+    // 1. CATEGORIES & COLLECTIONS CRUD (Shopify-Grade)
+    // =========================================================================
+    getCategories(filter = {}) {
+      let categories = Storage.get(STORAGE_KEYS.CATEGORIES, DEFAULT_CATEGORIES);
+      const products = this.getProducts();
+
+      // Compute live product counts for each category
+      categories = categories.map(c => {
+        const count = products.filter(p => p.category === c.slug || p.category === c.id).length;
+        return { ...c, productCount: count };
+      });
+
+      if (filter.search) {
+        const q = filter.search.toLowerCase().trim();
+        categories = categories.filter(c => 
+          c.name.toLowerCase().includes(q) || 
+          c.slug.toLowerCase().includes(q) ||
+          (c.description && c.description.toLowerCase().includes(q))
+        );
+      }
+
+      if (filter.status && filter.status !== 'all') {
+        categories = categories.filter(c => c.status === filter.status);
+      }
+
+      return categories.sort((a, b) => (a.order || 0) - (b.order || 0));
+    },
+
+    getCategoryById(id) {
+      const categories = this.getCategories();
+      return categories.find(c => c.id === id || c.slug === id) || null;
+    },
+
+    saveCategory(categoryData) {
+      const categories = Storage.get(STORAGE_KEYS.CATEGORIES, DEFAULT_CATEGORIES);
+      const cleanSlug = (categoryData.slug || categoryData.name || 'category')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-');
+
+      const existingIdx = categories.findIndex(c => c.id === categoryData.id || c.slug === cleanSlug);
+
+      const categoryObj = {
+        id: categoryData.id || cleanSlug,
+        slug: cleanSlug,
+        name: categoryData.name || "New Collection",
+        categoryLabel: categoryData.categoryLabel || categoryData.name || "Artisanal Category",
+        description: categoryData.description || "Curated bakery specialties",
+        icon: categoryData.icon || "🌸",
+        image: categoryData.image || "images/cat-cakes.jpg",
+        status: categoryData.status || "active",
+        order: Number(categoryData.order) || categories.length + 1,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (existingIdx !== -1) {
+        categories[existingIdx] = categoryObj;
+      } else {
+        categories.push(categoryObj);
+      }
+
+      Storage.set(STORAGE_KEYS.CATEGORIES, categories);
+      this.broadcastChange(STORAGE_KEYS.CATEGORIES, { action: 'save-category', category: categoryObj });
+      return categoryObj;
+    },
+
+    deleteCategory(id) {
+      let categories = Storage.get(STORAGE_KEYS.CATEGORIES, DEFAULT_CATEGORIES);
+      categories = categories.filter(c => c.id !== id && c.slug !== id);
+      Storage.set(STORAGE_KEYS.CATEGORIES, categories);
+      this.broadcastChange(STORAGE_KEYS.CATEGORIES, { action: 'delete-category', id });
+      return true;
+    },
+
+    // =========================================================================
+    // 2. PRODUCTS CRUD
     // =========================================================================
     getProducts(filter = {}) {
       let products = Storage.get(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS);
@@ -403,18 +527,14 @@
       return this.saveProduct(clone);
     },
 
-    getCategoryLabel(category) {
-      const labels = {
-        cakes: "Signature Floral Cake",
-        pastries: "Designer Pastry",
-        muffins: "Artisanal Muffin",
-        combos: "Luxury Gift Hamper"
-      };
-      return labels[category] || "Artisanal Bake";
+    getCategoryLabel(categorySlug) {
+      const cat = this.getCategoryById(categorySlug);
+      if (cat) return cat.categoryLabel || cat.name;
+      return "Artisanal Specialty";
     },
 
     // =========================================================================
-    // 2. ORDERS & LOGISTICS
+    // 3. ORDERS & LOGISTICS
     // =========================================================================
     getOrders(filter = {}) {
       let orders = Storage.get(STORAGE_KEYS.ORDERS, DEFAULT_ORDERS);
@@ -433,6 +553,11 @@
       }
 
       return orders;
+    },
+
+    getOrderById(id) {
+      const orders = this.getOrders();
+      return orders.find(o => o.id === id) || null;
     },
 
     addOrder(orderData) {
@@ -489,7 +614,70 @@
     },
 
     // =========================================================================
-    // 3. DISCOUNTS & COUPONS
+    // 4. CUSTOMERS DIRECTORY & CRM (Shopify-Grade)
+    // =========================================================================
+    getCustomers(filter = {}) {
+      const orders = this.getOrders();
+      const inqs = this.getInquiries();
+      const map = new Map();
+
+      orders.forEach(o => {
+        const phone = (o.phone || '').trim();
+        const key = phone || o.customerName;
+        if (!map.has(key)) {
+          map.set(key, {
+            name: o.customerName,
+            phone: o.phone,
+            address: o.address,
+            ordersCount: 0,
+            totalSpent: 0,
+            lastOrderDate: o.date || 'Recent',
+            type: 'customer'
+          });
+        }
+        const cust = map.get(key);
+        cust.ordersCount += 1;
+        cust.totalSpent += (o.total || 0);
+      });
+
+      inqs.forEach(i => {
+        const phone = (i.phone || '').trim();
+        const key = phone || i.customerName;
+        if (!map.has(key)) {
+          map.set(key, {
+            name: i.customerName,
+            phone: i.phone,
+            address: 'Custom Inquiry Client',
+            ordersCount: 0,
+            totalSpent: 0,
+            lastOrderDate: 'Inquiry submitted',
+            type: 'inquiry_lead'
+          });
+        }
+      });
+
+      let customerList = Array.from(map.values()).map(c => {
+        let tag = 'First-Timer';
+        if (c.ordersCount >= 3 || c.totalSpent >= 4000) tag = 'VIP Patron';
+        else if (c.ordersCount >= 2) tag = 'Repeat Client';
+        else if (c.type === 'inquiry_lead') tag = 'Custom Cake Lead';
+        return { ...c, tag };
+      });
+
+      if (filter.search) {
+        const q = filter.search.toLowerCase().trim();
+        customerList = customerList.filter(c => 
+          c.name.toLowerCase().includes(q) || 
+          (c.phone && c.phone.includes(q)) ||
+          c.tag.toLowerCase().includes(q)
+        );
+      }
+
+      return customerList.sort((a, b) => b.totalSpent - a.totalSpent);
+    },
+
+    // =========================================================================
+    // 5. DISCOUNTS & PROMOTIONS
     // =========================================================================
     getDiscounts() {
       return Storage.get(STORAGE_KEYS.DISCOUNTS, DEFAULT_DISCOUNTS);
@@ -557,7 +745,7 @@
     },
 
     // =========================================================================
-    // 4. CUSTOM CAKE INQUIRIES
+    // 6. CUSTOM CAKE INQUIRIES
     // =========================================================================
     getInquiries() {
       return Storage.get(STORAGE_KEYS.INQUIRIES, DEFAULT_INQUIRIES);
@@ -606,7 +794,7 @@
     },
 
     // =========================================================================
-    // 5. SETTINGS & PROFILE
+    // 7. SETTINGS & MARKETING ANNOUNCEMENTS
     // =========================================================================
     getSettings() {
       return Storage.get(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
@@ -621,12 +809,14 @@
     },
 
     // =========================================================================
-    // 6. ANALYTICS & DASHBOARD METRICS
+    // 8. DEEP ANALYTICS & SHOPIFY REPORTS
     // =========================================================================
     getAnalytics() {
       const products = this.getProducts();
+      const categories = this.getCategories();
       const orders = this.getOrders();
       const inquiries = this.getInquiries();
+      const customers = this.getCustomers();
 
       const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
       const totalOrders = orders.length;
@@ -634,26 +824,61 @@
       const lowStockItems = products.filter(p => p.stock <= 5);
       const activeOrders = orders.filter(o => o.status === 'baking' || o.status === 'pending' || o.status === 'shipped');
 
+      // Top selling products computation
+      const salesMap = {};
+      orders.forEach(o => {
+        if (Array.isArray(o.items)) {
+          o.items.forEach(i => {
+            if (!salesMap[i.name]) salesMap[i.name] = { name: i.name, units: 0, revenue: 0 };
+            salesMap[i.name].units += (i.qty || 1);
+            salesMap[i.name].revenue += ((i.price || 0) * (i.qty || 1));
+          });
+        }
+      });
+      const topSelling = Object.values(salesMap).sort((a, b) => b.revenue - a.revenue);
+
       return {
         totalRevenue,
         totalOrders,
         aov,
         totalProducts: products.length,
+        totalCategories: categories.length,
+        totalCustomers: customers.length,
         lowStockCount: lowStockItems.length,
         lowStockItems,
         activeOrdersCount: activeOrders.length,
         inquiriesCount: inquiries.length,
-        recentOrders: orders.slice(0, 5)
+        recentOrders: orders.slice(0, 5),
+        topSelling
       };
     },
 
     // =========================================================================
-    // 7. BACKUP, EXPORT & FACTORY RESET
+    // 9. CSV EXPORTS (Shopify Compatible)
     // =========================================================================
+    exportProductsCSV() {
+      const products = this.getProducts();
+      let csv = "ID,Name,Category,Price,ComparePrice,Stock,SKU,Unit,Dietary,Status\n";
+      products.forEach(p => {
+        csv += `"${p.id}","${(p.name||'').replace(/"/g, '""')}","${p.category}","${p.price}","${p.comparePrice||''}","${p.stock}","${p.sku||''}","${p.unit||''}","${p.eggless ? 'Eggless/Veg' : 'Egg'}","${p.status}"\n`;
+      });
+      return csv;
+    },
+
+    exportOrdersCSV() {
+      const orders = this.getOrders();
+      let csv = "Order ID,Date,Customer,Phone,Address,Subtotal,Discount,Total,Status,Payment\n";
+      orders.forEach(o => {
+        csv += `"${o.id}","${o.date||''}","${(o.customerName||'').replace(/"/g, '""')}","${o.phone||''}","${(o.address||'').replace(/"/g, '""')}","${o.subtotal}","${o.discount}","${o.total}","${o.status}","${o.paymentStatus||''}"\n`;
+      });
+      return csv;
+    },
+
     exportJSON() {
       const fullSnapshot = {
         version: "2.0",
         exportDate: new Date().toISOString(),
+        categories: this.getCategories(),
         products: this.getProducts(),
         orders: this.getOrders(),
         discounts: this.getDiscounts(),
@@ -666,6 +891,7 @@
     importJSON(jsonString) {
       try {
         const data = JSON.parse(jsonString);
+        if (data.categories && Array.isArray(data.categories)) Storage.set(STORAGE_KEYS.CATEGORIES, data.categories);
         if (data.products && Array.isArray(data.products)) Storage.set(STORAGE_KEYS.PRODUCTS, data.products);
         if (data.orders && Array.isArray(data.orders)) Storage.set(STORAGE_KEYS.ORDERS, data.orders);
         if (data.discounts && Array.isArray(data.discounts)) Storage.set(STORAGE_KEYS.DISCOUNTS, data.discounts);
@@ -681,6 +907,7 @@
     },
 
     resetToDefaults() {
+      Storage.set(STORAGE_KEYS.CATEGORIES, DEFAULT_CATEGORIES);
       Storage.set(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS);
       Storage.set(STORAGE_KEYS.ORDERS, DEFAULT_ORDERS);
       Storage.set(STORAGE_KEYS.DISCOUNTS, DEFAULT_DISCOUNTS);
