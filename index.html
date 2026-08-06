@@ -18,18 +18,13 @@
 <body>
 
   <!-- ==========================================================================
-       1. ANNOUNCEMENT BAR
+       1. ANNOUNCEMENT BAR (SLIM, STRICTLY SINGLE-LINE)
        ========================================================================== -->
   <div class="announcement-bar" id="announcementBar">
-    <div class="container">
-      <div class="marquee-wrapper">
-        <div class="announcement-item">
-          <span class="announcement-badge">Special Offer</span>
-          <span id="announcementText" style="transition: opacity 0.3s ease;">
-            🌸 Free Delivery on Orders Above ₹999 across Nashik | Order 24 Hrs in Advance
-          </span>
-        </div>
-      </div>
+    <div class="announcement-item">
+      <span id="announcementText" class="announcement-text">
+        🌸 Free Delivery Above ₹999 across Nashik • Order 24 Hrs in Advance
+      </span>
     </div>
   </div>
 
@@ -222,31 +217,31 @@
           <div class="usp-item">
             <div class="usp-icon">🌸</div>
             <div class="usp-text">
-              <h4>100% Handcrafted</h4>
-              <p>Bespoke floral artistry daily</p>
+              <h4>100% Edible Blooms</h4>
+              <p>Organic, pesticide-free fresh flowers</p>
+            </div>
+          </div>
+
+          <div class="usp-item">
+            <div class="usp-icon">🎨</div>
+            <div class="usp-text">
+              <h4>Custom Aesthetic</h4>
+              <p>Bespoke Pinterest cake styling</p>
             </div>
           </div>
 
           <div class="usp-item">
             <div class="usp-icon">🚚</div>
             <div class="usp-text">
-              <h4>Nashik-wide Delivery</h4>
-              <p>Refrigerated on-time transit</p>
+              <h4>Nashik Delivery</h4>
+              <p>Temperature-controlled delivery</p>
             </div>
           </div>
 
           <div class="usp-item">
-            <div class="usp-icon">🎂</div>
+            <div class="usp-icon">✨</div>
             <div class="usp-text">
-              <h4>Custom Aesthetic Designs</h4>
-              <p>Tailored to your dream theme</p>
-            </div>
-          </div>
-
-          <div class="usp-item">
-            <div class="usp-icon">⭐</div>
-            <div class="usp-text">
-              <h4>Premium Ingredients</h4>
+              <h4>Pure Vegetarian</h4>
               <p>Pure butter & 100% eggless options</p>
             </div>
           </div>
@@ -256,96 +251,101 @@
     </section>
 
     <!-- ==========================================================================
-         5. SHOP BY CATEGORY TILES (CORE 3: CAKES, PASTRIES, MUFFINS)
+         5. SHOP BY CATEGORY TILES (CLEAN & INTUITIVE 4-CARD HUB)
          ========================================================================== -->
     <section class="section-padding category-section" id="categories">
       <div class="container">
         
-        <div class="text-center">
-          <span class="heading-tag">Freshly Baked Daily</span>
-          <h2 class="section-title">Shop by <span class="highlight">Signature Categories</span></h2>
+        <div class="text-center" style="margin-bottom: 28px;">
+          <span class="heading-tag">Handcrafted Collections</span>
+          <h2 class="section-title">Explore Our <span class="highlight">Signature Creations</span></h2>
           <p class="section-subtitle">
-            From grand tiered celebration cakes to delicate French choux and morning blossom muffins, discover our botanical bakery collection.
+            Curated floral cakes, artisanal French pastries, morning blossom muffins, and luxury gift combos.
           </p>
         </div>
 
-        <!-- 3 Primary Category Cards -->
+        <!-- 4 Intuitive Visual Category Cards -->
         <div class="category-cards-grid">
           
           <!-- Category 1: Cakes -->
-          <div class="category-card">
+          <div class="category-card" onclick="selectCategory('cakes')" role="button" tabindex="0" title="Explore Floral Cakes">
             <div class="category-img-holder">
               <img src="images/cat-cakes.jpg" alt="Artisanal Floral Cakes" class="category-img" loading="lazy">
-              <span class="category-badge">Signature Collection</span>
+              <span class="category-badge">Signature</span>
             </div>
-            <div class="category-body">
-              <h3 class="category-title">Floral Cakes</h3>
-              <p class="category-desc">
-                Custom aesthetic birthday cakes, romantic anniversary tiers, vintage Lambeth piping, and bespoke celebration cakes decorated with fresh garden blooms.
-              </p>
-              <div class="category-footer">
-                <span class="category-count">18+ Designs Available</span>
-                <button class="btn btn-primary btn-sm" onclick="filterProducts('cakes', document.querySelectorAll('.filter-tab-btn')[1]); window.location.href='#bestsellers';">
-                  Shop Cakes <i class="fas fa-arrow-right"></i>
-                </button>
+            <div class="category-overlay-info">
+              <div class="category-meta">
+                <h3 class="category-title">Floral Cakes</h3>
+                <span class="category-price-hint">Custom Tiers • From ₹1,299</span>
+              </div>
+              <div class="category-action-pill">
+                <span>View</span> <i class="fas fa-arrow-right"></i>
               </div>
             </div>
           </div>
 
           <!-- Category 2: Pastries -->
-          <div class="category-card">
+          <div class="category-card" onclick="selectCategory('pastries')" role="button" tabindex="0" title="Explore French Pastries">
             <div class="category-img-holder">
               <img src="images/cat-pastries.jpg" alt="Designer Floral Pastries" class="category-img" loading="lazy">
               <span class="category-badge">French Patisserie</span>
             </div>
-            <div class="category-body">
-              <h3 class="category-title">Designer Pastries</h3>
-              <p class="category-desc">
-                Indulgent single-serve masterpieces including lavender choux craquelin, wildberry mascarpone tarts, and rosewater glazed French eclairs.
-              </p>
-              <div class="category-footer">
-                <span class="category-count">12+ Gourmet Flavors</span>
-                <button class="btn btn-primary btn-sm" onclick="filterProducts('pastries', document.querySelectorAll('.filter-tab-btn')[2]); window.location.href='#bestsellers';">
-                  Shop Pastries <i class="fas fa-arrow-right"></i>
-                </button>
+            <div class="category-overlay-info">
+              <div class="category-meta">
+                <h3 class="category-title">Designer Pastries</h3>
+                <span class="category-price-hint">Choux & Tarts • From ₹449</span>
+              </div>
+              <div class="category-action-pill">
+                <span>View</span> <i class="fas fa-arrow-right"></i>
               </div>
             </div>
           </div>
 
           <!-- Category 3: Muffins -->
-          <div class="category-card">
+          <div class="category-card" onclick="selectCategory('muffins')" role="button" tabindex="0" title="Explore Floral Muffins">
             <div class="category-img-holder">
               <img src="images/cat-muffins.jpg" alt="Artisanal Floral Muffins" class="category-img" loading="lazy">
-              <span class="category-badge">Daily Indulgence</span>
+              <span class="category-badge">Artisan</span>
             </div>
-            <div class="category-body">
-              <h3 class="category-title">Floral Muffins</h3>
-              <p class="category-desc">
-                Moist honey-baked muffins crowned with whipped botanical buttercream, crystallized rose petals, and delicate chamomile sugar blossoms.
-              </p>
-              <div class="category-footer">
-                <span class="category-count">8+ Artisan Flavors</span>
-                <button class="btn btn-primary btn-sm" onclick="filterProducts('muffins', document.querySelectorAll('.filter-tab-btn')[3]); window.location.href='#bestsellers';">
-                  Shop Muffins <i class="fas fa-arrow-right"></i>
-                </button>
+            <div class="category-overlay-info">
+              <div class="category-meta">
+                <h3 class="category-title">Floral Muffins</h3>
+                <span class="category-price-hint">Boxes of 4 • From ₹399</span>
+              </div>
+              <div class="category-action-pill">
+                <span>View</span> <i class="fas fa-arrow-right"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 4: Gifting Combos -->
+          <div class="category-card" onclick="selectCategory('combos')" role="button" tabindex="0" title="Explore Gift Combos">
+            <div class="category-img-holder">
+              <img src="images/combo-banner.jpg" alt="Cake and Flower Gifting Combos" class="category-img" loading="lazy">
+              <span class="category-badge">Luxury Hamper</span>
+            </div>
+            <div class="category-overlay-info">
+              <div class="category-meta">
+                <h3 class="category-title">Gifting Combos</h3>
+                <span class="category-price-hint">Cake + Blooms • From ₹2,499</span>
+              </div>
+              <div class="category-action-pill">
+                <span>View</span> <i class="fas fa-arrow-right"></i>
               </div>
             </div>
           </div>
 
         </div>
 
-        <!-- Occasions Secondary Row (CRO Multi-Path Browsing) -->
-        <div class="occasions-subrow-box">
-          <div class="occasions-subrow-header">
-            <h4><i class="fas fa-calendar-heart" style="color:var(--rose-deep); margin-right:8px;"></i> Browse by Occasion</h4>
-            <span style="font-size:0.85rem; color:var(--text-muted);">Quick-filtered selection</span>
-          </div>
+        <!-- Occasions Quick Filter Bar -->
+        <div class="occasions-bar">
+          <span class="occasions-bar-label"><i class="fas fa-sparkles" style="color:var(--rose-deep);"></i> Quick Occasion Filters:</span>
           <div class="occasion-chips">
-            <a href="#bestsellers" class="occasion-chip" onclick="filterProducts('cakes')">🎂 Birthday Cakes</a>
-            <a href="#bestsellers" class="occasion-chip" onclick="filterProducts('cakes')">💍 Anniversary Tiers</a>
-            <a href="#bestsellers" class="occasion-chip" onclick="openCakeBuilderModal()">💐 Wedding Cake Consultation</a>
-            <a href="#combos" class="occasion-chip">🎁 Flower + Cake Gifting Combos</a>
-            <a href="#bestsellers" class="occasion-chip" onclick="filterProducts('pastries')">☕ High Tea Dessert Boxes</a>
+            <button type="button" class="occasion-chip" onclick="selectCategory('cakes')">🎂 Birthday Cakes</button>
+            <button type="button" class="occasion-chip" onclick="selectCategory('cakes')">💍 Anniversary Tiers</button>
+            <button type="button" class="occasion-chip" onclick="openCakeBuilderModal()">💐 Custom Design Studio</button>
+            <button type="button" class="occasion-chip" onclick="selectCategory('combos')">🎁 Flower + Cake Hampers</button>
+            <button type="button" class="occasion-chip" onclick="selectCategory('pastries')">☕ High Tea Boxes</button>
           </div>
         </div>
 
@@ -368,11 +368,11 @@
 
         <!-- Filter Tabs -->
         <div class="product-filter-tabs">
-          <button class="filter-tab-btn active" onclick="filterProducts('all', this)">All Bakes</button>
-          <button class="filter-tab-btn" onclick="filterProducts('cakes', this)">Floral Cakes</button>
-          <button class="filter-tab-btn" onclick="filterProducts('pastries', this)">Designer Pastries</button>
-          <button class="filter-tab-btn" onclick="filterProducts('muffins', this)">Artisan Muffins</button>
-          <button class="filter-tab-btn" onclick="filterProducts('combos', this)">Gift Hamper Sets</button>
+          <button class="filter-tab-btn active" data-category="all" onclick="filterProducts('all', this)">All Bakes</button>
+          <button class="filter-tab-btn" data-category="cakes" onclick="filterProducts('cakes', this)">Floral Cakes</button>
+          <button class="filter-tab-btn" data-category="pastries" onclick="filterProducts('pastries', this)">Designer Pastries</button>
+          <button class="filter-tab-btn" data-category="muffins" data-category="muffins" onclick="filterProducts('muffins', this)">Artisan Muffins</button>
+          <button class="filter-tab-btn" data-category="combos" onclick="filterProducts('combos', this)">Gift Hamper Sets</button>
         </div>
 
         <!-- Products Grid Container -->

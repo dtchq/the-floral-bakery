@@ -179,9 +179,23 @@ function renderProducts(filterCategory = "all") {
 
 // Filter Tab Switcher
 function filterProducts(category, btnElement) {
-  document.querySelectorAll(".filter-tab-btn").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".filter-tab-btn").forEach(btn => {
+    btn.classList.remove("active");
+    if (!btnElement && btn.getAttribute("data-category") === category) {
+      btn.classList.add("active");
+    }
+  });
   if (btnElement) btnElement.classList.add("active");
   renderProducts(category);
+}
+
+// 1-Tap Category Hub Navigator
+function selectCategory(category) {
+  filterProducts(category);
+  const target = document.getElementById("bestsellers");
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 // Add Item to Cart
@@ -492,9 +506,9 @@ function setupStickyHeader() {
 // Announcement Bar Dynamic Messages
 function setupAnnouncements() {
   const announcements = [
-    "🌸 Free Delivery on Orders Above ₹999 across Nashik | Order 24 Hrs in Advance",
-    "✨ 100% Handcrafted Eggless Floral Cakes & Luxury Gifting Hampers",
-    "📍 Studio: Ibadat Villa, Sai Nath Nagar, Nashik | Call / WhatsApp 070835 17862"
+    "🌸 Free Delivery Above ₹999 across Nashik • Order 24h in Advance",
+    "✨ 100% Handcrafted Eggless Floral Cakes & Gift Hampers",
+    "📍 Studio: Sai Nath Nagar, Nashik • Call 070835 17862"
   ];
   let idx = 0;
   const el = document.getElementById("announcementText");
