@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Admin Studio &bull; The Flora Bakery</title>
   <link rel="icon" type="image/jpeg" href="images/logo.jpg">
   
@@ -30,12 +30,12 @@
       <form id="loginForm" class="auth-form">
         <div class="form-group">
           <label for="loginEmail">Staff Email</label>
-          <input type="email" id="loginEmail" class="form-input" value="admin@theflorabakery.com" required>
+          <input type="email" id="loginEmail" class="form-input" value="admin@theflorabakery.com" required autocomplete="username">
         </div>
 
         <div class="form-group">
           <label for="loginPass">Password</label>
-          <input type="password" id="loginPass" class="form-input" value="floral2026" required>
+          <input type="password" id="loginPass" class="form-input" value="floral2026" required autocomplete="current-password">
         </div>
 
         <button type="submit" class="auth-btn">
@@ -54,6 +54,9 @@
        ========================================================================= -->
   <div class="admin-app" id="adminApp" style="display: none;">
 
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
+
     <!-- SIDEBAR NAVIGATION -->
     <aside class="admin-sidebar" id="adminSidebar">
       <div class="sidebar-brand">
@@ -64,6 +67,7 @@
           <h2 class="font-serif">Flora Bakery</h2>
           <span>Admin Suite</span>
         </div>
+        <button class="sidebar-close-mobile-btn" id="sidebarCloseMobileBtn" aria-label="Close Sidebar">&times;</button>
       </div>
 
       <nav class="sidebar-menu">
@@ -87,7 +91,7 @@
         <a class="nav-item" data-view="orders">
           <span class="nav-icon">🛍️</span>
           <span>Orders</span>
-          <span class="nav-badge" id="sidebarOrdersBadge">4</span>
+          <span class="nav-badge" id="sidebarOrdersBadge">0</span>
         </a>
         <a class="nav-item" data-view="discounts">
           <span class="nav-icon">🏷️</span>
@@ -98,7 +102,7 @@
         <a class="nav-item" data-view="inquiries">
           <span class="nav-icon">💌</span>
           <span>Custom Inquiries</span>
-          <span class="nav-badge badge-rose" id="sidebarInqBadge">2</span>
+          <span class="nav-badge badge-rose" id="sidebarInqBadge" style="display: none;">0</span>
         </a>
 
         <div class="menu-category-label">System</div>
@@ -121,11 +125,13 @@
       <!-- TOP HEADER -->
       <header class="admin-header">
         <div class="header-left">
-          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Menu">☰</button>
+          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Menu">
+            <span>☰</span>
+          </button>
           
           <div class="global-search-trigger" id="globalSearchTrigger">
             <span>🔍</span>
-            <span>Quick search or command...</span>
+            <span class="search-label-text">Quick search or command...</span>
             <kbd class="kbd-shortcut">⌘K</kbd>
           </div>
         </div>
@@ -133,12 +139,12 @@
         <div class="header-right">
           <button class="header-action-btn" id="btnHeaderNewProduct">
             <span>+</span>
-            <span>New Product</span>
+            <span class="btn-text-full">New Product</span>
           </button>
 
-          <div class="admin-profile-pill" id="adminProfileBtn">
+          <div class="admin-profile-pill" id="adminProfileBtn" title="Click to Sign Out">
             <div class="admin-avatar">F</div>
-            <span class="admin-name">Studio Admin</span>
+            <span class="admin-name">Admin</span>
             <span style="font-size: 0.75rem; color: var(--cocoa-muted);">▾</span>
           </div>
         </div>
@@ -157,7 +163,7 @@
               <p>Real-time orders, bakery revenue, and inventory health</p>
             </div>
             <div class="view-actions">
-              <button class="btn-secondary" id="btnRefreshAnalytics">🔄 Refresh Stats</button>
+              <button class="btn-secondary btn-touch" id="btnRefreshAnalytics">🔄 Refresh</button>
             </div>
           </div>
 
@@ -170,8 +176,7 @@
               </div>
               <div class="kpi-value" id="kpiRevenue">₹0</div>
               <div class="kpi-trend trend-up">
-                <span>↑ 18.4%</span>
-                <span style="color: var(--cocoa-muted); font-weight: normal;">vs last week</span>
+                <span>Active Store</span>
               </div>
             </div>
 
@@ -182,20 +187,18 @@
               </div>
               <div class="kpi-value" id="kpiOrdersCount">0</div>
               <div class="kpi-trend trend-up">
-                <span id="kpiActiveOrdersTag">0 active</span>
-                <span style="color: var(--cocoa-muted); font-weight: normal;">in baking pipeline</span>
+                <span id="kpiActiveOrdersTag">0 active orders</span>
               </div>
             </div>
 
             <div class="kpi-card">
               <div class="kpi-top">
-                <span class="kpi-label">Average Order Value</span>
+                <span class="kpi-label">Avg Order Value</span>
                 <div class="kpi-icon-pill" style="background: #D1FAE5; color: #059669;">📈</div>
               </div>
               <div class="kpi-value" id="kpiAOV">₹0</div>
               <div class="kpi-trend trend-up">
-                <span>↑ ₹140</span>
-                <span style="color: var(--cocoa-muted); font-weight: normal;">above Nashik benchmark</span>
+                <span>Nashik Patisserie</span>
               </div>
             </div>
 
@@ -215,7 +218,7 @@
           <div class="card-panel">
             <div class="card-panel-header">
               <h2 class="card-panel-title">Recent Customer Orders</h2>
-              <button class="btn-secondary" onclick="AdminApp.switchView('orders')">View All Orders &rarr;</button>
+              <button class="btn-secondary btn-touch" onclick="AdminApp.switchView('orders')">View All &rarr;</button>
             </div>
             <div class="data-table-container">
               <table class="admin-table">
@@ -248,8 +251,8 @@
               <p>Manage signature floral cakes, French pastries, muffins and gift sets</p>
             </div>
             <div class="view-actions">
-              <button class="btn-primary" id="btnAddNewProduct">
-                <span>+ Add Product</span>
+              <button class="btn-primary btn-touch" id="btnAddNewProduct">
+                <span>+ Add Bake</span>
               </button>
             </div>
           </div>
@@ -277,7 +280,7 @@
                 </select>
               </div>
 
-              <div id="productCounterText" style="font-size: 0.85rem; color: var(--cocoa-muted);">
+              <div id="productCounterText" style="font-size: 0.85rem; color: var(--cocoa-muted); margin-top: 6px;">
                 Showing 8 products
               </div>
             </div>
@@ -314,7 +317,7 @@
               <p>Real-time stock controls, low-stock notifications and batch restock</p>
             </div>
             <div class="view-actions">
-              <button class="btn-secondary" id="btnRestockAll">📦 Batch Restock (+10 All)</button>
+              <button class="btn-secondary btn-touch" id="btnRestockAll">📦 +10 Batch Restock</button>
             </div>
           </div>
 
@@ -362,6 +365,9 @@
               <h1 class="font-serif">Orders & Fulfillment</h1>
               <p>Manage order pipeline, Nashik delivery status and WhatsApp notifications</p>
             </div>
+            <div class="view-actions">
+              <button class="btn-secondary btn-touch" id="btnClearOrdersBtn" style="color: var(--danger);">🗑️ Clear Orders (0)</button>
+            </div>
           </div>
 
           <div class="card-panel">
@@ -373,10 +379,10 @@
                 </div>
                 <select id="orderStatusFilter" class="select-filter">
                   <option value="all">All Order Stages</option>
-                  <option value="pending">Pending</option>
-                  <option value="baking">Baking in Progress</option>
-                  <option value="shipped">Out for Delivery</option>
-                  <option value="delivered">Delivered</option>
+                  <option value="pending">⏳ Pending</option>
+                  <option value="baking">👩‍🍳 Baking in Progress</option>
+                  <option value="shipped">🚚 Out for Delivery</option>
+                  <option value="delivered">✅ Delivered</option>
                 </select>
               </div>
             </div>
@@ -411,7 +417,7 @@
               <p>Create promotional coupons that instantly apply on the customer checkout cart</p>
             </div>
             <div class="view-actions">
-              <button class="btn-primary" id="btnCreateDiscount">
+              <button class="btn-primary btn-touch" id="btnCreateDiscount">
                 <span>+ Create Coupon</span>
               </button>
             </div>
@@ -448,7 +454,7 @@
         <section id="view-inquiries" class="view-section">
           <div class="view-header">
             <div class="view-header-title">
-              <h1 class="font-serif">Custom Cake Consultation Inquiries</h1>
+              <h1 class="font-serif">Custom Cake Inquiries</h1>
               <p>Bespoke requests submitted via the interactive Custom Cake Studio Builder</p>
             </div>
           </div>
@@ -484,14 +490,14 @@
         <section id="view-settings" class="view-section">
           <div class="view-header">
             <div class="view-header-title">
-              <h1 class="font-serif">Store Settings & Data Backup</h1>
+              <h1 class="font-serif">Settings & Data Backup</h1>
               <p>Bakery metadata, WhatsApp checkout configuration, and 1-click JSON backup</p>
             </div>
           </div>
 
           <div class="form-grid-2">
-            <div class="card-panel" style="padding: 24px;">
-              <h2 class="card-panel-title" style="margin-bottom: 18px;">Bakery Profile</h2>
+            <div class="card-panel" style="padding: 20px;">
+              <h2 class="card-panel-title" style="margin-bottom: 16px;">Bakery Profile</h2>
               <form id="settingsForm" class="auth-form">
                 <div class="form-group">
                   <label>Bakery Name</label>
@@ -509,56 +515,122 @@
                   <label>Studio Address</label>
                   <input type="text" id="setAddress" class="form-input" value="Ibadat Villa, Plot No. 41, Sai Nath Nagar, Nashik, Maharashtra 422006">
                 </div>
-                <button type="submit" class="btn-primary" style="margin-top: 8px;">Save Settings</button>
+                <button type="submit" class="btn-primary btn-touch" style="margin-top: 8px;">Save Settings</button>
               </form>
             </div>
 
-            <div class="card-panel" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="card-panel" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
               <div>
                 <h2 class="card-panel-title" style="margin-bottom: 12px;">Database Backup & Sync</h2>
-                <p style="font-size: 0.85rem; color: var(--cocoa-muted); margin-bottom: 20px;">
+                <p style="font-size: 0.85rem; color: var(--cocoa-muted); margin-bottom: 18px;">
                   Export full snapshot of your products, orders, inventory and coupons to a JSON file, or restore data at any time.
                 </p>
 
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                  <button class="btn-secondary" id="btnExportJSON" style="text-align: left; padding: 12px 16px;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <button class="btn-secondary btn-touch" id="btnExportJSON" style="text-align: left; padding: 12px 16px;">
                     📥 <strong>Export Store JSON Backup</strong>
                   </button>
 
-                  <label class="btn-secondary" style="cursor: pointer; text-align: left; padding: 12px 16px;">
+                  <label class="btn-secondary btn-touch" style="cursor: pointer; text-align: left; padding: 12px 16px;">
                     📤 <strong>Restore from JSON File</strong>
                     <input type="file" id="importFileInput" accept=".json" style="display: none;">
                   </label>
 
-                  <button class="btn-secondary" id="btnResetDefaults" style="color: var(--danger); text-align: left; padding: 12px 16px;">
-                    ⚠️ <strong>Reset to Fresh Demo Data</strong>
+                  <button class="btn-secondary btn-touch" id="btnResetDefaults" style="color: var(--danger); text-align: left; padding: 12px 16px;">
+                    ⚠️ <strong>Reset to Clean Store Data</strong>
                   </button>
                 </div>
               </div>
 
-              <div style="margin-top: 20px; font-size: 0.78rem; color: var(--cocoa-muted);">
-                Data synchronized across all tabs via <code>FloraDB</code> reactive engine.
+              <div style="margin-top: 18px; font-size: 0.78rem; color: var(--cocoa-muted);">
+                Data synchronized across all devices & tabs via <code>FloraDB</code> reactive engine.
               </div>
             </div>
           </div>
         </section>
 
       </main>
+
+      <!-- =======================================================================
+           APPLE-GRADE MOBILE BOTTOM NAVIGATION BAR
+           ======================================================================= -->
+      <nav class="admin-mobile-nav" id="adminMobileNav">
+        <button class="mobile-nav-tab active" data-view="dashboard">
+          <span class="mobile-tab-icon">📊</span>
+          <span class="mobile-tab-label">Overview</span>
+        </button>
+        <button class="mobile-nav-tab" data-view="products">
+          <span class="mobile-tab-icon">🎂</span>
+          <span class="mobile-tab-label">Bakes</span>
+        </button>
+        <button class="mobile-nav-tab" data-view="inventory">
+          <span class="mobile-tab-icon">📋</span>
+          <span class="mobile-tab-label">Stock</span>
+        </button>
+        <button class="mobile-nav-tab" data-view="orders">
+          <span class="mobile-tab-icon">🛍️</span>
+          <span class="mobile-tab-label">Orders</span>
+          <span class="mobile-tab-badge" id="mobileOrdersBadge" style="display:none;">0</span>
+        </button>
+        <button class="mobile-nav-tab" id="mobileMoreBtn">
+          <span class="mobile-tab-icon">☰</span>
+          <span class="mobile-tab-label">Menu</span>
+        </button>
+      </nav>
+
     </div>
   </div>
 
   <!-- =========================================================================
-       3. SLIDE-OVER PRODUCT EDITOR DRAWER
+       3. SLIDE-OVER PRODUCT EDITOR DRAWER (WITH IMAGE UPLOAD)
        ========================================================================= -->
   <div class="admin-drawer-overlay" id="productDrawerOverlay"></div>
   <div class="admin-drawer" id="productDrawer">
     <div class="drawer-header">
       <h2 id="drawerTitle" class="font-serif">Add New Product</h2>
-      <button class="drawer-close-btn" id="drawerCloseBtn">&times;</button>
+      <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close Drawer">&times;</button>
     </div>
 
     <form id="productForm" class="drawer-body">
       <input type="hidden" id="prodId">
+
+      <!-- PRODUCT IMAGE UPLOAD & PREVIEW ZONE -->
+      <div class="form-group">
+        <label>Product Image (Upload Photo or Pick Preset)</label>
+        
+        <div class="image-upload-zone" id="imageDropZone">
+          <input type="file" id="prodImageFileInput" accept="image/*" style="display: none;">
+          
+          <div class="upload-prompt" id="uploadPrompt">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text">
+              <strong>Tap to upload photo</strong> from camera or gallery
+            </div>
+            <span class="upload-subtext">JPG, PNG, WEBP (stored in local database)</span>
+          </div>
+
+          <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
+            <img id="imagePreviewImg" src="" alt="Bake Photo Preview">
+            <button type="button" class="btn-remove-preview" id="btnRemovePreview" title="Remove image">&times;</button>
+            <span class="image-preview-tag">Active Photo</span>
+          </div>
+        </div>
+
+        <!-- Hidden input for final image source (URL or base64 data) -->
+        <input type="hidden" id="prodImage" value="images/cat-cakes.jpg">
+
+        <!-- Quick Preset Switcher -->
+        <div class="image-preset-picker-row">
+          <span style="font-size: 0.72rem; color: var(--cocoa-muted); font-weight: 600; text-transform: uppercase;">Or pick preset:</span>
+          <div class="preset-chips">
+            <button type="button" class="preset-chip active" data-img="images/cat-cakes.jpg">🎂 Cakes</button>
+            <button type="button" class="preset-chip" data-img="images/hero-cake.jpg">🌸 Tier Cake</button>
+            <button type="button" class="preset-chip" data-img="images/cat-pastries.jpg">🥐 Pastry</button>
+            <button type="button" class="preset-chip" data-img="images/cat-muffins.jpg">🧁 Muffin</button>
+            <button type="button" class="preset-chip" data-img="images/combo-banner.jpg">🎁 Gift Hamper</button>
+          </div>
+        </div>
+      </div>
 
       <div class="form-group">
         <label for="prodName">Product Title *</label>
@@ -589,7 +661,7 @@
         </div>
 
         <div class="form-group">
-          <label for="prodComparePrice">Compare at Price (₹)</label>
+          <label for="prodComparePrice">Compare Price (₹)</label>
           <input type="number" id="prodComparePrice" class="form-input" placeholder="1499">
         </div>
       </div>
@@ -619,17 +691,6 @@
       </div>
 
       <div class="form-group">
-        <label for="prodImage">Image Path / Preset</label>
-        <select id="prodImage" class="form-input">
-          <option value="images/cat-cakes.jpg">🎂 Signature Cake Photo (cat-cakes.jpg)</option>
-          <option value="images/hero-cake.jpg">🌸 Vintage Floral Tier (hero-cake.jpg)</option>
-          <option value="images/cat-pastries.jpg">🥐 Gourmet French Pastries (cat-pastries.jpg)</option>
-          <option value="images/cat-muffins.jpg">🧁 Floral Muffins (cat-muffins.jpg)</option>
-          <option value="images/combo-banner.jpg">🎁 Luxury Gift Hamper (combo-banner.jpg)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
         <label for="prodDesc">Product Description</label>
         <textarea id="prodDesc" class="form-input" rows="3" placeholder="Artisanal flavor notes, edible botanicals, and ingredients..."></textarea>
       </div>
@@ -647,8 +708,8 @@
     </form>
 
     <div class="drawer-footer">
-      <button type="button" class="btn-secondary" id="drawerCancelBtn">Cancel</button>
-      <button type="button" class="btn-primary" id="drawerSaveBtn">Save Product</button>
+      <button type="button" class="btn-secondary btn-touch" id="drawerCancelBtn">Cancel</button>
+      <button type="button" class="btn-primary btn-touch" id="drawerSaveBtn">Save Bake</button>
     </div>
   </div>
 
@@ -659,7 +720,7 @@
     <div class="palette-box">
       <div class="palette-input-holder">
         <span>🔍</span>
-        <input type="text" id="paletteInput" placeholder="Type a command, product name, or navigation...">
+        <input type="text" id="paletteInput" placeholder="Type a command or product name...">
         <kbd class="kbd-shortcut">ESC</kbd>
       </div>
       <div class="palette-results" id="paletteResults">
@@ -673,9 +734,9 @@
        ========================================================================= -->
   <div class="admin-drawer-overlay" id="discountModalOverlay"></div>
   <div class="command-palette-modal" id="discountModal" style="align-items: center;">
-    <div class="palette-box" style="max-width: 480px; padding: 28px;">
+    <div class="palette-box" style="max-width: 480px; padding: 24px;">
       <h2 class="font-serif" style="margin-bottom: 6px; font-size: 1.3rem;">Create Discount Coupon</h2>
-      <p style="font-size: 0.85rem; color: var(--cocoa-muted); margin-bottom: 20px;">
+      <p style="font-size: 0.85rem; color: var(--cocoa-muted); margin-bottom: 18px;">
         Coupon will instantly be redeemable by clients in the storefront cart.
       </p>
 
@@ -707,8 +768,8 @@
         </div>
 
         <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
-          <button type="button" class="btn-secondary" id="btnCancelDiscount">Cancel</button>
-          <button type="submit" class="btn-primary">Save & Activate</button>
+          <button type="button" class="btn-secondary btn-touch" id="btnCancelDiscount">Cancel</button>
+          <button type="submit" class="btn-primary btn-touch">Save & Activate</button>
         </div>
       </form>
     </div>

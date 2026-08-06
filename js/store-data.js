@@ -8,15 +8,15 @@
   'use strict';
 
   const STORAGE_KEYS = {
-    PRODUCTS: 'flora_products_v1',
-    ORDERS: 'flora_orders_v1',
-    DISCOUNTS: 'flora_discounts_v1',
-    INQUIRIES: 'flora_inquiries_v1',
-    SETTINGS: 'flora_settings_v1',
-    AUTH: 'flora_admin_auth_v1'
+    PRODUCTS: 'flora_products_v2',
+    ORDERS: 'flora_orders_v2',
+    DISCOUNTS: 'flora_discounts_v2',
+    INQUIRIES: 'flora_inquiries_v2',
+    SETTINGS: 'flora_settings_v2',
+    AUTH: 'flora_admin_auth_v2'
   };
 
-  // Initial Seed Data
+  // Initial Seed Products
   const DEFAULT_PRODUCTS = [
     {
       id: 1,
@@ -172,353 +172,275 @@
     }
   ];
 
-  const DEFAULT_ORDERS = [
-    {
-      id: "FB-1048",
-      customerName: "Priyanka Kulkarni",
-      phone: "9823019283",
-      address: "Gangapur Road, Near Navshya Ganpati, Nashik",
-      items: [
-        { name: "Blush Rose & Lychee Chiffon Cake", qty: 1, price: 1299 }
-      ],
-      subtotal: 1299,
-      discount: 130,
-      total: 1169,
-      status: "baking",
-      paymentStatus: "Paid Online",
-      date: "Today, 11:20 AM",
-      timeAgo: "25 mins ago",
-      notes: "Please write 'Happy 25th Mom & Dad' in rose gold cursive."
-    },
-    {
-      id: "FB-1047",
-      customerName: "Rohit Deshmukh",
-      phone: "9822451092",
-      address: "College Road, Behind BYK College, Nashik",
-      items: [
-        { name: "The Royal Flora + Cake Gifting Hamper", qty: 1, price: 2499 }
-      ],
-      subtotal: 2499,
-      discount: 0,
-      total: 2499,
-      status: "shipped",
-      paymentStatus: "Paid Online",
-      date: "Today, 09:45 AM",
-      timeAgo: "2 hours ago",
-      notes: "Anniversary surprise. Please deliver with luxury satin ribbon."
-    },
-    {
-      id: "FB-1046",
-      customerName: "Snehal Sharma",
-      phone: "9422781903",
-      address: "Mahatma Nagar, Opp Water Tank, Nashik",
-      items: [
-        { name: "French Lavender Berry Choux Pastries", qty: 2, price: 449 },
-        { name: "Honey Chamomile Bloom Muffins", qty: 1, price: 399 }
-      ],
-      subtotal: 1297,
-      discount: 100,
-      total: 1197,
-      status: "delivered",
-      paymentStatus: "Cash on Delivery",
-      date: "Yesterday, 04:30 PM",
-      timeAgo: "1 day ago",
-      notes: "High tea gathering box."
-    },
-    {
-      id: "FB-1045",
-      customerName: "Aditya Patil",
-      phone: "9175392019",
-      address: "Indira Nagar, Near Jogging Track, Nashik",
-      items: [
-        { name: "Victorian Vintage Lambeth Heart Cake", qty: 1, price: 1599 }
-      ],
-      subtotal: 1599,
-      discount: 160,
-      total: 1439,
-      status: "delivered",
-      paymentStatus: "Paid Online",
-      date: "05 Aug 2026, 06:15 PM",
-      timeAgo: "2 days ago",
-      notes: "Birthday cake with pastel ribbon border."
-    }
-  ];
+  // Orders initialized to clean ZERO (Empty array)
+  const DEFAULT_ORDERS = [];
+
+  // Inquiries initialized to clean ZERO (Empty array)
+  const DEFAULT_INQUIRIES = [];
 
   const DEFAULT_DISCOUNTS = [
     {
       code: "FLORA10",
       type: "percent",
       value: 10,
-      minOrder: 500,
-      description: "10% off on all floral bakes for VIP Bloom Club",
-      usageCount: 42,
+      minOrder: 499,
+      description: "10% off on all floral cakes and pastries",
       active: true,
-      expiryDate: "2026-12-31"
+      usageCount: 0
     },
     {
-      code: "BLOOM20",
+      code: "BLOOM10",
       type: "percent",
-      value: 20,
-      minOrder: 1500,
-      description: "20% off on celebration orders above ₹1,500",
-      usageCount: 18,
+      value: 10,
+      minOrder: 499,
+      description: "VIP Club 10% welcome discount",
       active: true,
-      expiryDate: "2026-09-30"
+      usageCount: 0
     },
     {
-      code: "NASHIKLOVE",
+      code: "CELEBRATE150",
       type: "fixed",
       value: 150,
-      minOrder: 999,
-      description: "Flat ₹150 off on orders above ₹999",
-      usageCount: 29,
+      minOrder: 1299,
+      description: "Flat ₹150 off on celebration cake orders above ₹1299",
       active: true,
-      expiryDate: "2026-10-15"
-    }
-  ];
-
-  const DEFAULT_INQUIRIES = [
-    {
-      id: "INQ-801",
-      customerName: "Ananya Mehta",
-      phone: "9823901234",
-      occasion: "Engagement Celebration",
-      size: "2.0 kg",
-      flavor: "Rose Lychee & Pistachio",
-      palette: "Dusty Rose, Champagne & Buttercup",
-      message: "Ananya & Siddharth 💍",
-      requiredDate: "2026-08-15",
-      notes: "Looking for a 2-tier textured buttercream design with real English tea roses inspired by Pinterest reference.",
-      status: "new",
-      date: "Today, 10:15 AM"
-    },
-    {
-      id: "INQ-800",
-      customerName: "Dr. Mihir Joshi",
-      phone: "9890123456",
-      occasion: "50th Golden Birthday",
-      size: "1.5 kg",
-      flavor: "Belgian Chocolate Truffle",
-      palette: "Vintage Lambeth Ivory & Gold",
-      message: "Golden 50 Mihir 🎉",
-      requiredDate: "2026-08-18",
-      notes: "Must be 100% Eggless pure veg. Delivery to Ashoka Marg.",
-      status: "contacted",
-      date: "Yesterday, 02:40 PM"
+      usageCount: 0
     }
   ];
 
   const DEFAULT_SETTINGS = {
     storeName: "The Flora Bakery",
-    tagline: "Handcrafted Floral Patisserie & Custom Aesthetic Cakes",
+    tagline: "Handcrafted Floral Patisserie",
+    location: "Nashik, Maharashtra",
+    address: "Ibadat Villa, Plot No. 41, Sai Nath Nagar, Nashik, Maharashtra 422006",
     phone: "070835 17862",
     whatsapp: "917083517862",
-    address: "Ibadat Villa, Plot No. 41, Sai Nath Nagar, Nashik, Maharashtra 422006",
+    instagram: "the.flora.bakery",
     freeShippingThreshold: 999,
     currencySymbol: "₹",
-    lowStockThreshold: 5,
-    taxRate: 0,
-    isOpenForOrders: true,
-    operatingHours: "09:00 AM - 10:00 PM Daily"
+    pureVegGuaranteed: true,
+    lastBackup: new Date().toISOString()
   };
 
-  class FloraDatabase {
-    constructor() {
-      this.init();
-      this.setupCrossTabSync();
-    }
-
-    init() {
-      if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
-        this.set(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS);
-      }
-      if (!localStorage.getItem(STORAGE_KEYS.ORDERS)) {
-        this.set(STORAGE_KEYS.ORDERS, DEFAULT_ORDERS);
-      }
-      if (!localStorage.getItem(STORAGE_KEYS.DISCOUNTS)) {
-        this.set(STORAGE_KEYS.DISCOUNTS, DEFAULT_DISCOUNTS);
-      }
-      if (!localStorage.getItem(STORAGE_KEYS.INQUIRIES)) {
-        this.set(STORAGE_KEYS.INQUIRIES, DEFAULT_INQUIRIES);
-      }
-      if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
-        this.set(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
-      }
-    }
-
-    get(key, fallback = []) {
+  // Safe localStorage helper
+  const Storage = {
+    get(key, defaultVal) {
       try {
         const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : fallback;
-      } catch (e) {
-        console.error("FloraDB read error:", e);
-        return fallback;
+        return data ? JSON.parse(data) : defaultVal;
+      } catch (err) {
+        console.warn(`FloraDB: Failed reading ${key}`, err);
+        return defaultVal;
       }
-    }
-
-    set(key, value) {
+    },
+    set(key, val) {
       try {
-        localStorage.setItem(key, JSON.stringify(value));
-        this.broadcastChange(key, value);
-      } catch (e) {
-        console.error("FloraDB write error:", e);
+        localStorage.setItem(key, JSON.stringify(val));
+        return true;
+      } catch (err) {
+        console.error(`FloraDB: Failed writing ${key}`, err);
+        return false;
       }
+    },
+    remove(key) {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {}
     }
+  };
 
-    broadcastChange(key, data) {
-      const event = new CustomEvent('flora:data-changed', {
-        detail: { key, data, timestamp: Date.now() }
-      });
-      window.dispatchEvent(event);
-    }
+  // Central Database Interface
+  const FloraDB = {
+    init() {
+      // Clear legacy storage if present to ensure clean zero orders
+      try {
+        localStorage.removeItem('flora_orders_v1');
+        localStorage.removeItem('flora_inquiries_v1');
+      } catch(e) {}
 
-    setupCrossTabSync() {
+      if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
+        Storage.set(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS);
+      }
+      if (!localStorage.getItem(STORAGE_KEYS.ORDERS)) {
+        Storage.set(STORAGE_KEYS.ORDERS, DEFAULT_ORDERS);
+      }
+      if (!localStorage.getItem(STORAGE_KEYS.DISCOUNTS)) {
+        Storage.set(STORAGE_KEYS.DISCOUNTS, DEFAULT_DISCOUNTS);
+      }
+      if (!localStorage.getItem(STORAGE_KEYS.INQUIRIES)) {
+        Storage.set(STORAGE_KEYS.INQUIRIES, DEFAULT_INQUIRIES);
+      }
+      if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
+        Storage.set(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+      }
+
+      // Sync across browser tabs in real time
       window.addEventListener('storage', (e) => {
         if (Object.values(STORAGE_KEYS).includes(e.key)) {
-          this.broadcastChange(e.key, this.get(e.key));
+          this.broadcastChange(e.key, 'remote-tab-sync');
         }
       });
-    }
+    },
 
-    // Products API
-    getProducts(options = {}) {
-      let products = this.get(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS);
+    broadcastChange(key, detail = {}) {
+      const event = new CustomEvent('flora:data-changed', {
+        detail: { key, ...detail, timestamp: Date.now() }
+      });
+      window.dispatchEvent(event);
+    },
+
+    // =========================================================================
+    // 1. PRODUCTS CRUD
+    // =========================================================================
+    getProducts(filter = {}) {
+      let products = Storage.get(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS);
       
-      if (options.category && options.category !== 'all') {
-        products = products.filter(p => p.category === options.category);
+      if (filter.category && filter.category !== 'all') {
+        products = products.filter(p => p.category === filter.category);
       }
-      if (options.status) {
-        products = products.filter(p => p.status === options.status);
-      }
-      if (options.search) {
-        const q = options.search.toLowerCase().trim();
+      if (filter.search) {
+        const q = filter.search.toLowerCase().trim();
         products = products.filter(p => 
           p.name.toLowerCase().includes(q) || 
-          (p.description && p.description.toLowerCase().includes(q)) ||
+          (p.sku && p.sku.toLowerCase().includes(q)) ||
           (p.categoryLabel && p.categoryLabel.toLowerCase().includes(q)) ||
-          (p.sku && p.sku.toLowerCase().includes(q))
+          (p.description && p.description.toLowerCase().includes(q))
         );
       }
-      if (options.onlyInStock) {
-        products = products.filter(p => p.stock > 0);
+      if (filter.status && filter.status !== 'all') {
+        products = products.filter(p => p.status === filter.status);
       }
+      if (filter.egglessOnly) {
+        products = products.filter(p => p.eggless);
+      }
+
       return products;
-    }
+    },
 
     getProductById(id) {
       const products = this.getProducts();
       return products.find(p => p.id === Number(id)) || null;
-    }
+    },
 
     saveProduct(productData) {
       const products = this.getProducts();
-      const numId = Number(productData.id);
+      let savedProduct;
 
-      if (numId) {
-        const index = products.findIndex(p => p.id === numId);
-        if (index !== -1) {
-          products[index] = {
-            ...products[index],
+      if (productData.id) {
+        // Edit existing product
+        const idx = products.findIndex(p => p.id === Number(productData.id));
+        if (idx !== -1) {
+          products[idx] = {
+            ...products[idx],
             ...productData,
-            id: numId,
-            price: Number(productData.price) || 0,
-            stock: Number(productData.stock) >= 0 ? Number(productData.stock) : 0,
-            comparePrice: productData.comparePrice ? Number(productData.comparePrice) : null,
+            id: Number(productData.id),
             updatedAt: new Date().toISOString()
           };
-          this.set(STORAGE_KEYS.PRODUCTS, products);
-          return products[index];
+          savedProduct = products[idx];
         }
+      } else {
+        // Create new product
+        const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+        savedProduct = {
+          id: newId,
+          name: productData.name || "Untitled Bake",
+          category: productData.category || "cakes",
+          categoryLabel: productData.categoryLabel || this.getCategoryLabel(productData.category),
+          price: Number(productData.price) || 999,
+          comparePrice: productData.comparePrice ? Number(productData.comparePrice) : null,
+          stock: productData.stock !== undefined ? Number(productData.stock) : 10,
+          unit: productData.unit || "0.5 kg",
+          rating: 5.0,
+          reviews: 1,
+          badge: productData.badge || "New",
+          eggless: productData.eggless !== undefined ? productData.eggless : true,
+          sku: productData.sku || `FB-${(productData.category || 'CK').substring(0,2).toUpperCase()}-${String(newId).padStart(3, '0')}`,
+          image: productData.image || "images/cat-cakes.jpg",
+          description: productData.description || "Freshly baked handcrafted floral specialty.",
+          status: productData.status || "active",
+          createdAt: new Date().toISOString()
+        };
+        products.push(savedProduct);
       }
 
-      const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-      const newProduct = {
-        ...productData,
-        id: newId,
-        price: Number(productData.price) || 0,
-        stock: Number(productData.stock) >= 0 ? Number(productData.stock) : 10,
-        comparePrice: productData.comparePrice ? Number(productData.comparePrice) : null,
-        rating: productData.rating || 5.0,
-        reviews: productData.reviews || 1,
-        badge: productData.badge || "New",
-        eggless: productData.eggless !== undefined ? productData.eggless : true,
-        sku: productData.sku || `FB-ITM-${String(newId).padStart(3, '0')}`,
-        status: productData.status || "active",
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-
-      products.unshift(newProduct);
-      this.set(STORAGE_KEYS.PRODUCTS, products);
-      return newProduct;
-    }
+      Storage.set(STORAGE_KEYS.PRODUCTS, products);
+      this.broadcastChange(STORAGE_KEYS.PRODUCTS, { action: 'save-product', product: savedProduct });
+      return savedProduct;
+    },
 
     deleteProduct(id) {
-      const products = this.getProducts();
-      const filtered = products.filter(p => p.id !== Number(id));
-      this.set(STORAGE_KEYS.PRODUCTS, filtered);
+      let products = this.getProducts();
+      const target = products.find(p => p.id === Number(id));
+      products = products.filter(p => p.id !== Number(id));
+      Storage.set(STORAGE_KEYS.PRODUCTS, products);
+      this.broadcastChange(STORAGE_KEYS.PRODUCTS, { action: 'delete-product', id, product: target });
       return true;
-    }
-
-    duplicateProduct(id) {
-      const target = this.getProductById(id);
-      if (!target) return null;
-
-      const clone = {
-        ...target,
-        id: null,
-        name: `${target.name} (Copy)`,
-        sku: `${target.sku}-COPY`,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-      return this.saveProduct(clone);
-    }
-
-    updateStock(id, newStock) {
-      const products = this.getProducts();
-      const item = products.find(p => p.id === Number(id));
-      if (item) {
-        item.stock = Math.max(0, Number(newStock));
-        this.set(STORAGE_KEYS.PRODUCTS, products);
-        return item.stock;
-      }
-      return null;
-    }
+    },
 
     adjustStock(id, delta) {
       const products = this.getProducts();
-      const item = products.find(p => p.id === Number(id));
-      if (item) {
-        item.stock = Math.max(0, item.stock + delta);
-        this.set(STORAGE_KEYS.PRODUCTS, products);
-        return item.stock;
+      const p = products.find(prod => prod.id === Number(id));
+      if (p) {
+        p.stock = Math.max(0, (p.stock || 0) + Number(delta));
+        Storage.set(STORAGE_KEYS.PRODUCTS, products);
+        this.broadcastChange(STORAGE_KEYS.PRODUCTS, { action: 'stock-adjusted', id, newStock: p.stock });
+        return p.stock;
       }
       return null;
-    }
+    },
 
-    // Orders API
-    getOrders(options = {}) {
-      let orders = this.get(STORAGE_KEYS.ORDERS, DEFAULT_ORDERS);
-      if (options.status && options.status !== 'all') {
-        orders = orders.filter(o => o.status === options.status);
+    duplicateProduct(id) {
+      const orig = this.getProductById(id);
+      if (!orig) return null;
+
+      const clone = {
+        ...orig,
+        id: null,
+        name: `${orig.name} (Copy)`,
+        sku: `${orig.sku || 'FB'}-COPY`,
+        createdAt: new Date().toISOString()
+      };
+      return this.saveProduct(clone);
+    },
+
+    getCategoryLabel(category) {
+      const labels = {
+        cakes: "Signature Floral Cake",
+        pastries: "Designer Pastry",
+        muffins: "Artisanal Muffin",
+        combos: "Luxury Gift Hamper"
+      };
+      return labels[category] || "Artisanal Bake";
+    },
+
+    // =========================================================================
+    // 2. ORDERS & LOGISTICS
+    // =========================================================================
+    getOrders(filter = {}) {
+      let orders = Storage.get(STORAGE_KEYS.ORDERS, DEFAULT_ORDERS);
+
+      if (filter.status && filter.status !== 'all') {
+        orders = orders.filter(o => o.status === filter.status);
       }
-      if (options.search) {
-        const q = options.search.toLowerCase().trim();
+      if (filter.search) {
+        const q = filter.search.toLowerCase().trim();
         orders = orders.filter(o => 
           o.id.toLowerCase().includes(q) ||
           o.customerName.toLowerCase().includes(q) ||
-          o.phone.includes(q) ||
-          o.address.toLowerCase().includes(q)
+          (o.phone && o.phone.includes(q)) ||
+          (o.address && o.address.toLowerCase().includes(q))
         );
       }
+
       return orders;
-    }
+    },
 
     addOrder(orderData) {
       const orders = this.getOrders();
-      const nextNum = 1040 + orders.length + 1;
+      const newOrderNum = orders.length > 0 ? 1000 + orders.length + 1 : 1001;
       const newOrder = {
-        id: `FB-${nextNum}`,
-        customerName: orderData.customerName || "Website Shopper",
+        id: `FB-${newOrderNum}`,
+        customerName: orderData.customerName || "Customer",
         phone: orderData.phone || "070835 17862",
         address: orderData.address || "Nashik, Maharashtra",
         items: orderData.items || [],
@@ -526,235 +448,253 @@
         discount: Number(orderData.discount) || 0,
         total: Number(orderData.total) || 0,
         status: "pending",
-        paymentStatus: orderData.paymentStatus || "WhatsApp Order / COD",
-        date: "Today, Just now",
-        timeAgo: "Few seconds ago",
-        notes: orderData.notes || "Placed via website instant checkout."
+        paymentStatus: orderData.paymentStatus || "WhatsApp Order Pending",
+        date: "Just now",
+        timeAgo: "1m ago",
+        notes: orderData.notes || "",
+        createdAt: new Date().toISOString()
       };
 
+      orders.unshift(newOrder);
+      Storage.set(STORAGE_KEYS.ORDERS, orders);
+
+      // Decrement inventory stock for ordered items
       if (Array.isArray(orderData.items)) {
         orderData.items.forEach(item => {
-          if (item.id) {
-            this.adjustStock(item.id, -(item.qty || 1));
-          }
+          this.adjustStock(item.id, -(item.qty || 1));
         });
       }
 
-      orders.unshift(newOrder);
-      this.set(STORAGE_KEYS.ORDERS, orders);
+      this.broadcastChange(STORAGE_KEYS.ORDERS, { action: 'new-order', order: newOrder });
       return newOrder;
-    }
+    },
 
     updateOrderStatus(orderId, newStatus) {
       const orders = this.getOrders();
       const order = orders.find(o => o.id === orderId);
       if (order) {
         order.status = newStatus;
-        this.set(STORAGE_KEYS.ORDERS, orders);
-        return order;
+        order.updatedAt = new Date().toISOString();
+        Storage.set(STORAGE_KEYS.ORDERS, orders);
+        this.broadcastChange(STORAGE_KEYS.ORDERS, { action: 'order-status-update', orderId, status: newStatus });
+        return true;
       }
-      return null;
-    }
+      return false;
+    },
 
-    // Discounts API
+    clearAllOrders() {
+      Storage.set(STORAGE_KEYS.ORDERS, []);
+      this.broadcastChange(STORAGE_KEYS.ORDERS, { action: 'orders-cleared' });
+      return true;
+    },
+
+    // =========================================================================
+    // 3. DISCOUNTS & COUPONS
+    // =========================================================================
     getDiscounts() {
-      return this.get(STORAGE_KEYS.DISCOUNTS, DEFAULT_DISCOUNTS);
-    }
+      return Storage.get(STORAGE_KEYS.DISCOUNTS, DEFAULT_DISCOUNTS);
+    },
 
-    saveDiscount(discountData) {
+    saveDiscount(discount) {
       const discounts = this.getDiscounts();
-      const upperCode = (discountData.code || '').trim().toUpperCase();
-      if (!upperCode) return null;
+      const code = (discount.code || '').trim().toUpperCase();
+      const idx = discounts.findIndex(d => d.code === code);
 
-      const existingIndex = discounts.findIndex(d => d.code === upperCode);
-      const newEntry = {
-        code: upperCode,
-        type: discountData.type || 'percent',
-        value: Number(discountData.value) || 10,
-        minOrder: Number(discountData.minOrder) || 0,
-        description: discountData.description || `Special ${discountData.value}% discount`,
-        usageCount: discountData.usageCount || 0,
-        active: discountData.active !== undefined ? discountData.active : true,
-        expiryDate: discountData.expiryDate || "2026-12-31"
+      const discountObj = {
+        code,
+        type: discount.type || 'percent',
+        value: Number(discount.value) || 10,
+        minOrder: Number(discount.minOrder) || 0,
+        description: discount.description || `${discount.value}% off coupon`,
+        active: discount.active !== undefined ? discount.active : true,
+        usageCount: discount.usageCount || 0
       };
 
-      if (existingIndex !== -1) {
-        discounts[existingIndex] = newEntry;
+      if (idx !== -1) {
+        discounts[idx] = discountObj;
       } else {
-        discounts.unshift(newEntry);
+        discounts.push(discountObj);
       }
 
-      this.set(STORAGE_KEYS.DISCOUNTS, discounts);
-      return newEntry;
-    }
+      Storage.set(STORAGE_KEYS.DISCOUNTS, discounts);
+      this.broadcastChange(STORAGE_KEYS.DISCOUNTS, { action: 'save-discount', discount: discountObj });
+      return discountObj;
+    },
 
     deleteDiscount(code) {
-      const discounts = this.getDiscounts();
-      const filtered = discounts.filter(d => d.code !== code.toUpperCase());
-      this.set(STORAGE_KEYS.DISCOUNTS, filtered);
+      let discounts = this.getDiscounts();
+      discounts = discounts.filter(d => d.code !== code.toUpperCase());
+      Storage.set(STORAGE_KEYS.DISCOUNTS, discounts);
+      this.broadcastChange(STORAGE_KEYS.DISCOUNTS, { action: 'delete-discount', code });
       return true;
-    }
+    },
 
-    validateDiscount(code, cartSubtotal) {
-      if (!code) return { valid: false, message: "Please enter a promo code." };
+    validateDiscount(code, subtotal = 0) {
       const discounts = this.getDiscounts();
-      const match = discounts.find(d => d.code.toUpperCase() === code.trim().toUpperCase());
+      const cleanCode = (code || '').trim().toUpperCase();
+      const found = discounts.find(d => d.code === cleanCode && d.active);
 
-      if (!match) {
-        return { valid: false, message: "Invalid coupon code." };
+      if (!found) {
+        return { valid: false, message: `Coupon code "${cleanCode}" is not recognized.` };
       }
-      if (!match.active) {
-        return { valid: false, message: "This coupon is no longer active." };
-      }
-      if (match.minOrder && cartSubtotal < match.minOrder) {
-        return { valid: false, message: `Minimum order value for ${match.code} is ₹${match.minOrder}.` };
+      if (subtotal < found.minOrder) {
+        return { valid: false, message: `Coupon requires a minimum order of ₹${found.minOrder}.` };
       }
 
       let discountAmount = 0;
-      if (match.type === 'percent') {
-        discountAmount = Math.round((cartSubtotal * match.value) / 100);
+      if (found.type === 'percent') {
+        discountAmount = Math.round((subtotal * found.value) / 100);
       } else {
-        discountAmount = Math.min(cartSubtotal, match.value);
+        discountAmount = Math.min(subtotal, found.value);
       }
 
       return {
         valid: true,
-        discount: match,
-        amount: discountAmount,
-        discountPercent: match.type === 'percent' ? match.value / 100 : discountAmount / Math.max(1, cartSubtotal),
-        message: `🌸 Coupon "${match.code}" applied! You saved ₹${discountAmount}.`
+        discount: found,
+        discountAmount,
+        message: `✨ ${found.code} applied! Saved ₹${discountAmount}`
       };
-    }
+    },
 
-    // Inquiries API
+    // =========================================================================
+    // 4. CUSTOM CAKE INQUIRIES
+    // =========================================================================
     getInquiries() {
-      return this.get(STORAGE_KEYS.INQUIRIES, DEFAULT_INQUIRIES);
-    }
+      return Storage.get(STORAGE_KEYS.INQUIRIES, DEFAULT_INQUIRIES);
+    },
 
-    addInquiry(inqData) {
+    addInquiry(inquiryData) {
       const inquiries = this.getInquiries();
-      const nextId = `INQ-${800 + inquiries.length + 1}`;
-      const newInq = {
-        id: nextId,
-        customerName: inqData.customerName || "Custom Cake Client",
-        phone: inqData.phone || "070835 17862",
-        occasion: inqData.occasion || "Celebration",
-        size: inqData.size || "1.0 kg",
-        flavor: inqData.flavor || "Signature Rose Chiffon",
-        palette: inqData.palette || "Pastel Floral",
-        message: inqData.message || "None",
-        requiredDate: inqData.requiredDate || "Upcoming",
-        notes: inqData.notes || "None",
+      const newInquiry = {
+        id: `INQ-${100 + inquiries.length + 1}`,
+        customerName: inquiryData.customerName || "Customer",
+        phone: inquiryData.phone || "070835 17862",
+        occasion: inquiryData.occasion || "Celebration",
+        size: inquiryData.size || "1.0 kg",
+        flavor: inquiryData.flavor || "Rose & Lychee Chiffon",
+        palette: inquiryData.palette || "Blush Pink",
+        message: inquiryData.message || "",
+        requiredDate: inquiryData.requiredDate || "Upcoming",
+        notes: inquiryData.notes || "",
         status: "new",
-        date: "Today, Just now"
+        date: "Just now",
+        createdAt: new Date().toISOString()
       };
 
-      inquiries.unshift(newInq);
-      this.set(STORAGE_KEYS.INQUIRIES, inquiries);
-      return newInq;
-    }
+      inquiries.unshift(newInquiry);
+      Storage.set(STORAGE_KEYS.INQUIRIES, inquiries);
+      this.broadcastChange(STORAGE_KEYS.INQUIRIES, { action: 'new-inquiry', inquiry: newInquiry });
+      return newInquiry;
+    },
 
-    updateInquiryStatus(id, newStatus) {
+    updateInquiryStatus(inquiryId, status) {
       const inquiries = this.getInquiries();
-      const inq = inquiries.find(i => i.id === id);
+      const inq = inquiries.find(i => i.id === inquiryId);
       if (inq) {
-        inq.status = newStatus;
-        this.set(STORAGE_KEYS.INQUIRIES, inquiries);
-        return inq;
+        inq.status = status;
+        Storage.set(STORAGE_KEYS.INQUIRIES, inquiries);
+        this.broadcastChange(STORAGE_KEYS.INQUIRIES, { action: 'inquiry-status-update', inquiryId, status });
+        return true;
       }
-      return null;
-    }
+      return false;
+    },
 
-    // Settings API
+    clearAllInquiries() {
+      Storage.set(STORAGE_KEYS.INQUIRIES, []);
+      this.broadcastChange(STORAGE_KEYS.INQUIRIES, { action: 'inquiries-cleared' });
+      return true;
+    },
+
+    // =========================================================================
+    // 5. SETTINGS & PROFILE
+    // =========================================================================
     getSettings() {
-      return this.get(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
-    }
+      return Storage.get(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+    },
 
     saveSettings(newSettings) {
       const current = this.getSettings();
-      const updated = { ...current, ...newSettings };
-      this.set(STORAGE_KEYS.SETTINGS, updated);
+      const updated = { ...current, ...newSettings, updatedAt: new Date().toISOString() };
+      Storage.set(STORAGE_KEYS.SETTINGS, updated);
+      this.broadcastChange(STORAGE_KEYS.SETTINGS, { action: 'save-settings', settings: updated });
       return updated;
-    }
+    },
 
-    // Analytics Engine
+    // =========================================================================
+    // 6. ANALYTICS & DASHBOARD METRICS
+    // =========================================================================
     getAnalytics() {
       const products = this.getProducts();
       const orders = this.getOrders();
       const inquiries = this.getInquiries();
 
-      const totalRevenue = orders
-        .filter(o => o.status !== 'cancelled')
-        .reduce((sum, o) => sum + (o.total || 0), 0);
-
-      const activeOrdersCount = orders.filter(o => ['pending', 'baking', 'shipped'].includes(o.status)).length;
-      const completedOrdersCount = orders.filter(o => o.status === 'delivered').length;
-      const aov = orders.length > 0 ? Math.round(totalRevenue / Math.max(1, orders.length)) : 0;
-
-      const lowStockProducts = products.filter(p => p.stock <= 5);
-      const outOfStockProducts = products.filter(p => p.stock === 0);
-
-      const categoryCounts = {
-        cakes: products.filter(p => p.category === 'cakes').length,
-        pastries: products.filter(p => p.category === 'pastries').length,
-        muffins: products.filter(p => p.category === 'muffins').length,
-        combos: products.filter(p => p.category === 'combos').length
-      };
+      const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+      const totalOrders = orders.length;
+      const aov = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
+      const lowStockItems = products.filter(p => p.stock <= 5);
+      const activeOrders = orders.filter(o => o.status === 'baking' || o.status === 'pending' || o.status === 'shipped');
 
       return {
         totalRevenue,
-        totalOrders: orders.length,
-        activeOrdersCount,
-        completedOrdersCount,
+        totalOrders,
         aov,
         totalProducts: products.length,
-        lowStockCount: lowStockProducts.length,
-        outOfStockCount: outOfStockProducts.length,
-        lowStockProducts,
-        inquiriesCount: inquiries.filter(i => i.status === 'new').length,
-        categoryCounts,
+        lowStockCount: lowStockItems.length,
+        lowStockItems,
+        activeOrdersCount: activeOrders.length,
+        inquiriesCount: inquiries.length,
         recentOrders: orders.slice(0, 5)
       };
-    }
+    },
 
-    // Backup & Restore
+    // =========================================================================
+    // 7. BACKUP, EXPORT & FACTORY RESET
+    // =========================================================================
     exportJSON() {
-      const payload = {
+      const fullSnapshot = {
+        version: "2.0",
+        exportDate: new Date().toISOString(),
         products: this.getProducts(),
         orders: this.getOrders(),
         discounts: this.getDiscounts(),
         inquiries: this.getInquiries(),
-        settings: this.getSettings(),
-        exportedAt: new Date().toISOString(),
-        version: "1.0"
+        settings: this.getSettings()
       };
-      return JSON.stringify(payload, null, 2);
-    }
+      return JSON.stringify(fullSnapshot, null, 2);
+    },
 
     importJSON(jsonString) {
       try {
-        const parsed = JSON.parse(jsonString);
-        if (parsed.products) this.set(STORAGE_KEYS.PRODUCTS, parsed.products);
-        if (parsed.orders) this.set(STORAGE_KEYS.ORDERS, parsed.orders);
-        if (parsed.discounts) this.set(STORAGE_KEYS.DISCOUNTS, parsed.discounts);
-        if (parsed.inquiries) this.set(STORAGE_KEYS.INQUIRIES, parsed.inquiries);
-        if (parsed.settings) this.set(STORAGE_KEYS.SETTINGS, parsed.settings);
+        const data = JSON.parse(jsonString);
+        if (data.products && Array.isArray(data.products)) Storage.set(STORAGE_KEYS.PRODUCTS, data.products);
+        if (data.orders && Array.isArray(data.orders)) Storage.set(STORAGE_KEYS.ORDERS, data.orders);
+        if (data.discounts && Array.isArray(data.discounts)) Storage.set(STORAGE_KEYS.DISCOUNTS, data.discounts);
+        if (data.inquiries && Array.isArray(data.inquiries)) Storage.set(STORAGE_KEYS.INQUIRIES, data.inquiries);
+        if (data.settings) Storage.set(STORAGE_KEYS.SETTINGS, data.settings);
+
+        this.broadcastChange('all', { action: 'import-backup' });
         return { success: true };
-      } catch (e) {
-        return { success: false, error: e.message };
+      } catch (err) {
+        console.error("FloraDB: JSON import failed", err);
+        return { success: false, error: err.message };
       }
-    }
+    },
 
     resetToDefaults() {
-      this.set(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS);
-      this.set(STORAGE_KEYS.ORDERS, DEFAULT_ORDERS);
-      this.set(STORAGE_KEYS.DISCOUNTS, DEFAULT_DISCOUNTS);
-      this.set(STORAGE_KEYS.INQUIRIES, DEFAULT_INQUIRIES);
-      this.set(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+      Storage.set(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS);
+      Storage.set(STORAGE_KEYS.ORDERS, DEFAULT_ORDERS);
+      Storage.set(STORAGE_KEYS.DISCOUNTS, DEFAULT_DISCOUNTS);
+      Storage.set(STORAGE_KEYS.INQUIRIES, DEFAULT_INQUIRIES);
+      Storage.set(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+      this.broadcastChange('all', { action: 'factory-reset' });
       return true;
     }
-  }
+  };
 
-  window.FloraDB = new FloraDatabase();
+  // Boot Database Engine
+  FloraDB.init();
+
+  // Expose to Global Scope
+  window.FloraDB = FloraDB;
 
 })(window);

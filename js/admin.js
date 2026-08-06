@@ -1,7 +1,7 @@
 /**
  * THE FLORA BAKERY - ADMIN SUITE CONTROLLER
  * High-performance, Apple-grade interface manager
- * Handles Authentication, Real-time CRUD, Inventory Steppers, WhatsApp Order Dispatch & Command Palette
+ * Handles Authentication, Real-time CRUD, Product Image Uploading, Mobile Nav, Inventory Steppers & WhatsApp Dispatch
  */
 
 (function() {
@@ -14,6 +14,7 @@
     init() {
       this.checkAuth();
       this.bindEvents();
+      this.setupImageUploader();
       this.setupKeyboardShortcuts();
       this.listenToDataChanges();
     },
@@ -77,29 +78,56 @@
         });
       }
 
-      // Sidebar Navigation
+      // Desktop Sidebar Navigation
       document.querySelectorAll('.sidebar-menu .nav-item').forEach(item => {
         item.addEventListener('click', (e) => {
           e.preventDefault();
           const view = item.getAttribute('data-view');
-          if (view) this.switchView(view);
+          if (view) {
+            this.switchView(view);
+            this.closeMobileSidebar();
+          }
         });
       });
 
-      // Mobile Menu Toggle
-      const mobileToggle = document.getElementById('mobileMenuToggle');
-      const sidebar = document.getElementById('adminSidebar');
-      if (mobileToggle && sidebar) {
-        mobileToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('mobile-open');
+      // Mobile Bottom Navigation Tabs
+      document.querySelectorAll('.admin-mobile-nav .mobile-nav-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          const view = tab.getAttribute('data-view');
+          if (view) {
+            this.switchView(view);
+          }
+        });
+      });
+
+      // Mobile "More" Tab -> Opens Sidebar Drawer
+      const mobileMoreBtn = document.getElementById('mobileMoreBtn');
+      if (mobileMoreBtn) {
+        mobileMoreBtn.addEventListener('click', () => {
+          this.openMobileSidebar();
         });
       }
+
+      // Mobile Menu Toggle Button (Header)
+      const mobileToggle = document.getElementById('mobileMenuToggle');
+      if (mobileToggle) {
+        mobileToggle.addEventListener('click', () => {
+          this.toggleMobileSidebar();
+        });
+      }
+
+      // Mobile Sidebar Close Button & Backdrop
+      const sidebarCloseMobileBtn = document.getElementById('sidebarCloseMobileBtn');
+      const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+      if (sidebarCloseMobileBtn) sidebarCloseMobileBtn.addEventListener('click', () => this.closeMobileSidebar());
+      if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => this.closeMobileSidebar());
 
       // Profile Dropdown / Logout
       const profileBtn = document.getElementById('adminProfileBtn');
       if (profileBtn) {
         profileBtn.addEventListener('click', () => {
-          if (confirm('Do you want to log out of the Admin Suite?')) {
+          if (confirm('Do you want to log out of the Admin Studio?')) {
             this.logout();
           }
         });
@@ -163,11 +191,22 @@
         });
       }
 
-      // Order Filters
+      // Order Filters & Clear Orders Button
       const orderSearch = document.getElementById('orderSearchInput');
       const orderStatus = document.getElementById('orderStatusFilter');
+      const btnClearOrdersBtn = document.getElementById('btnClearOrdersBtn');
       if (orderSearch) orderSearch.addEventListener('input', () => this.renderOrdersTable());
       if (orderStatus) orderStatus.addEventListener('change', () => this.renderOrdersTable());
+      if (btnClearOrdersBtn) {
+        btnClearOrdersBtn.addEventListener('click', () => {
+          if (confirm('Are you sure you want to clear all orders and reset count to 0?')) {
+            FloraDB.clearAllOrders();
+            this.renderOrdersTable();
+            this.renderDashboard();
+            this.showToast('🗑️ All orders cleared. Count reset to 0.', 'info');
+          }
+        });
+      }
 
       // Discount Modal Controls
       const btnCreateDiscount = document.getElementById('btnCreateDiscount');
@@ -253,7 +292,7 @@
             reader.onload = (event) => {
               const res = FloraDB.importJSON(event.target.result);
               if (res.success) {
-                this.showToast('📤 Database restored from backup!', 'success');
+                this.showToast('📤 Store database successfully restored!', 'success');
                 this.loadAllData();
               } else {
                 this.showToast(`Import failed: ${res.error}`, 'error');
@@ -267,277 +306,339 @@
       const btnResetDefaults = document.getElementById('btnResetDefaults');
       if (btnResetDefaults) {
         btnResetDefaults.addEventListener('click', () => {
-          if (confirm('Reset entire store to initial demo products and orders?')) {
+          if (confirm('Reset store catalog to clean default items with 0 orders?')) {
             FloraDB.resetToDefaults();
-            this.showToast('Store reset to clean demo data.', 'info');
+            this.showToast('🔄 Store reset to clean state.', 'info');
             this.loadAllData();
           }
         });
       }
-
-      // Command Palette Trigger
-      const globalSearchTrigger = document.getElementById('globalSearchTrigger');
-      if (globalSearchTrigger) {
-        globalSearchTrigger.addEventListener('click', () => this.openCommandPalette());
-      }
     },
 
     // =========================================================================
-    // 3. KEYBOARD SHORTCUTS & COMMAND PALETTE (Apple ⌘K)
+    // 3. IMAGE UPLOAD & ASSET MANAGER
     // =========================================================================
-    setupKeyboardShortcuts() {
-      window.addEventListener('keydown', (e) => {
-        // ⌘K or Ctrl+K -> Command Palette
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-          e.preventDefault();
-          this.toggleCommandPalette();
-        }
+    setupImageUploader() {
+      const dropZone = document.getElementById('imageDropZone');
+      const fileInput = document.getElementById('prodImageFileInput');
+      const promptBox = document.getElementById('uploadPrompt');
+      const previewBox = document.getElementById('imagePreviewContainer');
+      const previewImg = document.getElementById('imagePreviewImg');
+      const removeBtn = document.getElementById('btnRemovePreview');
+      const hiddenInput = document.getElementById('prodImage');
 
-        // Escape -> Close drawers & modals
-        if (e.key === 'Escape') {
-          this.closeProductDrawer();
-          this.closeCommandPalette();
-          document.getElementById('discountModal')?.classList.remove('active');
-          document.getElementById('discountModalOverlay')?.classList.remove('active');
-        }
+      if (!dropZone || !fileInput) return;
 
-        // N key (when not typing in an input) -> New Product
-        if (e.key.toLowerCase() === 'n' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
-          e.preventDefault();
-          this.openProductDrawer();
+      // Click dropzone triggers file selector
+      dropZone.addEventListener('click', (e) => {
+        if (e.target !== removeBtn && !e.target.closest('#btnRemovePreview')) {
+          fileInput.click();
         }
       });
 
-      const paletteInput = document.getElementById('paletteInput');
-      if (paletteInput) {
-        paletteInput.addEventListener('input', (e) => {
-          this.renderPaletteResults(e.target.value);
-        });
-      }
-    },
-
-    toggleCommandPalette() {
-      const palette = document.getElementById('commandPalette');
-      if (palette.classList.contains('active')) {
-        this.closeCommandPalette();
-      } else {
-        this.openCommandPalette();
-      }
-    },
-
-    openCommandPalette() {
-      const palette = document.getElementById('commandPalette');
-      const input = document.getElementById('paletteInput');
-      palette.classList.add('active');
-      input.value = '';
-      input.focus();
-      this.renderPaletteResults('');
-    },
-
-    closeCommandPalette() {
-      document.getElementById('commandPalette').classList.remove('active');
-    },
-
-    renderPaletteResults(query) {
-      const container = document.getElementById('paletteResults');
-      const q = query.toLowerCase().trim();
-      const products = FloraDB.getProducts();
-
-      const items = [
-        { label: '📊 Go to Dashboard', action: () => this.switchView('dashboard'), type: 'Navigation' },
-        { label: '🎂 Go to Products Catalog', action: () => this.switchView('products'), type: 'Navigation' },
-        { label: '📋 Go to Inventory Radar', action: () => this.switchView('inventory'), type: 'Navigation' },
-        { label: '🛍️ Go to Orders Pipeline', action: () => this.switchView('orders'), type: 'Navigation' },
-        { label: '🏷️ Go to Discounts & Coupons', action: () => this.switchView('discounts'), type: 'Navigation' },
-        { label: '💌 Go to Custom Inquiries', action: () => this.switchView('inquiries'), type: 'Navigation' },
-        { label: '➕ Add New Floral Product', action: () => this.openProductDrawer(), type: 'Action' },
-        { label: '📦 Batch Restock Catalog (+10 units)', action: () => { products.forEach(p => FloraDB.adjustStock(p.id, 10)); this.showToast('Batch restocked!', 'success'); }, type: 'Action' },
-        { label: '🌸 Open Customer Storefront (New Tab)', action: () => window.open('index.html', '_blank'), type: 'External' }
-      ];
-
-      // Add product matches
-      products.forEach(p => {
-        items.push({
-          label: `Edit Bake: ${p.name} (₹${p.price})`,
-          action: () => this.openProductDrawer(p.id),
-          type: `Product &bull; ${p.categoryLabel}`
-        });
+      // Handle File Selection
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          this.processUploadedImage(file);
+        }
       });
 
-      const filtered = q ? items.filter(i => i.label.toLowerCase().includes(q) || i.type.toLowerCase().includes(q)) : items;
+      // Drag & Drop Handlers
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = 'var(--rose-primary)';
+        dropZone.style.background = 'rgba(232, 105, 138, 0.15)';
+      });
 
-      if (filtered.length === 0) {
-        container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--cocoa-muted); font-size: 0.9rem;">No results found for "${query}"</div>`;
+      dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '';
+        dropZone.style.background = '';
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '';
+        dropZone.style.background = '';
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          this.processUploadedImage(e.dataTransfer.files[0]);
+        }
+      });
+
+      // Remove Preview
+      if (removeBtn) {
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.setImagePreview('images/cat-cakes.jpg');
+          this.showToast('Photo removed. Reset to default preset.', 'info');
+        });
+      }
+
+      // Preset Chips Click Handler
+      document.querySelectorAll('.preset-chip').forEach(chip => {
+        chip.addEventListener('click', (e) => {
+          e.preventDefault();
+          const imgPath = chip.getAttribute('data-img');
+          if (imgPath) {
+            document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            this.setImagePreview(imgPath);
+          }
+        });
+      });
+    },
+
+    processUploadedImage(file) {
+      if (!file.type.startsWith('image/')) {
+        this.showToast('Please select a valid image file (JPG, PNG, WEBP).', 'error');
         return;
       }
 
-      container.innerHTML = filtered.map((item, idx) => `
-        <div class="palette-item" data-idx="${idx}">
-          <span style="font-weight: 500;">${item.label}</span>
-          <span style="margin-left: auto; font-size: 0.75rem; color: var(--cocoa-muted);">${item.type}</span>
-        </div>
-      `).join('');
+      // Check max size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.showToast('Image is too large. Please choose an image under 5MB.', 'error');
+        return;
+      }
 
-      container.querySelectorAll('.palette-item').forEach((elem, index) => {
-        elem.addEventListener('click', () => {
-          this.closeCommandPalette();
-          filtered[index].action();
-        });
-      });
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64Data = event.target.result;
+        this.setImagePreview(base64Data);
+        this.showToast('📷 Photo uploaded and set for this bake!', 'success');
+      };
+      reader.readAsDataURL(file);
+    },
+
+    setImagePreview(src) {
+      const promptBox = document.getElementById('uploadPrompt');
+      const previewBox = document.getElementById('imagePreviewContainer');
+      const previewImg = document.getElementById('imagePreviewImg');
+      const hiddenInput = document.getElementById('prodImage');
+
+      if (!hiddenInput) return;
+
+      hiddenInput.value = src || 'images/cat-cakes.jpg';
+
+      if (previewImg && promptBox && previewBox) {
+        if (src) {
+          previewImg.src = src;
+          previewBox.style.display = 'block';
+          promptBox.style.display = 'none';
+        } else {
+          previewBox.style.display = 'none';
+          promptBox.style.display = 'flex';
+        }
+      }
     },
 
     // =========================================================================
-    // 4. VIEW ROUTING & REAL-TIME SYNC
+    // 4. MOBILE SIDEBAR CONTROL
+    // =========================================================================
+    openMobileSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (sidebar) sidebar.classList.add('mobile-open');
+      if (backdrop) backdrop.classList.add('active');
+    },
+
+    closeMobileSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (sidebar) sidebar.classList.remove('mobile-open');
+      if (backdrop) backdrop.classList.remove('active');
+    },
+
+    toggleMobileSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      if (sidebar && sidebar.classList.contains('mobile-open')) {
+        this.closeMobileSidebar();
+      } else {
+        this.openMobileSidebar();
+      }
+    },
+
+    // =========================================================================
+    // 5. VIEW ROUTING & DATA RENDERING
     // =========================================================================
     switchView(viewName) {
       this.currentView = viewName;
 
-      // Update sidebar active link
-      document.querySelectorAll('.sidebar-menu .nav-item').forEach(link => {
-        if (link.getAttribute('data-view') === viewName) {
-          link.classList.add('active');
-        } else {
-          link.classList.remove('active');
-        }
+      // Update Desktop Nav Active States
+      document.querySelectorAll('.sidebar-menu .nav-item').forEach(item => {
+        item.classList.toggle('active', item.getAttribute('data-view') === viewName);
       });
 
-      // Update view section
-      document.querySelectorAll('.view-section').forEach(sec => {
-        sec.classList.remove('active');
+      // Update Mobile Nav Active States
+      document.querySelectorAll('.admin-mobile-nav .mobile-nav-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.getAttribute('data-view') === viewName);
       });
-      const activeSection = document.getElementById(`view-${viewName}`);
-      if (activeSection) {
-        activeSection.classList.add('active');
+
+      // Switch Main View Sections
+      document.querySelectorAll('.view-section').forEach(section => {
+        section.classList.remove('active');
+      });
+
+      const targetView = document.getElementById(`view-${viewName}`);
+      if (targetView) {
+        targetView.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // Close mobile sidebar if open
-      document.getElementById('adminSidebar')?.classList.remove('mobile-open');
-
-      // Refresh view data
+      // Re-render target data
       if (viewName === 'dashboard') this.renderDashboard();
       if (viewName === 'products') this.renderProductsTable();
       if (viewName === 'inventory') this.renderInventoryTable();
       if (viewName === 'orders') this.renderOrdersTable();
       if (viewName === 'discounts') this.renderDiscountsTable();
       if (viewName === 'inquiries') this.renderInquiriesTable();
-      if (viewName === 'settings') this.renderSettingsForm();
+    },
+
+    loadAllData() {
+      this.renderDashboard();
+      this.renderProductsTable();
+      this.renderInventoryTable();
+      this.renderOrdersTable();
+      this.renderDiscountsTable();
+      this.renderInquiriesTable();
+      this.updateSidebarCounters();
     },
 
     listenToDataChanges() {
-      window.addEventListener('flora:data-changed', () => {
+      window.addEventListener('flora:data-changed', (e) => {
         this.loadAllData();
       });
     },
 
-    loadAllData() {
-      this.updateSidebarBadges();
-      if (this.currentView === 'dashboard') this.renderDashboard();
-      if (this.currentView === 'products') this.renderProductsTable();
-      if (this.currentView === 'inventory') this.renderInventoryTable();
-      if (this.currentView === 'orders') this.renderOrdersTable();
-      if (this.currentView === 'discounts') this.renderDiscountsTable();
-      if (this.currentView === 'inquiries') this.renderInquiriesTable();
-    },
-
-    updateSidebarBadges() {
+    updateSidebarCounters() {
+      const products = FloraDB.getProducts();
       const analytics = FloraDB.getAnalytics();
-      const prodBadge = document.getElementById('sidebarProductCount');
+      const orders = FloraDB.getOrders();
+      const inqs = FloraDB.getInquiries();
+
+      const prodCountEl = document.getElementById('sidebarProductCount');
+      if (prodCountEl) prodCountEl.textContent = products.length;
+
       const lowStockBadge = document.getElementById('sidebarLowStockBadge');
-      const ordersBadge = document.getElementById('sidebarOrdersBadge');
-      const inqBadge = document.getElementById('sidebarInqBadge');
-
-      if (prodBadge) prodBadge.textContent = analytics.totalProducts;
-      if (ordersBadge) ordersBadge.textContent = analytics.totalOrders;
-      if (inqBadge) inqBadge.textContent = analytics.inquiriesCount;
-
       if (lowStockBadge) {
         if (analytics.lowStockCount > 0) {
-          lowStockBadge.textContent = `${analytics.lowStockCount} low`;
+          lowStockBadge.textContent = analytics.lowStockCount;
           lowStockBadge.style.display = 'inline-block';
         } else {
           lowStockBadge.style.display = 'none';
         }
       }
+
+      const ordersBadge = document.getElementById('sidebarOrdersBadge');
+      if (ordersBadge) ordersBadge.textContent = orders.length;
+
+      const mobileOrdersBadge = document.getElementById('mobileOrdersBadge');
+      if (mobileOrdersBadge) {
+        if (orders.length > 0) {
+          mobileOrdersBadge.textContent = orders.length;
+          mobileOrdersBadge.style.display = 'inline-block';
+        } else {
+          mobileOrdersBadge.style.display = 'none';
+        }
+      }
+
+      const inqBadge = document.getElementById('sidebarInqBadge');
+      if (inqBadge) {
+        if (inqs.length > 0) {
+          inqBadge.textContent = inqs.length;
+          inqBadge.style.display = 'inline-block';
+        } else {
+          inqBadge.style.display = 'none';
+        }
+      }
     },
 
     // =========================================================================
-    // 5. DASHBOARD MODULE
+    // 6. DASHBOARD VIEW
     // =========================================================================
     renderDashboard() {
-      const analytics = FloraDB.getAnalytics();
+      const stats = FloraDB.getAnalytics();
 
-      document.getElementById('kpiRevenue').textContent = `₹${analytics.totalRevenue.toLocaleString('en-IN')}`;
-      document.getElementById('kpiOrdersCount').textContent = analytics.totalOrders;
-      document.getElementById('kpiActiveOrdersTag').textContent = `${analytics.activeOrdersCount} active`;
-      document.getElementById('kpiAOV').textContent = `₹${analytics.aov.toLocaleString('en-IN')}`;
-      document.getElementById('kpiLowStockCount').textContent = analytics.lowStockCount;
+      const kpiRev = document.getElementById('kpiRevenue');
+      const kpiOrders = document.getElementById('kpiOrdersCount');
+      const kpiAOV = document.getElementById('kpiAOV');
+      const kpiLow = document.getElementById('kpiLowStockCount');
+      const kpiActive = document.getElementById('kpiActiveOrdersTag');
+      const kpiLowSub = document.getElementById('kpiLowStockSubtext');
 
-      const stockSubtext = document.getElementById('kpiLowStockSubtext');
-      if (analytics.lowStockCount > 0) {
-        stockSubtext.innerHTML = `<span style="color: var(--danger); font-weight: 700;">⚠️ ${analytics.lowStockCount} items need baking restock</span>`;
-      } else {
-        stockSubtext.innerHTML = `<span style="color: var(--success); font-weight: 600;">✓ All items healthy</span>`;
+      if (kpiRev) kpiRev.textContent = `₹${stats.totalRevenue.toLocaleString('en-IN')}`;
+      if (kpiOrders) kpiOrders.textContent = stats.totalOrders;
+      if (kpiAOV) kpiAOV.textContent = `₹${stats.aov.toLocaleString('en-IN')}`;
+      if (kpiLow) kpiLow.textContent = stats.lowStockCount;
+      if (kpiActive) kpiActive.textContent = `${stats.activeOrdersCount} active`;
+
+      if (kpiLowSub) {
+        if (stats.lowStockCount > 0) {
+          kpiLowSub.innerHTML = `<span style="color: var(--danger);">⚠️ ${stats.lowStockCount} items need baking/restock</span>`;
+        } else {
+          kpiLowSub.innerHTML = `<span>All catalog items healthy</span>`;
+        }
       }
 
-      // Recent Orders Table
-      const tbody = document.getElementById('dashboardRecentOrdersBody');
-      if (!tbody) return;
-
-      const recentOrders = analytics.recentOrders;
-      if (recentOrders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 28px; color: var(--cocoa-muted);">No orders in the bakery queue.</td></tr>`;
-        return;
+      // Render Recent Orders Table
+      const recentBody = document.getElementById('dashboardRecentOrdersBody');
+      if (recentBody) {
+        if (stats.recentOrders.length === 0) {
+          recentBody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 36px 16px; color: var(--cocoa-muted);">
+                <div style="font-size: 1.8rem; margin-bottom: 8px;">🌸</div>
+                <strong style="display: block; color: var(--cocoa-dark); margin-bottom: 4px;">No customer orders logged yet</strong>
+                <span style="font-size: 0.84rem;">Orders placed via WhatsApp checkout will appear here in real time.</span>
+              </td>
+            </tr>
+          `;
+        } else {
+          recentBody.innerHTML = stats.recentOrders.map(o => `
+            <tr>
+              <td><strong>${o.id}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${o.date || o.timeAgo || 'Recent'}</span></td>
+              <td><strong>${this.escapeHTML(o.customerName)}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${o.phone}</span></td>
+              <td>${Array.isArray(o.items) ? o.items.map(i => `${i.name} (x${i.qty})`).join(', ') : 'Custom Bake'}</td>
+              <td><strong>₹${(o.total || 0).toLocaleString('en-IN')}</strong></td>
+              <td><span class="status-pill status-${o.status}">${this.formatStatus(o.status)}</span></td>
+              <td>${o.paymentStatus || 'WhatsApp Order'}</td>
+              <td>
+                <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppOrder('${o.id}')">
+                  <span>📱 Update</span>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
       }
 
-      tbody.innerHTML = recentOrders.map(order => {
-        const itemsSummary = order.items.map(i => `${i.qty}x ${i.name}`).join(', ');
-        return `
-          <tr>
-            <td><strong>${order.id}</strong></td>
-            <td>
-              <div style="font-weight: 600;">${order.customerName}</div>
-              <div style="font-size: 0.75rem; color: var(--cocoa-muted);">${order.phone}</div>
-            </td>
-            <td style="max-width: 260px; font-size: 0.82rem; color: var(--cocoa-muted);" title="${itemsSummary}">
-              ${itemsSummary.length > 40 ? itemsSummary.substring(0, 40) + '...' : itemsSummary}
-            </td>
-            <td><strong>₹${order.total}</strong></td>
-            <td>
-              <span class="status-pill status-${order.status}">${order.status}</span>
-            </td>
-            <td style="font-size: 0.8rem;">${order.paymentStatus}</td>
-            <td>
-              <button class="btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="AdminApp.openWhatsAppNotify('${order.id}')">
-                📱 WhatsApp
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
+      this.updateSidebarCounters();
     },
 
     // =========================================================================
-    // 6. PRODUCTS CATALOG MODULE
+    // 7. PRODUCTS CATALOG CRUD
     // =========================================================================
     renderProductsTable() {
-      const search = document.getElementById('productSearchInput')?.value || '';
+      const search = (document.getElementById('productSearchInput')?.value || '').trim();
       const category = document.getElementById('productCategoryFilter')?.value || 'all';
       const status = document.getElementById('productStatusFilter')?.value || 'all';
 
-      const products = FloraDB.getProducts({
-        search,
-        category: category !== 'all' ? category : undefined,
-        status: status !== 'all' ? status : undefined
-      });
-
-      const countText = document.getElementById('productCounterText');
-      if (countText) countText.textContent = `Showing ${products.length} products`;
-
+      const products = FloraDB.getProducts({ search, category, status });
       const tbody = document.getElementById('productsTableBody');
+      const counterEl = document.getElementById('productCounterText');
+
+      if (counterEl) counterEl.textContent = `Showing ${products.length} products`;
+
       if (!tbody) return;
 
       if (products.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 32px; color: var(--cocoa-muted);">No products match your criteria.</td></tr>`;
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--cocoa-muted);">
+              No products found matching filters. <button class="btn-primary" style="margin-left: 10px;" onclick="AdminApp.openProductDrawer()">+ Add First Bake</button>
+            </td>
+          </tr>
+        `;
         return;
       }
 
@@ -545,95 +646,86 @@
         <tr>
           <td>
             <div class="table-product-cell">
-              <div class="table-product-thumb">
-                <img src="${p.image}" alt="${p.name}" onerror="this.src='images/cat-cakes.jpg'">
-              </div>
-              <div class="table-product-info">
-                <span class="table-product-name">${p.name}</span>
-                <span class="table-product-sku">SKU: ${p.sku} &bull; ${p.unit}</span>
+              <img src="${p.image || 'images/cat-cakes.jpg'}" alt="${this.escapeHTML(p.name)}" class="table-product-thumb" onerror="this.src='images/cat-cakes.jpg'">
+              <div class="table-product-meta">
+                <h4>${this.escapeHTML(p.name)}</h4>
+                <span>SKU: ${p.sku || 'N/A'} &bull; ${p.unit || '0.5 kg'}</span>
               </div>
             </div>
           </td>
+          <td><span style="font-size:0.8rem; font-weight:600; text-transform:capitalize;">${p.category}</span></td>
           <td>
-            <span class="category-chip">${p.categoryLabel || p.category}</span>
+            <strong>₹${p.price.toLocaleString('en-IN')}</strong>
+            ${p.comparePrice ? `<br><span style="text-decoration: line-through; font-size:0.75rem; color:var(--cocoa-muted);">₹${p.comparePrice}</span>` : ''}
           </td>
           <td>
-            <strong>₹${p.price}</strong>
-            ${p.comparePrice ? `<div style="font-size: 0.72rem; text-decoration: line-through; color: var(--cocoa-light);">₹${p.comparePrice}</div>` : ''}
+            <span style="font-weight:700; ${p.stock <= 5 ? 'color: var(--danger);' : ''}">${p.stock} units</span>
           </td>
           <td>
-            <div class="stock-stepper">
-              <button class="stock-stepper-btn" onclick="AdminApp.adjustStockQuick(${p.id}, -1)">-</button>
-              <span class="stock-stepper-val ${p.stock <= 5 ? 'trend-warn' : ''}">${p.stock}</span>
-              <button class="stock-stepper-btn" onclick="AdminApp.adjustStockQuick(${p.id}, 1)">+</button>
-            </div>
+            ${p.eggless ? '<span class="status-pill" style="background:#D1FAE5; color:#065F46;">🟢 100% Veg</span>' : '<span class="status-pill">Contains Egg</span>'}
           </td>
           <td>
-            ${p.eggless ? `<span style="color: #059669; font-weight: 600; font-size: 0.78rem;">🟢 100% Veg</span>` : '<span style="color: var(--cocoa-muted); font-size: 0.78rem;">Regular</span>'}
+            ${p.badge ? `<span class="status-pill status-baking">${this.escapeHTML(p.badge)}</span>` : '<span style="color:var(--cocoa-light); font-size:0.75rem;">—</span>'}
           </td>
           <td>
-            <span style="font-size: 0.75rem; background: var(--rose-light); color: var(--rose-hover); padding: 2px 6px; border-radius: 4px; font-weight: 600;">
-              ${p.badge || 'None'}
-            </span>
-          </td>
-          <td>
-            <span class="status-pill status-${p.stock > 0 ? 'instock' : 'outofstock'}">
-              ${p.stock > 0 ? 'Active' : 'Out of Stock'}
-            </span>
+            <span class="status-pill status-${p.status || 'active'}">${p.status === 'active' ? '● Active' : '○ Draft'}</span>
           </td>
           <td>
             <div class="table-actions">
-              <button class="action-icon-btn" title="Edit Product" onclick="AdminApp.openProductDrawer(${p.id})">✏️</button>
-              <button class="action-icon-btn" title="Duplicate" onclick="AdminApp.duplicateProduct(${p.id})">📋</button>
-              <button class="action-icon-btn danger" title="Delete" onclick="AdminApp.deleteProduct(${p.id})">🗑️</button>
+              <button class="action-icon-btn" onclick="AdminApp.openEditProduct(${p.id})" title="Edit Bake">✏️ Edit</button>
+              <button class="action-icon-btn" onclick="AdminApp.duplicateProduct(${p.id})" title="Duplicate">📋</button>
+              <button class="action-icon-btn" style="color: var(--danger);" onclick="AdminApp.deleteProduct(${p.id})" title="Delete">🗑️</button>
             </div>
           </td>
         </tr>
       `).join('');
     },
 
-    openProductDrawer(productId = null) {
-      this.editingProductId = productId;
+    openProductDrawer(product = null) {
+      this.editingProductId = product ? product.id : null;
       const drawer = document.getElementById('productDrawer');
       const overlay = document.getElementById('productDrawerOverlay');
-      const title = document.getElementById('drawerTitle');
-      const form = document.getElementById('productForm');
+      const drawerTitle = document.getElementById('drawerTitle');
 
-      form.reset();
+      if (!drawer || !overlay) return;
 
-      if (productId) {
-        const p = FloraDB.getProductById(productId);
-        if (p) {
-          title.textContent = `Edit Bake: ${p.name}`;
-          document.getElementById('prodId').value = p.id;
-          document.getElementById('prodName').value = p.name;
-          document.getElementById('prodCategory').value = p.category;
-          document.getElementById('prodCategoryLabel').value = p.categoryLabel || '';
-          document.getElementById('prodPrice').value = p.price;
-          document.getElementById('prodComparePrice').value = p.comparePrice || '';
-          document.getElementById('prodStock').value = p.stock;
-          document.getElementById('prodUnit').value = p.unit || '';
-          document.getElementById('prodBadge').value = p.badge || '';
-          document.getElementById('prodSku').value = p.sku || '';
-          document.getElementById('prodImage').value = p.image || 'images/cat-cakes.jpg';
-          document.getElementById('prodDesc').value = p.description || '';
-          document.getElementById('prodEggless').checked = p.eggless !== undefined ? p.eggless : true;
-        }
+      if (product) {
+        drawerTitle.textContent = `Edit "${product.name}"`;
+        document.getElementById('prodId').value = product.id;
+        document.getElementById('prodName').value = product.name;
+        document.getElementById('prodCategory').value = product.category || 'cakes';
+        document.getElementById('prodCategoryLabel').value = product.categoryLabel || '';
+        document.getElementById('prodPrice').value = product.price;
+        document.getElementById('prodComparePrice').value = product.comparePrice || '';
+        document.getElementById('prodStock').value = product.stock;
+        document.getElementById('prodUnit').value = product.unit || '';
+        document.getElementById('prodBadge').value = product.badge || '';
+        document.getElementById('prodSku').value = product.sku || '';
+        document.getElementById('prodDesc').value = product.description || '';
+        document.getElementById('prodEggless').checked = product.eggless !== false;
+        this.setImagePreview(product.image || 'images/cat-cakes.jpg');
       } else {
-        title.textContent = 'Add New Floral Bake';
+        drawerTitle.textContent = "Add New Signature Bake";
+        document.getElementById('productForm').reset();
         document.getElementById('prodId').value = '';
-        document.getElementById('prodCategory').value = 'cakes';
-        document.getElementById('prodStock').value = '10';
         document.getElementById('prodEggless').checked = true;
+        this.setImagePreview('images/cat-cakes.jpg');
       }
 
-      drawer.classList.add('active');
       overlay.classList.add('active');
+      drawer.classList.add('active');
+    },
+
+    openEditProduct(id) {
+      const product = FloraDB.getProductById(id);
+      if (product) this.openProductDrawer(product);
     },
 
     closeProductDrawer() {
-      document.getElementById('productDrawer')?.classList.remove('active');
-      document.getElementById('productDrawerOverlay')?.classList.remove('active');
+      const drawer = document.getElementById('productDrawer');
+      const overlay = document.getElementById('productDrawerOverlay');
+      if (drawer) drawer.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
       this.editingProductId = null;
     },
 
@@ -641,73 +733,67 @@
       const name = document.getElementById('prodName').value.trim();
       const price = Number(document.getElementById('prodPrice').value);
       const stock = Number(document.getElementById('prodStock').value);
-      const category = document.getElementById('prodCategory').value;
 
-      if (!name || !price) {
-        this.showToast('Please provide product title and price.', 'error');
+      if (!name || isNaN(price) || price <= 0) {
+        this.showToast('Please enter a valid product title and price.', 'error');
         return;
       }
 
       const productData = {
         id: this.editingProductId,
-        name,
-        category,
-        categoryLabel: document.getElementById('prodCategoryLabel').value.trim() || undefined,
-        price,
-        comparePrice: Number(document.getElementById('prodComparePrice').value) || null,
-        stock: Math.max(0, stock),
-        unit: document.getElementById('prodUnit').value.trim() || 'Per serving',
-        badge: document.getElementById('prodBadge').value.trim() || 'New',
-        sku: document.getElementById('prodSku').value.trim() || undefined,
-        image: document.getElementById('prodImage').value,
-        description: document.getElementById('prodDesc').value.trim(),
-        eggless: document.getElementById('prodEggless').checked
+        name: name,
+        category: document.getElementById('prodCategory').value,
+        categoryLabel: document.getElementById('prodCategoryLabel').value,
+        price: price,
+        comparePrice: document.getElementById('prodComparePrice').value ? Number(document.getElementById('prodComparePrice').value) : null,
+        stock: isNaN(stock) ? 10 : stock,
+        unit: document.getElementById('prodUnit').value || '0.5 kg',
+        badge: document.getElementById('prodBadge').value,
+        sku: document.getElementById('prodSku').value,
+        image: document.getElementById('prodImage').value || 'images/cat-cakes.jpg',
+        description: document.getElementById('prodDesc').value,
+        eggless: document.getElementById('prodEggless').checked,
+        status: 'active'
       };
 
       FloraDB.saveProduct(productData);
       this.closeProductDrawer();
-      this.showToast(`✨ Product "${name}" saved to catalog!`, 'success');
+      this.showToast(`🎂 Bake "${name}" saved to catalog & synced live!`, 'success');
       this.renderProductsTable();
-      this.updateSidebarBadges();
-    },
-
-    duplicateProduct(id) {
-      const clone = FloraDB.duplicateProduct(id);
-      if (clone) {
-        this.showToast(`📋 Duplicated: ${clone.name}`, 'info');
-        this.renderProductsTable();
-      }
+      this.renderInventoryTable();
     },
 
     deleteProduct(id) {
       const p = FloraDB.getProductById(id);
       if (!p) return;
-      if (confirm(`Are you sure you want to remove "${p.name}" from your catalog?`)) {
+
+      if (confirm(`Are you sure you want to delete "${p.name}" from the bakery catalog?`)) {
         FloraDB.deleteProduct(id);
-        this.showToast(`🗑️ Removed "${p.name}"`, 'info');
+        this.showToast(`Deleted "${p.name}".`, 'info');
         this.renderProductsTable();
-        this.updateSidebarBadges();
+        this.renderInventoryTable();
       }
     },
 
-    adjustStockQuick(id, delta) {
-      const newStock = FloraDB.adjustStock(id, delta);
-      this.renderProductsTable();
-      this.updateSidebarBadges();
+    duplicateProduct(id) {
+      const clone = FloraDB.duplicateProduct(id);
+      if (clone) {
+        this.showToast(`📋 Duplicated bake: "${clone.name}"`, 'success');
+        this.renderProductsTable();
+      }
     },
 
     // =========================================================================
-    // 7. INVENTORY MODULE
+    // 8. INVENTORY RADAR
     // =========================================================================
     renderInventoryTable() {
-      const search = document.getElementById('inventorySearchInput')?.value || '';
-      const filter = document.getElementById('inventoryStockFilter')?.value || 'all';
+      const search = (document.getElementById('inventorySearchInput')?.value || '').trim();
+      const stockFilter = document.getElementById('inventoryStockFilter')?.value || 'all';
 
       let products = FloraDB.getProducts({ search });
-
-      if (filter === 'low') {
-        products = products.filter(p => p.stock > 0 && p.stock <= 5);
-      } else if (filter === 'out') {
+      if (stockFilter === 'low') {
+        products = products.filter(p => p.stock <= 5 && p.stock > 0);
+      } else if (stockFilter === 'out') {
         products = products.filter(p => p.stock === 0);
       }
 
@@ -715,155 +801,140 @@
       if (!tbody) return;
 
       if (products.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 28px; color: var(--cocoa-muted);">No inventory records match this view.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--cocoa-muted);">No inventory records found.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = products.map(p => {
-        let statusClass = 'status-instock';
-        let statusText = 'In Stock';
-        if (p.stock === 0) {
-          statusClass = 'status-outofstock';
-          statusText = 'Out of Stock';
-        } else if (p.stock <= 5) {
-          statusClass = 'status-lowstock';
-          statusText = `Low (${p.stock} left)`;
-        }
-
-        return `
-          <tr>
-            <td>
-              <div class="table-product-cell">
-                <div class="table-product-thumb">
-                  <img src="${p.image}" alt="${p.name}">
-                </div>
-                <div class="table-product-info">
-                  <span class="table-product-name">${p.name}</span>
-                  <span class="table-product-sku">${p.categoryLabel}</span>
-                </div>
+      tbody.innerHTML = products.map(p => `
+        <tr>
+          <td>
+            <div class="table-product-cell">
+              <img src="${p.image || 'images/cat-cakes.jpg'}" alt="${this.escapeHTML(p.name)}" class="table-product-thumb" onerror="this.src='images/cat-cakes.jpg'">
+              <div>
+                <strong>${this.escapeHTML(p.name)}</strong>
+                <div style="font-size:0.75rem; color:var(--cocoa-muted); text-transform:capitalize;">${p.category}</div>
               </div>
-            </td>
-            <td><code>${p.sku}</code></td>
-            <td>
-              <strong style="font-size: 1.1rem; color: ${p.stock <= 5 ? 'var(--danger)' : 'var(--cocoa-dark)'};">
-                ${p.stock} units
-              </strong>
-            </td>
-            <td>
-              <div class="stock-stepper">
-                <button class="stock-stepper-btn" onclick="AdminApp.adjustInventoryStock(${p.id}, -1)">-</button>
-                <span class="stock-stepper-val">${p.stock}</span>
-                <button class="stock-stepper-btn" onclick="AdminApp.adjustInventoryStock(${p.id}, 1)">+</button>
-              </div>
-            </td>
-            <td>
-              <span class="status-pill ${statusClass}">${statusText}</span>
-            </td>
-            <td style="font-size: 0.8rem; color: var(--cocoa-muted);">${p.unit}</td>
-          </tr>
-        `;
-      }).join('');
+            </div>
+          </td>
+          <td><code>${p.sku || 'N/A'}</code></td>
+          <td>
+            <span style="font-size:1.1rem; font-weight:800; ${p.stock <= 5 ? 'color:var(--danger);' : ''}">${p.stock}</span> units
+          </td>
+          <td>
+            <div class="stock-stepper">
+              <button class="stepper-btn" onclick="AdminApp.adjustStock(${p.id}, -1)">-</button>
+              <span class="stepper-val">${p.stock}</span>
+              <button class="stepper-btn" onclick="AdminApp.adjustStock(${p.id}, 1)">+</button>
+            </div>
+          </td>
+          <td>
+            ${p.stock === 0 ? '<span class="status-pill" style="background:#FEE2E2; color:#DC2626;">❌ Sold Out</span>' :
+              p.stock <= 5 ? '<span class="status-pill" style="background:#FEF3C7; color:#B45309;">⚠️ Low Stock</span>' :
+              '<span class="status-pill status-active">✓ In Stock</span>'}
+          </td>
+          <td><span style="font-size:0.8rem; color:var(--cocoa-muted);">${p.unit || 'Standard'}</span></td>
+        </tr>
+      `).join('');
     },
 
-    adjustInventoryStock(id, delta) {
-      FloraDB.adjustStock(id, delta);
-      this.renderInventoryTable();
-      this.updateSidebarBadges();
+    adjustStock(id, delta) {
+      const newStock = FloraDB.adjustStock(id, delta);
+      if (newStock !== null) {
+        this.renderInventoryTable();
+        this.renderProductsTable();
+        this.renderDashboard();
+      }
     },
 
     // =========================================================================
-    // 8. ORDERS & LOGISTICS MODULE
+    // 9. ORDERS PIPELINE & WHATSAPP LOGISTICS
     // =========================================================================
     renderOrdersTable() {
-      const search = document.getElementById('orderSearchInput')?.value || '';
+      const search = (document.getElementById('orderSearchInput')?.value || '').trim();
       const status = document.getElementById('orderStatusFilter')?.value || 'all';
 
-      const orders = FloraDB.getOrders({
-        search,
-        status: status !== 'all' ? status : undefined
-      });
-
+      const orders = FloraDB.getOrders({ search, status });
       const tbody = document.getElementById('ordersTableBody');
       if (!tbody) return;
 
       if (orders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 32px; color: var(--cocoa-muted);">No orders matching this filter.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = orders.map(o => {
-        const itemsList = o.items.map(i => `&bull; ${i.qty}x ${i.name}`).join('<br>');
-        return `
+        tbody.innerHTML = `
           <tr>
-            <td>
-              <div style="font-weight: 700; font-size: 0.95rem;">${o.id}</div>
-              <div style="font-size: 0.75rem; color: var(--cocoa-muted);">${o.date}</div>
-            </td>
-            <td>
-              <div style="font-weight: 600;">${o.customerName}</div>
-              <div style="font-size: 0.8rem; color: var(--cocoa-text);">📞 ${o.phone}</div>
-              <div style="font-size: 0.75rem; color: var(--cocoa-muted); max-width: 220px;">📍 ${o.address}</div>
-            </td>
-            <td style="font-size: 0.82rem; line-height: 1.4;">
-              ${itemsList}
-              ${o.notes ? `<div style="font-size: 0.72rem; color: var(--rose-hover); margin-top: 4px; font-style: italic;">📝 "${o.notes}"</div>` : ''}
-            </td>
-            <td>
-              <div style="font-weight: 800; font-size: 1rem;">₹${o.total}</div>
-              <div style="font-size: 0.72rem; color: var(--cocoa-muted);">${o.paymentStatus}</div>
-            </td>
-            <td>
-              <select class="select-filter" style="font-size: 0.78rem; font-weight: 600;" onchange="AdminApp.changeOrderStatus('${o.id}', this.value)">
-                <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
-                <option value="baking" ${o.status === 'baking' ? 'selected' : ''}>👩‍🍳 Baking</option>
-                <option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>🚚 Out for Delivery</option>
-                <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>✅ Delivered</option>
-                <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
-              </select>
-            </td>
-            <td>
-              <button class="btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; display: flex; align-items: center; gap: 4px;" onclick="AdminApp.openWhatsAppNotify('${o.id}')">
-                <span>💬</span> Ping Client
-              </button>
+            <td colspan="6" style="text-align: center; padding: 48px 16px; color: var(--cocoa-muted);">
+              <div style="font-size: 2.2rem; margin-bottom: 8px;">🛍️</div>
+              <h3 style="font-size: 1.1rem; color: var(--cocoa-dark); margin-bottom: 6px;">Zero Orders in Queue</h3>
+              <p style="font-size: 0.85rem; max-width: 420px; margin: 0 auto 14px;">
+                Your bakery order pipeline is completely clean. When customers place orders via the storefront WhatsApp checkout, they will instantly appear here.
+              </p>
+              <a href="index.html" target="_blank" class="btn-primary btn-touch">🌸 Open Storefront to Test Order</a>
             </td>
           </tr>
         `;
-      }).join('');
+        return;
+      }
+
+      tbody.innerHTML = orders.map(o => `
+        <tr>
+          <td>
+            <strong>${o.id}</strong><br>
+            <span style="font-size:0.75rem; color:var(--cocoa-muted);">${o.date || o.timeAgo || 'Recent'}</span>
+          </td>
+          <td>
+            <strong>${this.escapeHTML(o.customerName)}</strong><br>
+            <span style="font-size:0.78rem; color:var(--cocoa-muted);">📞 ${o.phone}</span><br>
+            <span style="font-size:0.75rem; color:var(--cocoa-light);">${this.escapeHTML(o.address)}</span>
+          </td>
+          <td>
+            <div style="font-size:0.85rem;">
+              ${Array.isArray(o.items) ? o.items.map(i => `<div>&bull; ${i.name} <strong>x${i.qty}</strong></div>`).join('') : 'Custom Order'}
+            </div>
+            ${o.notes ? `<div style="font-size:0.74rem; color:var(--rose-hover); margin-top:4px;">Note: "${this.escapeHTML(o.notes)}"</div>` : ''}
+          </td>
+          <td>
+            <strong>₹${(o.total || 0).toLocaleString('en-IN')}</strong><br>
+            <span style="font-size:0.72rem; color:var(--cocoa-muted);">${o.paymentStatus || 'Pending'}</span>
+          </td>
+          <td>
+            <select class="select-filter" style="padding: 6px 10px; font-size: 0.8rem;" onchange="AdminApp.changeOrderStatus('${o.id}', this.value)">
+              <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+              <option value="baking" ${o.status === 'baking' ? 'selected' : ''}>👩‍🍳 Baking in Oven</option>
+              <option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>🚚 Out for Delivery</option>
+              <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>✅ Delivered</option>
+            </select>
+          </td>
+          <td>
+            <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppOrder('${o.id}')">
+              <span>📱 Notify WA</span>
+            </button>
+          </td>
+        </tr>
+      `).join('');
     },
 
     changeOrderStatus(orderId, newStatus) {
       FloraDB.updateOrderStatus(orderId, newStatus);
-      this.showToast(`Order ${orderId} updated to "${newStatus}"`, 'success');
-      this.updateSidebarBadges();
+      this.showToast(`Order ${orderId} updated to "${this.formatStatus(newStatus)}"`, 'success');
+      this.renderDashboard();
     },
 
-    openWhatsAppNotify(orderId) {
+    openWhatsAppOrder(orderId) {
       const orders = FloraDB.getOrders();
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return;
+      const o = orders.find(ord => ord.id === orderId);
+      if (!o) return;
 
-      const cleanPhone = (order.phone || '').replace(/\D/g, '');
-      const phoneToUse = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone || '917083517862';
+      const cleanPhone = (o.phone || '').replace(/\D/g, '');
+      const phoneNum = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
 
-      let statusMsg = '';
-      if (order.status === 'baking') {
-        statusMsg = '👩‍🍳 Your bespoke floral bakes are now fresh in the oven!';
-      } else if (order.status === 'shipped') {
-        statusMsg = '🚚 Your order is out for refrigerated doorstep delivery across Nashik!';
-      } else if (order.status === 'delivered') {
-        statusMsg = '🌸 Your order has been delivered! We hope you love the floral craftsmanship.';
-      } else {
-        statusMsg = '🌸 We have received your order and our patisserie team is preparing it.';
-      }
+      const itemsSummary = Array.isArray(o.items) ? o.items.map(i => `• ${i.name} (x${i.qty})`).join('%0A') : 'Handcrafted Bakery Item';
+      const statusText = this.formatStatus(o.status);
 
-      const text = `Hello ${order.customerName}! 🌸\n\nUpdate from *The Flora Bakery Nashik* regarding Order *#${order.id}*:\n\n${statusMsg}\n\n*Items:* ${order.items.map(i => `${i.qty}x ${i.name}`).join(', ')}\n*Total:* ₹${order.total}\n\nThank you for blooming with us! ✨`;
+      const msg = `🌸 *The Flora Bakery, Nashik* - Order Update%0A%0AHello *${encodeURIComponent(o.customerName)}*,%0AYour order *#${o.id}* status is: *${encodeURIComponent(statusText)}*%0A%0A*Order Summary:*%0A${itemsSummary}%0A%0A*Total Amount:* ₹${o.total}%0A*Delivery Location:* ${encodeURIComponent(o.address)}%0A%0AThank you for choosing The Flora Bakery! ✨`;
 
-      const url = `https://api.whatsapp.com/send?phone=${phoneToUse}&text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+      window.open(`https://wa.me/${phoneNum}?text=${msg}`, '_blank');
     },
 
     // =========================================================================
-    // 9. DISCOUNTS MODULE
+    // 10. DISCOUNTS & COUPONS
     // =========================================================================
     renderDiscountsTable() {
       const discounts = FloraDB.getDiscounts();
@@ -872,36 +943,20 @@
 
       tbody.innerHTML = discounts.map(d => `
         <tr>
-          <td>
-            <strong style="font-size: 1rem; color: var(--rose-hover); letter-spacing: 0.05em;">${d.code}</strong>
-          </td>
-          <td>
-            <strong>${d.type === 'percent' ? `${d.value}% Off` : `₹${d.value} Flat Off`}</strong>
-          </td>
+          <td><strong style="letter-spacing:0.05em;">${d.code}</strong></td>
+          <td>${d.type === 'percent' ? `<strong>${d.value}% OFF</strong>` : `<strong>₹${d.value} Flat OFF</strong>`}</td>
           <td>₹${d.minOrder}</td>
-          <td style="font-size: 0.85rem; color: var(--cocoa-muted);">${d.description}</td>
-          <td><strong>${d.usageCount || 0} times</strong></td>
+          <td>${this.escapeHTML(d.description || '')}</td>
+          <td>${d.usageCount || 0} times</td>
+          <td><span class="status-pill ${d.active ? 'status-active' : 'status-draft'}">${d.active ? 'Active' : 'Disabled'}</span></td>
           <td>
-            <span class="status-pill status-${d.active ? 'instock' : 'outofstock'}">
-              ${d.active ? 'Active' : 'Inactive'}
-            </span>
-          </td>
-          <td>
-            <div class="table-actions">
-              <button class="action-icon-btn" title="Copy Code" onclick="AdminApp.copyCoupon('${d.code}')">📋</button>
-              <button class="action-icon-btn danger" title="Delete" onclick="AdminApp.deleteCoupon('${d.code}')">🗑️</button>
-            </div>
+            <button class="action-icon-btn" style="color:var(--danger);" onclick="AdminApp.deleteDiscount('${d.code}')">🗑️ Delete</button>
           </td>
         </tr>
       `).join('');
     },
 
-    copyCoupon(code) {
-      navigator.clipboard.writeText(code);
-      this.showToast(`📋 Copied code "${code}" to clipboard!`, 'info');
-    },
-
-    deleteCoupon(code) {
+    deleteDiscount(code) {
       if (confirm(`Delete coupon "${code}"?`)) {
         FloraDB.deleteDiscount(code);
         this.showToast(`Coupon "${code}" deleted.`, 'info');
@@ -910,103 +965,219 @@
     },
 
     // =========================================================================
-    // 10. CUSTOM CAKE INQUIRIES
+    // 11. INQUIRIES LOG
     // =========================================================================
     renderInquiriesTable() {
       const inquiries = FloraDB.getInquiries();
       const tbody = document.getElementById('inquiriesTableBody');
       if (!tbody) return;
 
-      tbody.innerHTML = inquiries.map(inq => `
+      if (inquiries.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:36px; color:var(--cocoa-muted);">Zero custom cake inquiries logged. Custom builder submissions will appear here.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = inquiries.map(i => `
         <tr>
-          <td><strong>${inq.id}</strong><br><span style="font-size: 0.72rem; color: var(--cocoa-muted);">${inq.date}</span></td>
+          <td><strong>${i.id}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${i.date || 'Recent'}</span></td>
+          <td><strong>${this.escapeHTML(i.customerName)}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">📞 ${i.phone}</span></td>
+          <td><strong>${this.escapeHTML(i.occasion)}</strong><br><span style="font-size:0.75rem; color:var(--cocoa-muted);">Date: ${i.requiredDate}</span></td>
+          <td>${i.flavor}<br><span style="font-size:0.75rem; color:var(--cocoa-muted);">${i.size}</span></td>
+          <td>${i.palette || 'Blush'}<br><span style="font-size:0.75rem; color:var(--rose-hover);">"${this.escapeHTML(i.message || '')}"</span></td>
+          <td><span class="status-pill status-${i.status}">${i.status}</span></td>
           <td>
-            <div style="font-weight: 600;">${inq.customerName}</div>
-            <div style="font-size: 0.8rem; color: var(--cocoa-text);">📞 ${inq.phone}</div>
-          </td>
-          <td>
-            <strong>${inq.occasion}</strong>
-            <div style="font-size: 0.75rem; color: var(--cocoa-muted);">Date: ${inq.requiredDate}</div>
-          </td>
-          <td>
-            <div>${inq.flavor}</div>
-            <div style="font-size: 0.75rem; color: var(--cocoa-muted);">${inq.size}</div>
-          </td>
-          <td>
-            <div style="font-size: 0.82rem;">Palette: ${inq.palette}</div>
-            ${inq.message ? `<div style="font-size: 0.75rem; color: var(--rose-hover);">Cake Text: "${inq.message}"</div>` : ''}
-          </td>
-          <td>
-            <span class="status-pill status-${inq.status === 'new' ? 'pending' : 'delivered'}">${inq.status}</span>
-          </td>
-          <td>
-            <button class="btn-secondary" style="font-size: 0.78rem; padding: 6px 10px;" onclick="AdminApp.respondToInquiry('${inq.id}')">
-              💬 Consult on WA
+            <button class="whatsapp-action-btn" onclick="AdminApp.openWhatsAppInquiry('${i.id}')">
+              <span>💬 Consult</span>
             </button>
           </td>
         </tr>
       `).join('');
     },
 
-    respondToInquiry(inqId) {
-      const inq = FloraDB.getInquiries().find(i => i.id === inqId);
+    openWhatsAppInquiry(inquiryId) {
+      const inquiries = FloraDB.getInquiries();
+      const inq = inquiries.find(i => i.id === inquiryId);
       if (!inq) return;
 
-      FloraDB.updateInquiryStatus(inqId, 'contacted');
-      this.renderInquiriesTable();
+      const cleanPhone = (inq.phone || '').replace(/\D/g, '');
+      const phoneNum = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
 
-      const phone = inq.phone.replace(/\D/g, '');
-      const cleanPhone = phone.length === 10 ? `91${phone}` : phone || '917083517862';
+      const msg = `🌸 *The Flora Bakery, Nashik* - Custom Cake Consultation%0A%0AHello *${encodeURIComponent(inq.customerName)}*,%0AWe received your custom cake inquiry for *${encodeURIComponent(inq.occasion)}*!%0A%0A*Flavor:* ${encodeURIComponent(inq.flavor)}%0A*Size:* ${encodeURIComponent(inq.size)}%0A*Palette:* ${encodeURIComponent(inq.palette)}%0A*Message:* "${encodeURIComponent(inq.message || '')}"%0A%0ALet's finalize your bespoke floral design and schedule delivery! 🎂✨`;
 
-      const text = `Hello ${inq.customerName}! 🌸\n\nThank you for reaching out to *The Flora Bakery Nashik* for your custom cake consultation (*${inq.occasion}* - ${inq.size}).\n\nWe would love to craft this bespoke *${inq.flavor}* design for you! When would you like to discuss the final sketch and details? ✨`;
-
-      window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`, '_blank');
+      window.open(`https://wa.me/${phoneNum}?text=${msg}`, '_blank');
     },
 
     // =========================================================================
-    // 11. SETTINGS & PROFILE
+    // 12. COMMAND PALETTE (⌘K / Ctrl+K)
     // =========================================================================
-    renderSettingsForm() {
-      const settings = FloraDB.getSettings();
-      document.getElementById('setStoreName').value = settings.storeName || '';
-      document.getElementById('setWhatsApp').value = settings.whatsapp || '';
-      document.getElementById('setFreeShipping').value = settings.freeShippingThreshold || 999;
-      document.getElementById('setAddress').value = settings.address || '';
+    setupKeyboardShortcuts() {
+      const palette = document.getElementById('commandPalette');
+      const input = document.getElementById('paletteInput');
+      const trigger = document.getElementById('globalSearchTrigger');
+
+      const openPalette = () => {
+        if (palette) {
+          palette.classList.add('active');
+          if (input) {
+            input.value = '';
+            input.focus();
+            this.renderPaletteResults('');
+          }
+        }
+      };
+
+      const closePalette = () => {
+        if (palette) palette.classList.remove('active');
+      };
+
+      if (trigger) trigger.addEventListener('click', openPalette);
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          if (palette.classList.contains('active')) closePalette();
+          else openPalette();
+        }
+        if (e.key === 'Escape' && palette && palette.classList.contains('active')) {
+          closePalette();
+        }
+      });
+
+      if (palette) {
+        palette.addEventListener('click', (e) => {
+          if (e.target === palette) closePalette();
+        });
+      }
+
+      if (input) {
+        input.addEventListener('input', (e) => {
+          this.renderPaletteResults(e.target.value);
+        });
+      }
+    },
+
+    renderPaletteResults(query) {
+      const resultsBox = document.getElementById('paletteResults');
+      if (!resultsBox) return;
+
+      const q = query.toLowerCase().trim();
+      const products = FloraDB.getProducts();
+
+      const defaultCommands = [
+        { icon: '📊', label: 'Go to Dashboard', action: () => this.switchView('dashboard') },
+        { icon: '🎂', label: 'View Products Catalog', action: () => this.switchView('products') },
+        { icon: '➕', label: 'Add New Product Bake', action: () => this.openProductDrawer() },
+        { icon: '📋', label: 'Stock & Inventory Radar', action: () => this.switchView('inventory') },
+        { icon: '🛍️', label: 'Customer Orders & Logistics', action: () => this.switchView('orders') },
+        { icon: '🏷️', label: 'Discounts & Promo Engine', action: () => this.switchView('discounts') },
+        { icon: '💌', label: 'Custom Cake Consultations', action: () => this.switchView('inquiries') },
+        { icon: '⚙️', label: 'Store Settings & Backup', action: () => this.switchView('settings') },
+        { icon: '🌸', label: 'Open Public Storefront', action: () => window.open('index.html', '_blank') }
+      ];
+
+      let filteredCommands = defaultCommands.filter(c => c.label.toLowerCase().includes(q));
+
+      let matchedProducts = [];
+      if (q) {
+        matchedProducts = products.filter(p => p.name.toLowerCase().includes(q) || (p.sku && p.sku.toLowerCase().includes(q)));
+      }
+
+      let html = '';
+
+      if (filteredCommands.length > 0) {
+        html += `<div style="font-size: 0.7rem; font-weight:700; color:var(--cocoa-light); text-transform:uppercase; padding: 6px 12px;">Navigation & Commands</div>`;
+        html += filteredCommands.map((cmd, idx) => `
+          <div class="palette-item" data-cmd-idx="${idx}">
+            <span>${cmd.icon}</span>
+            <span>${cmd.label}</span>
+          </div>
+        `).join('');
+      }
+
+      if (matchedProducts.length > 0) {
+        html += `<div style="font-size: 0.7rem; font-weight:700; color:var(--cocoa-light); text-transform:uppercase; padding: 10px 12px 6px;">Matching Products (${matchedProducts.length})</div>`;
+        html += matchedProducts.map(p => `
+          <div class="palette-item" data-prod-id="${p.id}">
+            <img src="${p.image || 'images/cat-cakes.jpg'}" style="width:22px; height:22px; border-radius:4px; object-fit:cover;">
+            <span>${this.escapeHTML(p.name)}</span>
+            <span style="margin-left:auto; font-size:0.75rem; color:var(--cocoa-muted);">₹${p.price} &bull; Stock: ${p.stock}</span>
+          </div>
+        `).join('');
+      }
+
+      if (!html) {
+        html = `<div style="text-align:center; padding: 24px; color:var(--cocoa-muted); font-size:0.88rem;">No matching commands or products for "${this.escapeHTML(q)}"</div>`;
+      }
+
+      resultsBox.innerHTML = html;
+
+      // Attach Click Listeners
+      resultsBox.querySelectorAll('[data-cmd-idx]').forEach(el => {
+        el.addEventListener('click', () => {
+          const idx = Number(el.getAttribute('data-cmd-idx'));
+          filteredCommands[idx].action();
+          document.getElementById('commandPalette').classList.remove('active');
+        });
+      });
+
+      resultsBox.querySelectorAll('[data-prod-id]').forEach(el => {
+        el.addEventListener('click', () => {
+          const pid = Number(el.getAttribute('data-prod-id'));
+          this.openEditProduct(pid);
+          document.getElementById('commandPalette').classList.remove('active');
+        });
+      });
     },
 
     // =========================================================================
-    // 12. TOAST ENGINE
+    // 13. UTILITIES & TOAST ENGINE
     // =========================================================================
-    showToast(message, type = 'info') {
+    showToast(message, type = 'success') {
       const container = document.getElementById('adminToastContainer');
       if (!container) return;
 
       const toast = document.createElement('div');
       toast.className = `admin-toast ${type}`;
-      
-      const icons = {
-        success: '✓',
-        error: '✕',
-        info: '🌸'
-      };
-
       toast.innerHTML = `
-        <span style="font-weight: bold; font-size: 1.1rem;">${icons[type] || '🌸'}</span>
-        <span style="font-size: 0.88rem; font-weight: 500;">${message}</span>
+        <span>${type === 'error' ? '⚠️' : type === 'info' ? 'ℹ️' : '✨'}</span>
+        <span>${this.escapeHTML(message)}</span>
       `;
 
       container.appendChild(toast);
 
       setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
+        toast.style.transform = 'translateY(-10px)';
         toast.style.transition = 'all 0.3s ease';
         setTimeout(() => toast.remove(), 300);
       }, 3500);
+    },
+
+    formatStatus(status) {
+      const map = {
+        pending: 'Pending',
+        baking: 'Baking in Oven',
+        shipped: 'Out for Delivery',
+        delivered: 'Delivered',
+        active: 'Active',
+        draft: 'Draft',
+        new: 'New Inquiry'
+      };
+      return map[status] || status;
+    },
+
+    escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
   };
 
-  // Expose globally and boot
+  // Expose and Init
   window.AdminApp = AdminApp;
   document.addEventListener('DOMContentLoaded', () => AdminApp.init());
 
