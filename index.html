@@ -358,21 +358,51 @@
     <section class="section-padding bestsellers-section" id="bestsellers">
       <div class="container">
         
-        <div class="text-center">
-          <span class="heading-tag yellow-tag">Nashik's Most Loved</span>
+        <div class="text-center" style="margin-bottom: 24px;">
+          <span class="heading-tag yellow-tag"><i class="fas fa-sparkles"></i> Nashik's Most Loved</span>
           <h2 class="section-title">Featured <span class="highlight">Floral Bakes</span></h2>
           <p class="section-subtitle">
-            Handcrafted with love in our Nashik boutique studio. Every product is 100% vegetarian, eggless, and made with pesticide-free edible flowers.
+            Handcrafted with organic edible flowers, pure butter, and 100% vegetarian eggless recipes.
           </p>
         </div>
 
-        <!-- Filter Tabs -->
-        <div class="product-filter-tabs">
-          <button class="filter-tab-btn active" data-category="all" onclick="filterProducts('all', this)">All Bakes</button>
-          <button class="filter-tab-btn" data-category="cakes" onclick="filterProducts('cakes', this)">Floral Cakes</button>
-          <button class="filter-tab-btn" data-category="pastries" onclick="filterProducts('pastries', this)">Designer Pastries</button>
-          <button class="filter-tab-btn" data-category="muffins" data-category="muffins" onclick="filterProducts('muffins', this)">Artisan Muffins</button>
-          <button class="filter-tab-btn" data-category="combos" onclick="filterProducts('combos', this)">Gift Hamper Sets</button>
+        <!-- Touch-Optimized Segmented Filter Tabs -->
+        <div class="product-filter-wrapper">
+          <div class="product-filter-tabs" role="tablist" aria-label="Product categories">
+            <button class="filter-tab-btn active" data-category="all" onclick="filterProducts('all', this)" role="tab" aria-selected="true">
+              <span class="tab-icon">✨</span>
+              <span class="tab-text">All Bakes</span>
+              <span class="tab-badge" id="count-all">8</span>
+            </button>
+            <button class="filter-tab-btn" data-category="cakes" onclick="filterProducts('cakes', this)" role="tab" aria-selected="false">
+              <span class="tab-icon">🎂</span>
+              <span class="tab-text">Floral Cakes</span>
+              <span class="tab-badge" id="count-cakes">3</span>
+            </button>
+            <button class="filter-tab-btn" data-category="pastries" onclick="filterProducts('pastries', this)" role="tab" aria-selected="false">
+              <span class="tab-icon">🥐</span>
+              <span class="tab-text">French Pastries</span>
+              <span class="tab-badge" id="count-pastries">2</span>
+            </button>
+            <button class="filter-tab-btn" data-category="muffins" onclick="filterProducts('muffins', this)" role="tab" aria-selected="false">
+              <span class="tab-icon">🧁</span>
+              <span class="tab-text">Floral Muffins</span>
+              <span class="tab-badge" id="count-muffins">2</span>
+            </button>
+            <button class="filter-tab-btn" data-category="combos" onclick="filterProducts('combos', this)" role="tab" aria-selected="false">
+              <span class="tab-icon">🎁</span>
+              <span class="tab-text">Gift Hampers</span>
+              <span class="tab-badge" id="count-combos">1</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Status Bar -->
+        <div class="filter-status-bar" id="filterStatusBar">
+          <span class="filter-status-text" id="filterStatusText">Showing <strong>all 8 botanical creations</strong></span>
+          <div class="dietary-hint">
+            <span class="veg-emblem-inline"></span> 100% Eggless & Freshly Baked
+          </div>
         </div>
 
         <!-- Products Grid Container -->
@@ -381,13 +411,18 @@
         </div>
 
         <!-- Custom Order Banner Card -->
-        <div style="margin-top: 48px; background: var(--pink-soft); border: 2px dashed var(--pink-blush); border-radius: var(--radius-md); padding: 28px; text-align: center; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
-          <div style="text-align: left;">
-            <h4 style="font-family: var(--font-serif); font-size: 1.3rem; color: var(--text-cocoa); margin-bottom: 4px;">Looking for a custom cake concept?</h4>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">Send us your dream Pinterest reference or tell our chef what floral theme you love.</p>
+        <div class="custom-cake-cta-banner">
+          <div class="cta-banner-content">
+            <div class="cta-banner-icon">
+              <i class="fas fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+              <h4 class="cta-banner-title">Need a Bespoke Floral Cake for Your Special Event?</h4>
+              <p class="cta-banner-desc">Share your dream Pinterest aesthetic or color theme with our pastry chef in Nashik.</p>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="openCakeBuilderModal()">
-            <i class="fas fa-wand-magic-sparkles"></i> Customize Your Cake
+          <button class="btn btn-primary btn-md" onclick="openCakeBuilderModal()">
+            <i class="fas fa-magic"></i> Design Custom Cake
           </button>
         </div>
 

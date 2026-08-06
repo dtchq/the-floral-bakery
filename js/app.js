@@ -144,48 +144,103 @@ function renderProducts(filterCategory = "all") {
     ? PRODUCTS 
     : PRODUCTS.filter(p => p.category === filterCategory);
 
-  grid.innerHTML = filtered.map(product => `
-    <div class="product-card" data-id="${product.id}">
-      <div class="product-thumb-holder">
-        <img src="${product.image}" alt="${product.name}" class="product-thumb" loading="lazy">
-        <span class="product-tag-badge">${product.badge}</span>
-        ${product.eggless ? '<span class="product-tag-badge eggless-badge"><span class="eggless-dot"></span> 100% Eggless</span>' : ''}
-        <button class="product-quickview-btn" onclick="openQuickView(${product.id})">
-          <i class="fas fa-eye"></i> Quick View
-        </button>
-      </div>
-      <div class="product-info">
-        <span class="product-category-meta">${product.categoryLabel}</span>
-        <h4 class="product-name">${product.name}</h4>
-        <p class="product-flavor-note">${product.description}</p>
-        <div class="product-rating">
-          <span class="star"><i class="fas fa-star"></i></span>
-          <span>${product.rating}</span>
-          <span class="reviews-count">(${product.reviews} reviews)</span>
-        </div>
-        <div class="product-pricing-action">
-          <div class="price-box">
-            <span class="price-current">₹${product.price}</span>
-            <span class="price-unit">${product.unit}</span>
+  // Update Status Text
+  const statusEl = document.getElementById("filterStatusText");
+  if (statusEl) {
+    const catLabels = {
+      all: "all 8 botanical creations",
+      cakes: "3 Handcrafted Floral Cakes",
+      pastries: "2 Designer French Pastries",
+      muffins: "2 Morning Blossom Muffins",
+      combos: "1 Luxury Flower + Cake Hamper"
+    };
+    statusEl.innerHTML = `Showing <strong>${catLabels[filterCategory] || filtered.length + " items"}</strong>`;
+  }
+
+  // Update Tab Badges
+  const countAll = document.getElementById("count-all");
+  if (countAll) countAll.textContent = PRODUCTS.length;
+  const countCakes = document.getElementById("count-cakes");
+  if (countCakes) countCakes.textContent = PRODUCTS.filter(p => p.category === "cakes").length;
+  const countPastries = document.getElementById("count-pastries");
+  if (countPastries) countPastries.textContent = PRODUCTS.filter(p => p.category === "pastries").length;
+  const countMuffins = document.getElementById("count-muffins");
+  if (countMuffins) countMuffins.textContent = PRODUCTS.filter(p => p.category === "muffins").length;
+  const countCombos = document.getElementById("count-combos");
+  if (countCombos) countCombos.textContent = PRODUCTS.filter(p => p.category === "combos").length;
+
+  grid.innerHTML = filtered.map(product => {
+    const cartItem = cart.find(item => item.id === product.id);
+    const inCartQty = cartItem ? cartItem.qty : 0;
+
+    return `
+      <div class="product-card" data-id="${product.id}">
+        <!-- Top Thumbnail Area -->
+        <div class="product-thumb-holder" onclick="openQuickView(${product.id})">
+          <img src="${product.image}" alt="${product.name}" class="product-thumb" loading="lazy">
+          
+          <!-- Pure Veg Emblem & Badges -->
+          <div class="card-top-badges">
+            <span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>
+            ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : ''}
           </div>
-          <button class="add-to-cart-btn" onclick="addToCart(${product.id})" title="Add to cart" aria-label="Add ${product.name} to cart">
-            <i class="fas fa-plus"></i>
+
+          <button class="product-quickview-btn" onclick="event.stopPropagation(); openQuickView(${product.id})" title="View Details">
+            <i class="fas fa-expand"></i> <span>Details</span>
           </button>
         </div>
+
+        <!-- Product Information Body -->
+        <div class="product-info">
+          <div class="product-meta-row">
+            <span class="product-category-meta">${product.categoryLabel}</span>
+            <div class="product-rating-pill">
+              <i class="fas fa-star"></i>
+              <span>${product.rating}</span>
+            </div>
+          </div>
+
+          <h4 class="product-name" onclick="openQuickView(${product.id})">${product.name}</h4>
+          
+          <div class="product-unit-pill">
+            <i class="fas fa-scale-balanced" style="font-size:0.68rem; opacity:0.7;"></i> ${product.unit}
+          </div>
+
+          <!-- Price & Add Action -->
+          <div class="product-pricing-action">
+            <div class="price-box">
+              <span class="price-currency">₹</span><span class="price-current">${product.price}</span>
+            </div>
+            
+            <button class="add-to-cart-btn ${inCartQty > 0 ? 'in-cart' : ''}" 
+                    id="addBtn-${product.id}" 
+                    onclick="addToCart(${product.id})" 
+                    title="Add ${product.name} to cart" 
+                    aria-label="Add ${product.name} to cart">
+              ${inCartQty > 0 ? `<i class="fas fa-check"></i> <span>${inCartQty} in cart</span>` : `<i class="fas fa-plus"></i> <span>ADD</span>`}
+            </button>
+          </div>
+
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // Filter Tab Switcher
 function filterProducts(category, btnElement) {
   document.querySelectorAll(".filter-tab-btn").forEach(btn => {
     btn.classList.remove("active");
+    btn.setAttribute("aria-selected", "false");
     if (!btnElement && btn.getAttribute("data-category") === category) {
       btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
     }
   });
-  if (btnElement) btnElement.classList.add("active");
+  if (btnElement) {
+    btnElement.classList.add("active");
+    btnElement.setAttribute("aria-selected", "true");
+  }
   renderProducts(category);
 }
 
@@ -214,6 +269,14 @@ function addToCart(productId) {
       qty: 1,
       image: product.image
     });
+  }
+
+  // Instant card button feedback
+  const btn = document.getElementById(`addBtn-${productId}`);
+  if (btn) {
+    const updatedQty = existing ? existing.qty : 1;
+    btn.classList.add("in-cart");
+    btn.innerHTML = `<i class="fas fa-check"></i> <span>${updatedQty} in cart</span>`;
   }
 
   updateCartUI();
@@ -415,31 +478,45 @@ function openQuickView(productId) {
   const content = document.getElementById("quickViewContent");
   if (content) {
     content.innerHTML = `
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:28px; align-items:center;">
-        <div style="border-radius:18px; overflow:hidden; border:2px solid var(--border-light); height:320px;">
-          <img src="${product.image}" alt="${product.name}" style="width:100%; height:100%; object-fit:cover;">
+      <div class="quickview-modal-grid">
+        <div class="quickview-img-wrap">
+          <img src="${product.image}" alt="${product.name}" class="quickview-img">
+          <div class="card-top-badges">
+            <span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>
+            ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : ''}
+          </div>
         </div>
-        <div>
-          <span class="heading-tag" style="margin-bottom:8px;">${product.categoryLabel}</span>
-          <h3 style="font-family:var(--font-serif); font-size:1.6rem; color:var(--text-cocoa); margin-bottom:8px;">${product.name}</h3>
-          <div class="product-rating" style="margin-bottom:12px;">
+        <div class="quickview-details">
+          <span class="heading-tag" style="margin-bottom:6px;">${product.categoryLabel}</span>
+          <h3 class="quickview-title">${product.name}</h3>
+          
+          <div class="product-rating" style="margin-bottom:10px;">
             <span class="star" style="color:#FFB800;"><i class="fas fa-star"></i></span>
             <strong>${product.rating}</strong>
-            <span style="color:var(--text-muted);">(${product.reviews} happy Nashik customers)</span>
+            <span style="color:var(--text-muted); font-size:0.8rem;">(${product.reviews} reviews in Nashik)</span>
           </div>
-          <div style="font-size:1.6rem; font-weight:800; color:var(--rose-deep); margin-bottom:14px;">
-            ₹${product.price} <span style="font-size:0.85rem; color:var(--text-muted); font-weight:500;">/ ${product.unit}</span>
+
+          <div class="quickview-price-row">
+            <span class="quickview-price">₹${product.price}</span>
+            <span class="quickview-unit">/ ${product.unit}</span>
           </div>
-          <p style="font-size:0.95rem; color:var(--text-secondary); line-height:1.6; margin-bottom:20px;">
+
+          <p class="quickview-desc">
             ${product.description}
           </p>
-          <div style="background:var(--pink-soft); padding:12px 16px; border-radius:12px; font-size:0.85rem; margin-bottom:20px;">
-            🌿 <strong>Pure Vegetarian:</strong> 100% Eggless with organic edible floral garnishes.
+
+          <div class="quickview-usp-pill">
+            <span class="veg-emblem-inline"></span>
+            <span><strong>100% Eggless Pure Veg:</strong> Handcrafted with edible, pesticide-free blooms & pure dairy butter.</span>
           </div>
-          <div style="display:flex; gap:12px;">
-            <button class="btn btn-primary" onclick="addToCart(${product.id}); closeQuickViewModal();">
+
+          <div class="quickview-actions">
+            <button class="btn btn-primary" style="flex:1;" onclick="addToCart(${product.id}); closeQuickViewModal();">
               <i class="fas fa-shopping-bag"></i> Add to Cart • ₹${product.price}
             </button>
+            <a href="https://wa.me/917083517862?text=Hello%20The%20Flora%20Bakery!%20I%20have%20a%20question%20about%20${encodeURIComponent(product.name)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding:10px 14px;" title="Chat with Baker">
+              <i class="fab fa-whatsapp"></i>
+            </a>
           </div>
         </div>
       </div>
