@@ -619,10 +619,68 @@
       this.updateSidebarCounters();
     },
 
+    playNotificationSound() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+        osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12); // A5
+        gain.gain.setValueAtTime(0.18, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.45);
+      } catch (e) {
+        // AudioContext silent fail
+      }
+    },
+
     listenToDataChanges() {
+      // 1. Custom event listener (within same tab or triggered manually)
       window.addEventListener('flora:data-changed', () => {
         this.loadAllData();
       });
+
+      // 2. Storage event listener (cross-tab sync)
+      window.addEventListener('storage', (e) => {
+        if (e.key && e.key.startsWith('flora_')) {
+          this.loadAllData();
+        }
+      });
+
+      // 3. BroadcastChannel (instant modern cross-window sync)
+      if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('flora_sync_channel');
+        channel.onmessage = (event) => {
+          if (event.data && event.data.type === 'NEW_ORDER') {
+            this.showToast(`🎉 New Order #${event.data.orderId} received from ${event.data.customerName || 'Customer'}!`, 'success');
+            this.playNotificationSound();
+          }
+          this.loadAllData();
+        };
+      }
+
+      // 4. Reactive Heartbeat Polling (every 2.5s) to guarantee zero desync
+      let lastOrderCount = (FloraDB.getOrders() || []).length;
+      let lastInqCount = (FloraDB.getInquiries() || []).length;
+      setInterval(() => {
+        const currentOrders = (FloraDB.getOrders() || []).length;
+        const currentInqs = (FloraDB.getInquiries() || []).length;
+        if (currentOrders !== lastOrderCount || currentInqs !== lastInqCount) {
+          if (currentOrders > lastOrderCount) {
+            this.showToast(`🛍️ New Order arrived! Pipeline updated.`, 'success');
+            this.playNotificationSound();
+          }
+          lastOrderCount = currentOrders;
+          lastInqCount = currentInqs;
+          this.loadAllData();
+        }
+      }, 2500);
     },
 
     updateSidebarCounters() {

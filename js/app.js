@@ -1,8 +1,8 @@
 /**
- * THE FLORA BAKERY - E-COMMERCE & INTERACTIVE LOGIC
- * Connected in real-time to FloraDB Unified Storage Engine
- * Features: On-Site E-Commerce Checkout (COD & Gateway-Ready), Confirmation Email Dispatch, 
- * Cart Drawer, Custom Cake Consultation, QuickView, Mobile Navigation & Real-Time Sync
+ * THE FLORA BAKERY - E-COMMERCE & INTERACTIVE STOREFRONT LOGIC
+ * Connected in real-time to FloraDB Unified Storage Engine.
+ * Features: High-Converting PDP Navigation, Slide Cart Drawer with Dynamic Upsells,
+ * Direct Dedicated Checkout Redirection, Custom Cake Inquiries & Cross-Tab Sync.
  */
 
 // Helper to get active products from FloraDB
@@ -13,13 +13,8 @@ function getStoreProducts() {
   return [];
 }
 
-// Shopping Cart State
-let cart = [
-  { id: 1, name: "Blush Rose & Lychee Chiffon Cake", price: 1299, qty: 1, image: "images/cat-cakes.jpg" }
-];
 let appliedDiscountData = null;
 let currentFilterCategory = "all";
-let currentCompletedOrder = null;
 
 // DOM Elements Initialization
 document.addEventListener("DOMContentLoaded", () => {
@@ -28,42 +23,15 @@ document.addEventListener("DOMContentLoaded", () => {
   setupStickyHeader();
   setupAnnouncements();
   setupEventListeners();
-  setupCheckoutDateDefaults();
 
-  // Listen for real-time changes from Admin Panel or across tabs
+  // Listen for real-time changes from Admin Studio or across tabs
   window.addEventListener('flora:data-changed', (e) => {
     renderProducts(currentFilterCategory);
     updateCartUI();
   });
 });
 
-// Setup Default & Min Date for Checkout
-function setupCheckoutDateDefaults() {
-  const dateInput = document.getElementById("checkoutDate");
-  const customDateInput = document.getElementById("cakeDate");
-  const today = new Date();
-  
-  // Format to YYYY-MM-DD
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const minDateStr = `${yyyy}-${mm}-${dd}`;
-
-  if (dateInput) {
-    dateInput.min = minDateStr;
-    dateInput.value = minDateStr;
-  }
-  if (customDateInput) {
-    const tmrw = new Date(today);
-    tmrw.setDate(tmrw.getDate() + 1);
-    const tmrwDD = String(tmrw.getDate()).padStart(2, '0');
-    const tmrwMM = String(tmrw.getMonth() + 1).padStart(2, '0');
-    customDateInput.min = `${tmrw.getFullYear()}-${tmrwMM}-${tmrwDD}`;
-    customDateInput.value = `${tmrw.getFullYear()}-${tmrwMM}-${tmrwDD}`;
-  }
-}
-
-// Render Products Grid
+// Render Products Grid on Storefront
 function renderProducts(filterCategory = "all") {
   currentFilterCategory = filterCategory;
   const grid = document.getElementById("productGrid");
@@ -103,15 +71,16 @@ function renderProducts(filterCategory = "all") {
     return;
   }
 
+  const cart = window.FloraDB ? window.FloraDB.getCart() : [];
+
   grid.innerHTML = filtered.map(product => {
-    const cartItem = cart.find(item => item.id === product.id);
-    const inCartQty = cartItem ? cartItem.qty : 0;
+    const inCartQty = cart.filter(item => item.id === product.id).reduce((sum, i) => sum + i.qty, 0);
     const isOutOfStock = product.stock <= 0;
 
     return `
       <div class="product-card" data-id="${product.id}">
-        <!-- Top Thumbnail Area -->
-        <div class="product-thumb-holder" onclick="openQuickView(${product.id})">
+        <!-- Top Thumbnail Area (Clicks into Dedicated Product Detail Page) -->
+        <div class="product-thumb-holder" onclick="window.location.href='product.html?id=${product.id}'">
           <img src="${product.image}" alt="${product.name}" class="product-thumb" loading="lazy">
           
           <!-- Pure Veg Emblem & Badges -->
@@ -120,36 +89,36 @@ function renderProducts(filterCategory = "all") {
             ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : isOutOfStock ? `<span class="product-tag-badge sold-out">Sold Out</span>` : ''}
           </div>
 
-          <button class="product-quickview-btn" onclick="event.stopPropagation(); openQuickView(${product.id})" title="View Details">
-            <i class="fas fa-expand"></i> <span>Details</span>
-          </button>
+          <a href="product.html?id=${product.id}" class="product-quickview-btn" onclick="event.stopPropagation();" title="View Product Page">
+            <i class="fas fa-eye"></i> <span>View Bake</span>
+          </a>
         </div>
 
         <!-- Product Information Body -->
         <div class="product-info-wrap">
           <div class="product-category-tag">${product.categoryLabel || product.category}</div>
-          <h3 class="product-name" onclick="openQuickView(${product.id})">${product.name}</h3>
+          <h3 class="product-name" onclick="window.location.href='product.html?id=${product.id}'">${product.name}</h3>
           
           <div class="product-rating-row">
             <span class="product-rating-pill">
               <i class="fas fa-star"></i>
-              <span>${product.rating || 5.0}</span>
+              <span>${(product.rating || 4.9).toFixed(1)}</span>
             </span>
-            <span class="rating-count">(${product.reviews || 20})</span>
+            <span class="rating-count">(${product.reviews || 24} reviews)</span>
           </div>
 
           <div class="product-pricing-row">
-            <span class="price-current">₹${product.price}</span>
-            ${product.comparePrice ? `<span class="price-original">₹${product.comparePrice}</span>` : ''}
+            <span class="price-current">₹${product.price.toLocaleString('en-IN')}</span>
+            ${product.comparePrice ? `<span class="price-original">₹${product.comparePrice.toLocaleString('en-IN')}</span>` : ''}
             <span class="product-unit">/ ${product.unit || '0.5 kg'}</span>
           </div>
 
           <!-- Stock Radar Indicator -->
-          <div class="product-stock-status ${isOutOfStock ? 'out-of-stock' : product.stock <= 5 ? 'low-stock' : 'in-stock'}">
+          <div class="product-stock-status ${isOutOfStock ? 'out-of-stock' : product.stock <= 4 ? 'low-stock' : 'in-stock'}">
             ${isOutOfStock 
               ? '✕ Sold Out for Today' 
-              : product.stock <= 5 
-                ? `⚡ Only ${product.stock} units remaining today` 
+              : product.stock <= 4 
+                ? `⚡ Only ${product.stock} units left for today` 
                 : `✓ Freshly Baked & Available`}
           </div>
 
@@ -161,14 +130,14 @@ function renderProducts(filterCategory = "all") {
               </button>
             ` : inCartQty === 0 ? `
               <button class="btn btn-primary btn-add-cart" onclick="addToCart(${product.id})">
-                <i class="fas fa-plus"></i> Add to Cart
+                <i class="fas fa-shopping-bag"></i> Add to Cart
               </button>
             ` : `
               <div class="qty-control-pill">
                 <button class="qty-stepper-btn" onclick="changeQty(${product.id}, -1)" aria-label="Decrease quantity">
                   <i class="fas fa-minus"></i>
                 </button>
-                <span class="qty-stepper-val">${inCartQty} in Cart</span>
+                <span class="qty-stepper-val" onclick="openCartDrawer()">${inCartQty} in Bag</span>
                 <button class="qty-stepper-btn" onclick="changeQty(${product.id}, 1)" aria-label="Increase quantity">
                   <i class="fas fa-plus"></i>
                 </button>
@@ -234,7 +203,10 @@ function closeMobileNav() {
   }
 }
 
-// Add Item to Cart
+// =============================================================================
+// UNIFIED SHOPPING CART ENGINE (FLORADB POWERED)
+// =============================================================================
+
 function addToCart(productId) {
   const allProducts = getStoreProducts();
   const product = allProducts.find(p => p.id === productId);
@@ -245,89 +217,101 @@ function addToCart(productId) {
     return;
   }
 
-  const existing = cart.find(item => item.id === productId);
-  if (existing) {
-    if (existing.qty >= product.stock) {
-      showToast(`Only ${product.stock} units available in stock.`);
-      return;
-    }
-    existing.qty += 1;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      qty: 1
-    });
+  if (window.FloraDB) {
+    window.FloraDB.addToCart(product);
   }
 
   updateCartUI();
   renderProducts(currentFilterCategory);
-  showToast(`🌸 Added "${product.name}" to cart!`);
+  showToast(`🌸 Added "${product.name}" to your floral bag!`);
+  
+  // Automatically open slide cart drawer with dynamic upsells
+  openCartDrawer();
 }
 
-// Update Cart User Interface & Calculations
-function updateCartUI() {
-  const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+function changeQty(productId, delta) {
+  if (!window.FloraDB) return;
+  const cart = window.FloraDB.getCart();
+  const item = cart.find(i => i.id === productId);
+  if (item) {
+    window.FloraDB.updateCartQty(item.cartKey, item.qty + delta);
+    updateCartUI();
+    renderProducts(currentFilterCategory);
+  }
+}
 
-  // Update header badges
+function removeFromCart(cartKeyOrId) {
+  if (window.FloraDB) {
+    window.FloraDB.removeFromCart(cartKeyOrId);
+    updateCartUI();
+    renderProducts(currentFilterCategory);
+    showToast("Item removed from bag");
+  }
+}
+
+// Update Cart Drawer UI & Calculation Meter
+function updateCartUI() {
+  if (!window.FloraDB) return;
+
+  const summary = window.FloraDB.getCartSummary();
+  const cart = summary.items;
+
+  // Header Badges
   const badge1 = document.getElementById("cartCountBadge");
   const badge2 = document.getElementById("cartBadge");
+  const drawerCount = document.getElementById("cartDrawerCount");
+
   [badge1, badge2].forEach(b => {
     if (b) {
-      b.textContent = totalCount;
-      b.style.display = totalCount > 0 ? "flex" : "none";
+      b.textContent = summary.totalCount;
+      b.style.display = summary.totalCount > 0 ? "flex" : "none";
     }
   });
 
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  
-  // Calculate Promo Discount
-  let discountAmount = 0;
-  if (appliedDiscountData) {
-    if (appliedDiscountData.type === 'percent') {
-      discountAmount = Math.round((subtotal * appliedDiscountData.value) / 100);
-    } else {
-      discountAmount = Math.min(subtotal, appliedDiscountData.value);
-    }
-  }
+  if (drawerCount) drawerCount.textContent = summary.totalCount;
 
-  const grandTotal = Math.max(0, subtotal - discountAmount);
-
-  // Update Free Shipping Progress Bar (Threshold ₹999)
-  const freeThreshold = 999;
-  const progressPercent = Math.min(100, Math.round((subtotal / freeThreshold) * 100));
-  const diff = freeThreshold - subtotal;
-  
-  const fillEl = document.getElementById("freeShippingFill");
+  // Free Shipping Progress Bar
+  const fillEl = document.getElementById("freeShippingFill") || document.getElementById("meterBarFill");
   const textEl = document.getElementById("freeShippingText");
   
-  if (fillEl) fillEl.style.width = `${progressPercent}%`;
+  if (fillEl) fillEl.style.width = `${summary.progressPercent}%`;
   if (textEl) {
-    if (subtotal === 0) {
-      textEl.innerHTML = `Add <strong>₹${freeThreshold}</strong> for <strong>FREE Delivery</strong> in Nashik 🌸`;
-    } else if (subtotal >= freeThreshold) {
-      textEl.innerHTML = `🎉 You unlocked <strong>FREE Chilled Delivery</strong> in Nashik!`;
+    if (summary.isFreeShipping) {
+      textEl.innerHTML = `<i class="fas fa-check-circle" style="color:#059669;"></i> 🎉 You unlocked <strong>FREE Chilled Delivery in Nashik</strong>!`;
+      if (fillEl) fillEl.style.background = "#059669";
     } else {
-      textEl.innerHTML = `Add <strong>₹${diff}</strong> more for <strong>FREE Delivery</strong> in Nashik`;
+      textEl.innerHTML = `<i class="fas fa-truck"></i> Add <strong>₹${summary.amountNeededForFreeShipping.toLocaleString('en-IN')}</strong> more for <strong>FREE Delivery in Nashik</strong>`;
+      if (fillEl) fillEl.style.background = "linear-gradient(90deg, var(--rose-deep), #FF85A1)";
     }
   }
 
-  // Update Totals
-  const subtotalEl = document.getElementById("cartSubtotal");
-  const grandTotalEl = document.getElementById("cartGrandTotal");
-  if (subtotalEl) subtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+  // Totals
+  let discountAmount = 0;
+  if (appliedDiscountData) {
+    discountAmount = appliedDiscountData.discountAmount;
+  }
+
+  const deliveryFee = summary.isFreeShipping ? 0 : summary.deliveryFee;
+  const grandTotal = Math.max(0, summary.subtotal - discountAmount + deliveryFee);
+
+  const subtotalEl = document.getElementById("cartSubtotal") || document.getElementById("cartSubtotalVal");
+  const grandTotalEl = document.getElementById("cartGrandTotal") || document.getElementById("cartGrandTotalVal");
+  const deliveryEl = document.getElementById("cartDeliveryVal");
+
+  if (subtotalEl) subtotalEl.textContent = `₹${summary.subtotal.toLocaleString('en-IN')}`;
+  if (deliveryEl) deliveryEl.textContent = summary.isFreeShipping ? "FREE (Nashik)" : `₹${deliveryFee}`;
   if (grandTotalEl) grandTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
 
-  // Update Cart Drawer Items List
-  const itemsContainer = document.getElementById("cartItemsBody");
+  // Render Items List
+  const itemsContainer = document.getElementById("cartItemsBody") || document.getElementById("cartDrawerItems");
+  const footerEl = document.getElementById("cartDrawerFooter");
+
   if (itemsContainer) {
     if (cart.length === 0) {
       itemsContainer.innerHTML = `
-        <div class="cart-empty-state">
-          <div style="font-size:3.5rem; margin-bottom:12px;">🌸</div>
-          <h4 style="font-size:1.1rem; color:var(--text-cocoa); margin-bottom:6px;">Your sweet cart is empty</h4>
+        <div class="cart-empty-state" style="text-align:center; padding:32px 16px;">
+          <div style="font-size:3rem; margin-bottom:12px;">🌸</div>
+          <h4 style="font-size:1.1rem; color:var(--text-cocoa); margin-bottom:6px;">Your sweet bag is empty</h4>
           <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:16px;">
             Explore our freshly picked floral cakes and melt-in-mouth French pastries.
           </p>
@@ -336,18 +320,22 @@ function updateCartUI() {
           </button>
         </div>
       `;
+      if (footerEl) footerEl.style.display = "none";
     } else {
+      if (footerEl) footerEl.style.display = "block";
       itemsContainer.innerHTML = cart.map(item => `
         <div class="cart-item-row">
-          <img src="${item.image || 'images/cat-cakes.jpg'}" alt="${item.name}" class="cart-item-thumb">
-          <div class="cart-item-info">
-            <h5 class="cart-item-title">${item.name}</h5>
-            <div class="cart-item-price">₹${item.price.toLocaleString('en-IN')}</div>
-            <div class="cart-item-qty">
-              <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+          <img src="${item.image || 'images/cat-cakes.jpg'}" alt="${item.name}" class="cart-item-thumb" onclick="window.location.href='product.html?id=${item.id}'">
+          <div class="cart-item-info" style="flex:1;">
+            <h5 class="cart-item-title" onclick="window.location.href='product.html?id=${item.id}'">${item.name}</h5>
+            <span class="cart-item-variant" style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">${item.variantName || 'Standard'}</span>
+            ${item.cakeMessage ? `<span style="display:block; font-size:0.78rem; color:var(--rose-deep); margin-bottom:4px;"><i class="fas fa-pen-nib"></i> "${item.cakeMessage}"</span>` : ''}
+            <div class="cart-item-price" style="font-weight:700; color:var(--text-cocoa);">₹${(item.price * item.qty).toLocaleString('en-IN')}</div>
+            <div class="cart-item-qty" style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+              <button class="qty-btn" onclick="changeCartKeyQty('${item.cartKey}', -1)">-</button>
               <span style="font-weight:700; font-size:0.9rem; min-width:20px; text-align:center;">${item.qty}</span>
-              <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-              <button style="margin-left:auto; background:none; color:#C62828; font-size:0.85rem; font-weight:600; cursor:pointer;" onclick="removeFromCart(${item.id})">
+              <button class="qty-btn" onclick="changeCartKeyQty('${item.cartKey}', 1)">+</button>
+              <button style="margin-left:auto; background:none; color:#C62828; font-size:0.85rem; font-weight:600; cursor:pointer; border:none;" onclick="removeFromCart('${item.cartKey}')">
                 <i class="fas fa-trash-alt"></i> Remove
               </button>
             </div>
@@ -356,306 +344,97 @@ function updateCartUI() {
       `).join('');
     }
   }
+
+  // Render Dynamic Upsells inside Cart Drawer
+  renderDrawerUpsells();
 }
 
-// Change Quantity
-function changeQty(productId, delta) {
-  const item = cart.find(i => i.id === productId);
-  if (!item) return;
+function changeCartKeyQty(cartKey, delta) {
+  if (!window.FloraDB) return;
+  const cart = window.FloraDB.getCart();
+  const item = cart.find(i => i.cartKey === cartKey);
+  if (item) {
+    window.FloraDB.updateCartQty(cartKey, item.qty + delta);
+    updateCartUI();
+    renderProducts(currentFilterCategory);
+  }
+}
 
-  const product = getStoreProducts().find(p => p.id === productId);
-  if (delta > 0 && product && item.qty >= product.stock) {
-    showToast(`Only ${product.stock} units available in stock.`);
+// Render Upsell Carousel Inside Cart Drawer
+function renderDrawerUpsells() {
+  const upsellTrack = document.getElementById("cartUpsellItems");
+  const upsellSection = document.getElementById("cartUpsellSection");
+  if (!upsellTrack || !window.FloraDB) return;
+
+  const upsells = window.FloraDB.getUpsellProducts();
+  if (upsells.length === 0) {
+    if (upsellSection) upsellSection.style.display = "none";
     return;
   }
 
-  item.qty += delta;
-  if (item.qty <= 0) {
-    cart = cart.filter(i => i.id !== productId);
+  if (upsellSection) upsellSection.style.display = "block";
+  upsellTrack.innerHTML = upsells.map(p => `
+    <div class="upsell-item-card">
+      <img src="${p.image}" alt="${p.name}" class="upsell-thumb" onclick="window.location.href='product.html?id=${p.id}'">
+      <div class="upsell-info">
+        <span class="upsell-item-name" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</span>
+        <span class="upsell-item-price">₹${p.price.toLocaleString('en-IN')}</span>
+      </div>
+      <button class="btn btn-secondary upsell-add-btn" onclick="addUpsell(${p.id})">
+        <i class="fas fa-plus"></i> Add
+      </button>
+    </div>
+  `).join('');
+}
+
+function addUpsell(productId) {
+  const prod = window.FloraDB ? window.FloraDB.getProductById(productId) : null;
+  if (prod) {
+    window.FloraDB.addToCart(prod, null, 1);
+    showToast(`🌸 Added "${prod.name}" to your bag!`);
+    updateCartUI();
+    renderProducts(currentFilterCategory);
   }
-  updateCartUI();
-  renderProducts(currentFilterCategory);
 }
 
-// Remove from Cart
-function removeFromCart(productId) {
-  cart = cart.filter(i => i.id !== productId);
-  updateCartUI();
-  renderProducts(currentFilterCategory);
-  showToast("Item removed from cart");
-}
-
-// Cart Drawer Controls
+// Cart Drawer Visibility
 function openCartDrawer() {
-  document.getElementById("cartDrawerOverlay")?.classList.add("active");
+  const overlay = document.getElementById("cartDrawerOverlay");
+  const drawer = document.getElementById("cartDrawer");
+  if (overlay) overlay.classList.add("active");
+  if (drawer) drawer.classList.add("active");
   document.body.style.overflow = "hidden";
+  updateCartUI();
 }
 
 function closeCartDrawer() {
-  document.getElementById("cartDrawerOverlay")?.classList.remove("active");
+  const overlay = document.getElementById("cartDrawerOverlay");
+  const drawer = document.getElementById("cartDrawer");
+  if (overlay) overlay.classList.remove("active");
+  if (drawer) drawer.classList.remove("active");
   document.body.style.overflow = "auto";
 }
 
-// Apply Promo Code
+// Promo Code Application
 function applyPromoCode() {
-  const input = document.getElementById("cartPromoInput");
+  const input = document.getElementById("cartPromoInput") || document.getElementById("cartCouponInput");
   const code = input ? input.value.trim().toUpperCase() : "";
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const summary = window.FloraDB ? window.FloraDB.getCartSummary() : { subtotal: 0 };
 
   if (!code) {
     showToast("Please enter a promo code (e.g. FLORA10)");
     return;
   }
 
-  if (window.FloraDB && typeof window.FloraDB.applyDiscount === 'function') {
-    const result = window.FloraDB.applyDiscount(code, subtotal);
+  if (window.FloraDB) {
+    const result = window.FloraDB.applyDiscountCode(code, summary.subtotal);
     if (result.valid) {
-      appliedDiscountData = { code: result.code, value: result.value, type: result.type, amount: result.discountAmount };
+      appliedDiscountData = result;
       updateCartUI();
       showToast(result.message);
     } else {
       showToast(result.message);
     }
-  } else {
-    if (code === "FLORA10" || code === "BLOOM10") {
-      appliedDiscountData = { type: 'percent', value: 10, code };
-      updateCartUI();
-      showToast("✨ 10% VIP Discount Applied Successfully!");
-    } else {
-      showToast("Invalid code. Try using 'FLORA10'");
-    }
-  }
-}
-
-// =============================================================================
-// ON-SITE E-COMMERCE CHECKOUT FLOW (SHOPIFY-GRADE)
-// =============================================================================
-
-function openCheckoutModal() {
-  if (cart.length === 0) {
-    showToast("Your cart is empty! Add some delicious floral bakes first.");
-    return;
-  }
-
-  closeCartDrawer();
-  updateCheckoutSummary();
-  setupCheckoutDateDefaults();
-
-  const modal = document.getElementById("checkoutModal");
-  if (modal) {
-    modal.classList.add("active");
-    document.body.style.overflow = "hidden";
-  }
-}
-
-function closeCheckoutModal() {
-  const modal = document.getElementById("checkoutModal");
-  if (modal) {
-    modal.classList.remove("active");
-    document.body.style.overflow = "auto";
-  }
-}
-
-function updateCheckoutSummary() {
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const freeThreshold = 999;
-  const deliveryFee = subtotal >= freeThreshold || subtotal === 0 ? 0 : 99;
-
-  let discountAmount = 0;
-  if (appliedDiscountData) {
-    if (appliedDiscountData.type === 'percent') {
-      discountAmount = Math.round((subtotal * appliedDiscountData.value) / 100);
-    } else {
-      discountAmount = Math.min(subtotal, appliedDiscountData.value);
-    }
-  }
-
-  const grandTotal = Math.max(0, subtotal - discountAmount + deliveryFee);
-
-  // Update Summary Rows
-  const itemsContainer = document.getElementById("checkoutItemsList");
-  if (itemsContainer) {
-    itemsContainer.innerHTML = cart.map(item => `
-      <div class="checkout-summary-item">
-        <img src="${item.image || 'images/cat-cakes.jpg'}" alt="${item.name}" class="summary-item-img">
-        <div class="summary-item-info">
-          <div class="summary-item-name">${item.name}</div>
-          <div class="summary-item-qty">Qty: ${item.qty} &bull; ₹${item.price.toLocaleString('en-IN')} each</div>
-        </div>
-        <div class="summary-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}</div>
-      </div>
-    `).join('');
-  }
-
-  const subtotalEl = document.getElementById("checkoutSubtotal");
-  const deliveryFeeEl = document.getElementById("checkoutDeliveryFee");
-  const grandTotalEl = document.getElementById("checkoutGrandTotal");
-  const btnTotalEl = document.getElementById("checkoutBtnTotal");
-  const discountRow = document.getElementById("checkoutDiscountRow");
-  const discountCodeEl = document.getElementById("checkoutDiscountCode");
-  const discountValEl = document.getElementById("checkoutDiscountVal");
-
-  if (subtotalEl) subtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
-  if (deliveryFeeEl) {
-    deliveryFeeEl.textContent = deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`;
-    deliveryFeeEl.style.color = deliveryFee === 0 ? "#059669" : "var(--text-cocoa)";
-  }
-  if (grandTotalEl) grandTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
-  if (btnTotalEl) btnTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
-
-  if (discountRow) {
-    if (discountAmount > 0 && appliedDiscountData) {
-      discountRow.style.display = "flex";
-      if (discountCodeEl) discountCodeEl.textContent = appliedDiscountData.code;
-      if (discountValEl) discountValEl.textContent = `-₹${discountAmount.toLocaleString('en-IN')}`;
-    } else {
-      discountRow.style.display = "none";
-    }
-  }
-}
-
-// Process Checkout Form Submission (COD E-Commerce Order)
-function processCheckoutOrder(event) {
-  event.preventDefault();
-
-  if (cart.length === 0) {
-    showToast("Your cart is empty!");
-    closeCheckoutModal();
-    return;
-  }
-
-  const name = document.getElementById("checkoutName")?.value.trim();
-  const phone = document.getElementById("checkoutPhone")?.value.trim();
-  const email = document.getElementById("checkoutEmail")?.value.trim();
-  const date = document.getElementById("checkoutDate")?.value;
-  const slot = document.getElementById("checkoutSlot")?.value;
-  const address = document.getElementById("checkoutAddress")?.value.trim();
-  const locality = document.getElementById("checkoutLocality")?.value;
-  const landmark = document.getElementById("checkoutLandmark")?.value.trim();
-  const cakeMessage = document.getElementById("checkoutCakeMessage")?.value.trim();
-  const notes = document.getElementById("checkoutNotes")?.value.trim();
-
-  // Basic validation
-  if (!name || !phone || !email || !address) {
-    showToast("Please fill in all required fields!");
-    return;
-  }
-
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const deliveryFee = subtotal >= 999 ? 0 : 99;
-
-  let discountAmount = 0;
-  if (appliedDiscountData) {
-    if (appliedDiscountData.type === 'percent') {
-      discountAmount = Math.round((subtotal * appliedDiscountData.value) / 100);
-    } else {
-      discountAmount = Math.min(subtotal, appliedDiscountData.value);
-    }
-  }
-
-  const grandTotal = Math.max(0, subtotal - discountAmount + deliveryFee);
-  const fullAddress = `${address}${landmark ? ` (Near ${landmark})` : ''}, ${locality}, Nashik`;
-
-  // Construct Order Object
-  const orderPayload = {
-    customerName: name,
-    phone: phone,
-    email: email,
-    address: fullAddress,
-    locality: locality,
-    deliveryDate: date,
-    timeSlot: slot,
-    cakeMessage: cakeMessage,
-    notes: notes,
-    items: [...cart],
-    subtotal: subtotal,
-    deliveryFee: deliveryFee,
-    discount: discountAmount,
-    total: grandTotal,
-    paymentMethod: "COD"
-  };
-
-  // Add Order to Unified DB (Triggers notifications, email logs, stock decrement)
-  let createdOrder = null;
-  if (window.FloraDB && typeof window.FloraDB.addOrder === 'function') {
-    createdOrder = window.FloraDB.addOrder(orderPayload);
-  } else {
-    createdOrder = { ...orderPayload, id: `FB-${Math.floor(Math.random()*1000 + 1000)}` };
-  }
-
-  currentCompletedOrder = createdOrder;
-
-  // Clear Cart
-  cart = [];
-  appliedDiscountData = null;
-  updateCartUI();
-  renderProducts(currentFilterCategory);
-
-  // Close Checkout Modal & Open Order Success Screen
-  closeCheckoutModal();
-  openOrderSuccessModal(createdOrder);
-
-  // Toast celebration
-  showToast(`🎉 Order #${createdOrder.id} confirmed! Confirmation email dispatched.`);
-}
-
-// Order Success Modal Handler
-function openOrderSuccessModal(order) {
-  const modal = document.getElementById("orderSuccessModal");
-  if (!modal || !order) return;
-
-  const idEl = document.getElementById("successOrderId");
-  const nameEl = document.getElementById("successCustomerName");
-  const dateEl = document.getElementById("successDeliveryDate");
-  const totalEl = document.getElementById("successTotal");
-  const emailEl = document.getElementById("successCustomerEmail");
-
-  if (idEl) idEl.textContent = `#${order.id}`;
-  if (nameEl) nameEl.textContent = order.customerName;
-  if (dateEl) dateEl.textContent = `${order.deliveryDate || 'Scheduled'} (${order.timeSlot || 'Afternoon'})`;
-  if (totalEl) totalEl.textContent = `₹${order.total.toLocaleString('en-IN')}`;
-  if (emailEl) emailEl.textContent = order.email;
-
-  modal.classList.add("active");
-  document.body.style.overflow = "hidden";
-}
-
-function closeOrderSuccessModal() {
-  const modal = document.getElementById("orderSuccessModal");
-  if (modal) {
-    modal.classList.remove("active");
-    document.body.style.overflow = "auto";
-  }
-}
-
-// Simulated Email Receipt Modal Viewer
-function openEmailReceiptModal() {
-  if (!currentCompletedOrder) return;
-  const order = currentCompletedOrder;
-
-  const modal = document.getElementById("emailReceiptModal");
-  if (!modal) return;
-
-  const subjectEl = document.getElementById("emailModalSubject");
-  const toEl = document.getElementById("emailModalTo");
-  const dateEl = document.getElementById("emailModalDate");
-  const bodyEl = document.getElementById("emailRenderedBody");
-
-  if (subjectEl) subjectEl.textContent = `🌸 Order Confirmed! The Flora Bakery Order #${order.id}`;
-  if (toEl) toEl.textContent = `${order.customerName} <${order.email}>`;
-  if (dateEl) dateEl.textContent = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-
-  if (bodyEl && window.FloraDB && typeof window.FloraDB.generateEmailHTML === 'function') {
-    bodyEl.innerHTML = window.FloraDB.generateEmailHTML(order);
-  }
-
-  modal.classList.add("active");
-}
-
-function closeEmailReceiptModal() {
-  const modal = document.getElementById("emailReceiptModal");
-  if (modal) {
-    modal.classList.remove("active");
   }
 }
 
@@ -694,97 +473,11 @@ function submitCustomCakeInquiry(event) {
   waMsg += `• *Special Notes:* ${notes}\n\n`;
   waMsg += `Please provide me with a custom quote and confirm the date. Thank you!`;
 
-  // Auto-record inquiry in Admin FloraDB
-  if (window.FloraDB) {
-    window.FloraDB.addInquiry({
-      customerName: "Custom Cake Consultation",
-      phone: "070835 17862",
-      occasion,
-      size,
-      flavor,
-      palette,
-      message: messageText,
-      requiredDate: date,
-      notes
-    });
-  }
-
   closeCakeBuilderModal();
   showToast("🎉 Custom cake inquiry sent to studio!");
   setTimeout(() => {
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(waMsg)}`, "_blank");
   }, 600);
-}
-
-// Quick View Modal
-function openQuickView(productId) {
-  const allProducts = getStoreProducts();
-  const product = allProducts.find(p => p.id === productId);
-  if (!product) return;
-
-  const content = document.getElementById("quickViewContent");
-  if (content) {
-    const isOutOfStock = product.stock <= 0;
-    content.innerHTML = `
-      <div class="quickview-modal-grid">
-        <div class="quickview-img-wrap">
-          <img src="${product.image}" alt="${product.name}" class="quickview-img">
-          <div class="card-top-badges">
-            ${product.eggless ? `<span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>` : '<span></span>'}
-            ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : ''}
-            ${isOutOfStock ? `<span class="product-tag-badge" style="background:#EF4444; color:#FFF;">Sold Out</span>` : ''}
-          </div>
-        </div>
-        <div class="quickview-details">
-          <span class="heading-tag" style="margin-bottom:6px;">${product.categoryLabel || product.category}</span>
-          <h3 class="quickview-title">${product.name}</h3>
-          
-          <div class="product-rating" style="margin-bottom:10px;">
-            <span class="star" style="color:#FFB800;"><i class="fas fa-star"></i></span>
-            <strong>${product.rating || 5.0}</strong>
-            <span style="color:var(--text-muted); font-size:0.8rem;">(${product.reviews || 40} reviews in Nashik)</span>
-          </div>
-
-          <div class="quickview-price-row">
-            <span class="quickview-price">₹${product.price}</span>
-            <span class="quickview-unit">/ ${product.unit || '0.5 kg'}</span>
-            ${product.stock <= 5 && product.stock > 0 ? `<span style="color:#D97706; font-weight:700; font-size:0.8rem; margin-left:10px;">⚠️ Only ${product.stock} left</span>` : ''}
-          </div>
-
-          <p class="quickview-desc">
-            ${product.description}
-          </p>
-
-          <div class="quickview-usp-pill">
-            <span class="veg-emblem-inline"></span>
-            <span><strong>100% Eggless Pure Veg:</strong> Handcrafted with edible, pesticide-free blooms & pure dairy butter.</span>
-          </div>
-
-          <div class="quickview-actions">
-            ${isOutOfStock ? `
-              <button class="btn btn-secondary" style="flex:1; cursor:not-allowed;" disabled>
-                Sold Out for Today
-              </button>
-            ` : `
-              <button class="btn btn-primary" style="flex:1;" onclick="addToCart(${product.id}); closeQuickViewModal();">
-                <i class="fas fa-shopping-bag"></i> Add to Cart • ₹${product.price}
-              </button>
-            `}
-            <a href="https://wa.me/917083517862?text=Hello%20The%20Flora%20Bakery!%20I%20have%20a%20question%20about%20${encodeURIComponent(product.name)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding:10px 14px;" title="Chat with Baker">
-              <i class="fab fa-whatsapp"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-  document.getElementById("quickViewModal")?.classList.add("active");
-  document.body.style.overflow = "hidden";
-}
-
-function closeQuickViewModal() {
-  document.getElementById("quickViewModal")?.classList.remove("active");
-  document.body.style.overflow = "auto";
 }
 
 // Sticky Header Setup
@@ -871,9 +564,11 @@ function setupEventListeners() {
   // Cart Drawer Triggers
   const cartBtn = document.getElementById("cartBtn");
   const cartDrawerOverlay = document.getElementById("cartDrawerOverlay");
+  const cartDrawerClose = document.getElementById("cartDrawerClose");
 
   if (cartBtn) cartBtn.addEventListener("click", openCartDrawer);
   if (cartDrawerOverlay) cartDrawerOverlay.addEventListener("click", closeCartDrawer);
+  if (cartDrawerClose) cartDrawerClose.addEventListener("click", closeCartDrawer);
 
   // VIP Bloom Club Coupon Copy
   const copyBtn = document.getElementById("copyCouponBtn");
@@ -881,7 +576,7 @@ function setupEventListeners() {
     copyBtn.addEventListener("click", () => {
       navigator.clipboard.writeText("FLORA10");
       showToast("🌸 Coupon code FLORA10 copied to clipboard!");
-      const cartInput = document.getElementById("cartPromoInput");
+      const cartInput = document.getElementById("cartPromoInput") || document.getElementById("cartCouponInput");
       if (cartInput) {
         cartInput.value = "FLORA10";
       }

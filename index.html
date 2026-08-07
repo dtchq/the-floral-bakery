@@ -52,13 +52,11 @@
         <!-- Desktop Navigation Menu -->
         <nav>
           <ul class="nav-menu" id="navMenu">
-            <li><a href="#categories" class="nav-link">Categories</a></li>
-            <li><a href="#bestsellers" class="nav-link">Bestsellers</a></li>
-            <li><a href="#combos" class="nav-link">Gift Combos</a></li>
-            <li><a href="#why-us" class="nav-link">Why Flora</a></li>
-            <li><a href="#how-it-works" class="nav-link">Custom Orders</a></li>
-            <li><a href="#testimonials" class="nav-link">Reviews</a></li>
-            <li><a href="#delivery-info" class="nav-link">Nashik Delivery</a></li>
+            <li><a href="index.html" class="nav-link active">Home</a></li>
+            <li><a href="shop.html" class="nav-link">Shop Bakes</a></li>
+            <li><a href="categories.html" class="nav-link">Categories</a></li>
+            <li><a href="about.html" class="nav-link">About Us</a></li>
+            <li><a href="contact.html" class="nav-link">Contact</a></li>
           </ul>
         </nav>
 
@@ -66,7 +64,7 @@
         <div class="header-actions">
           <button class="action-icon-btn" onclick="openCartDrawer()" title="View Shopping Cart" aria-label="Shopping Cart">
             <i class="fas fa-shopping-bag"></i>
-            <span class="cart-count-badge" id="cartCountBadge">1</span>
+            <span class="cart-count-badge" id="cartCountBadge">0</span>
           </button>
           
           <button class="btn btn-primary btn-sm header-custom-cta" onclick="openCakeBuilderModal()">
@@ -96,13 +94,11 @@
       </div>
 
       <ul class="mobile-nav-links">
-        <li><a href="#categories" class="mobile-nav-link" onclick="closeMobileNav()"><span>🌸 Categories</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="#bestsellers" class="mobile-nav-link" onclick="closeMobileNav()"><span>✨ Bestsellers</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="#combos" class="mobile-nav-link" onclick="closeMobileNav()"><span>🎁 Gift Combos</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="#why-us" class="mobile-nav-link" onclick="closeMobileNav()"><span>🌿 Why Flora</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="#how-it-works" class="mobile-nav-link" onclick="closeMobileNav()"><span>🎂 Custom Orders</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="#testimonials" class="mobile-nav-link" onclick="closeMobileNav()"><span>⭐ Reviews</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="#delivery-info" class="mobile-nav-link" onclick="closeMobileNav()"><span>📍 Nashik Delivery</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="index.html" class="mobile-nav-link active" onclick="closeMobileNav()"><span>🌸 Home</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="shop.html" class="mobile-nav-link" onclick="closeMobileNav()"><span>🎂 Shop All Bakes</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="categories.html" class="mobile-nav-link" onclick="closeMobileNav()"><span>✨ Explore Categories</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="about.html" class="mobile-nav-link" onclick="closeMobileNav()"><span>🌿 About Our Bakery</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
+        <li><a href="contact.html" class="mobile-nav-link" onclick="closeMobileNav()"><span>💌 Contact & Studio</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
       </ul>
 
       <div style="margin-bottom: 20px;">
@@ -273,7 +269,7 @@
         <div class="category-cards-grid">
           
           <!-- Category 1: Cakes -->
-          <div class="category-card" onclick="selectCategory('cakes')" role="button" tabindex="0" title="Explore Floral Cakes">
+          <div class="category-card" onclick="window.location.href='shop.html?category=cakes'" role="button" tabindex="0" title="Explore Floral Cakes">
             <div class="category-img-holder">
               <img src="images/cat-cakes.jpg" alt="Artisanal Floral Cakes" class="category-img" loading="lazy">
               <span class="category-badge">Signature</span>
@@ -284,13 +280,13 @@
                 <span class="category-price-hint">Custom Tiers • From ₹1,299</span>
               </div>
               <div class="category-action-pill">
-                <span>View</span> <i class="fas fa-arrow-right"></i>
+                <span>Explore</span> <i class="fas fa-arrow-right"></i>
               </div>
             </div>
           </div>
 
           <!-- Category 2: Pastries -->
-          <div class="category-card" onclick="selectCategory('pastries')" role="button" tabindex="0" title="Explore French Pastries">
+          <div class="category-card" onclick="window.location.href='shop.html?category=pastries'" role="button" tabindex="0" title="Explore French Pastries">
             <div class="category-img-holder">
               <img src="images/cat-pastries.jpg" alt="Designer Floral Pastries" class="category-img" loading="lazy">
               <span class="category-badge">French Patisserie</span>
@@ -301,13 +297,13 @@
                 <span class="category-price-hint">Choux & Tarts • From ₹449</span>
               </div>
               <div class="category-action-pill">
-                <span>View</span> <i class="fas fa-arrow-right"></i>
+                <span>Explore</span> <i class="fas fa-arrow-right"></i>
               </div>
             </div>
           </div>
 
           <!-- Category 3: Muffins -->
-          <div class="category-card" onclick="selectCategory('muffins')" role="button" tabindex="0" title="Explore Floral Muffins">
+          <div class="category-card" onclick="window.location.href='shop.html?category=muffins'" role="button" tabindex="0" title="Explore Floral Muffins">
             <div class="category-img-holder">
               <img src="images/cat-muffins.jpg" alt="Artisanal Floral Muffins" class="category-img" loading="lazy">
               <span class="category-badge">Artisan</span>
@@ -318,13 +314,13 @@
                 <span class="category-price-hint">Boxes of 4 • From ₹399</span>
               </div>
               <div class="category-action-pill">
-                <span>View</span> <i class="fas fa-arrow-right"></i>
+                <span>Explore</span> <i class="fas fa-arrow-right"></i>
               </div>
             </div>
           </div>
 
           <!-- Category 4: Gifting Combos -->
-          <div class="category-card" onclick="selectCategory('combos')" role="button" tabindex="0" title="Explore Gift Combos">
+          <div class="category-card" onclick="window.location.href='shop.html?category=combos'" role="button" tabindex="0" title="Explore Gift Combos">
             <div class="category-img-holder">
               <img src="images/combo-banner.jpg" alt="Cake and Flower Gifting Combos" class="category-img" loading="lazy">
               <span class="category-badge">Luxury Hamper</span>
@@ -335,7 +331,7 @@
                 <span class="category-price-hint">Cake + Blooms • From ₹2,499</span>
               </div>
               <div class="category-action-pill">
-                <span>View</span> <i class="fas fa-arrow-right"></i>
+                <span>Explore</span> <i class="fas fa-arrow-right"></i>
               </div>
             </div>
           </div>
@@ -346,11 +342,11 @@
         <div class="occasions-bar">
           <span class="occasions-bar-label"><i class="fas fa-sparkles" style="color:var(--rose-deep);"></i> Quick Occasion Filters:</span>
           <div class="occasion-chips">
-            <button type="button" class="occasion-chip" onclick="selectCategory('cakes')">🎂 Birthday Cakes</button>
-            <button type="button" class="occasion-chip" onclick="selectCategory('cakes')">💍 Anniversary Tiers</button>
-            <button type="button" class="occasion-chip" onclick="openCakeBuilderModal()">💐 Custom Design Studio</button>
-            <button type="button" class="occasion-chip" onclick="selectCategory('combos')">🎁 Flower + Cake Hampers</button>
-            <button type="button" class="occasion-chip" onclick="selectCategory('pastries')">☕ High Tea Boxes</button>
+            <button type="button" class="occasion-chip" onclick="window.location.href='shop.html?category=cakes'">🎂 Birthday Cakes</button>
+            <button type="button" class="occasion-chip" onclick="window.location.href='shop.html?category=cakes'">💍 Anniversary Tiers</button>
+            <button type="button" class="occasion-chip" onclick="window.location.href='shop.html?category=combos'">🎁 Flower + Cake Hampers</button>
+            <button type="button" class="occasion-chip" onclick="window.location.href='shop.html?category=pastries'">☕ High Tea Boxes</button>
+            <button type="button" class="occasion-chip" onclick="openCakeBuilderModal()">💐 Bespoke Custom Studio</button>
           </div>
         </div>
 
@@ -913,26 +909,25 @@
 
         <!-- Quick Links -->
         <div class="footer-col">
-          <h4>Explore</h4>
+          <h4>Navigation</h4>
           <ul class="footer-links">
-            <li><a href="#categories">Floral Cakes</a></li>
-            <li><a href="#categories">Designer Pastries</a></li>
-            <li><a href="#categories">Artisanal Muffins</a></li>
-            <li><a href="#combos">Flower + Cake Combos</a></li>
-            <li><a href="#how-it-works">Custom Order Journey</a></li>
-            <li><a href="#testimonials">Customer Reviews</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html">Shop All Bakes</a></li>
+            <li><a href="categories.html">Categories</a></li>
+            <li><a href="about.html">About Our Bakery</a></li>
+            <li><a href="contact.html">Contact & Studio</a></li>
           </ul>
         </div>
 
-        <!-- Occasions -->
+        <!-- Collections -->
         <div class="footer-col">
-          <h4>Occasions</h4>
+          <h4>Collections</h4>
           <ul class="footer-links">
-            <li><a href="#bestsellers">Birthday Celebrations</a></li>
-            <li><a href="#bestsellers">Anniversary Specials</a></li>
-            <li><a href="#how-it-works">Wedding Cake Tasting</a></li>
-            <li><a href="#combos">Luxury Gifting Hampers</a></li>
-            <li><a href="#bestsellers">Corporate & High Tea</a></li>
+            <li><a href="shop.html?category=cakes">Floral Celebration Cakes</a></li>
+            <li><a href="shop.html?category=pastries">French Craquelin Choux</a></li>
+            <li><a href="shop.html?category=muffins">Chamomile Muffins</a></li>
+            <li><a href="shop.html?category=combos">Luxury Flower Hampers</a></li>
+            <li><a href="shop.html?category=breads">Artisanal Breads</a></li>
           </ul>
         </div>
 
@@ -942,15 +937,15 @@
           <div class="contact-info-list">
             <div class="contact-item">
               <i class="fas fa-map-marker-alt"></i>
-              <span>Ibadat Villa, Plot No. 41, Sai Nath Nagar, Nashik, Maharashtra 422006</span>
+              <span>Sai Nath Nagar, Nashik, Maharashtra 422009</span>
             </div>
             <div class="contact-item">
               <i class="fas fa-phone-alt"></i>
-              <a href="tel:07083517862" style="font-weight:700; color:var(--rose-deep);">070835 17862</a>
+              <a href="tel:07083517862" style="font-weight:700; color:var(--rose-deep);">+91 70835 17862</a>
             </div>
             <div class="contact-item">
               <i class="fas fa-clock"></i>
-              <span>Mon – Sun: 9:00 AM – 10:00 PM</span>
+              <span>Daily: 8:00 AM – 10:00 PM</span>
             </div>
             <div class="contact-item">
               <i class="fas fa-shield-heart"></i>
@@ -964,13 +959,10 @@
       <!-- Bottom Bar -->
       <div class="footer-bottom">
         <div>
-          © 2026 The Flora Bakery, Nashik. All Rights Reserved. Handcrafted with 🌸
+          © 2026 The Flora Bakery, Nashik. All Rights Reserved. 100% Pure Vegetarian Certified.
         </div>
         <div style="display:flex; gap:16px; align-items:center;">
-          <span>Secure Payments: UPI • GPay • Cards • Cash on Delivery</span>
-          <a href="admin.html" target="_blank" style="color:var(--rose-deep); text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px; padding:4px 10px; background:var(--pink-blush); border-radius:4px;">
-            <i class="fas fa-lock" style="font-size:0.75rem;"></i> Staff Admin Studio
-          </a>
+          <span>Chilled Same-Day Delivery Across Nashik • Cash on Delivery</span>
         </div>
       </div>
 
@@ -1003,8 +995,19 @@
         <!-- Dynamically rendered by app.js -->
       </div>
 
+      <!-- Dynamic Upsell Recommendations Container -->
+      <div class="cart-upsell-container" id="cartUpsellSection" style="display:none; padding:12px 16px; background:#FFF9F9; border-top:1px dashed var(--pink-blush);">
+        <div class="upsell-heading-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span class="upsell-title" style="font-size:0.85rem; font-weight:700; color:var(--text-cocoa);"><i class="fas fa-sparkles" style="color:var(--rose-deep);"></i> Complete Your Celebration</span>
+          <span class="upsell-badge" style="font-size:0.75rem; background:var(--pink-blush); color:var(--rose-deep); padding:2px 8px; border-radius:12px; font-weight:600;">Popular</span>
+        </div>
+        <div class="upsell-items-track" id="cartUpsellItems" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:6px;">
+          <!-- Upsells dynamically injected by JS -->
+        </div>
+      </div>
+
       <!-- Promo Code & Totals -->
-      <div class="cart-footer">
+      <div class="cart-footer" id="cartDrawerFooter">
         
         <div style="display:flex; gap:8px; margin-bottom:14px;">
           <input type="text" id="cartPromoInput" placeholder="Promo code (e.g. FLORA10)" style="flex-grow:1; padding:10px 14px; border:1px solid var(--border-light); border-radius:var(--radius-sm); text-transform:uppercase; font-size:0.85rem;">
@@ -1013,17 +1016,22 @@
 
         <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--text-secondary); margin-bottom:6px;">
           <span>Subtotal:</span>
-          <span id="cartSubtotal">₹1,299</span>
+          <span id="cartSubtotal">₹0</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--text-secondary); margin-bottom:6px;">
+          <span>Delivery (Nashik):</span>
+          <span id="cartDeliveryVal">₹99</span>
         </div>
 
         <div class="cart-total-row">
-          <span>Total:</span>
-          <span id="cartGrandTotal" style="color:var(--rose-deep);">₹1,299</span>
+          <span>Estimated Total:</span>
+          <span id="cartGrandTotal" style="color:var(--rose-deep);">₹0</span>
         </div>
 
-        <button class="btn btn-primary btn-checkout-site" style="width:100%; margin-bottom:10px; font-size:1rem; font-weight:700;" onclick="openCheckoutModal()">
-          <i class="fas fa-lock"></i> Proceed to Checkout 🌸
-        </button>
+        <a href="checkout.html" class="btn btn-primary btn-checkout-site" style="width:100%; margin-bottom:10px; font-size:1rem; font-weight:700; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none;">
+          <span>Proceed to Dedicated Checkout</span> <i class="fas fa-arrow-right"></i>
+        </a>
 
         <div style="display:flex; justify-content:center; gap:16px; font-size:0.78rem; color:var(--text-muted);">
           <span><i class="fas fa-truck" style="color:var(--rose-deep);"></i> Chilled Delivery</span>

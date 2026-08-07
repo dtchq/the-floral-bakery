@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Order Confirmed | The Flora Bakery Nashik</title>
+  <meta name="description" content="Your artisanal floral bakes are confirmed with our bakery kitchen. Live order tracking and receipt.">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="order-success-body">
+
+  <!-- BRAND HEADER -->
+  <header class="checkout-header">
+    <div class="container checkout-header-inner">
+      <a href="index.html" class="logo" aria-label="Return to Storefront">
+        <span class="logo-mark"><i class="fas fa-seedling"></i></span>
+        <div class="logo-text-group">
+          <span class="logo-title">THE FLORA BAKERY</span>
+          <span class="logo-subtitle">Nashik • Order Confirmation</span>
+        </div>
+      </a>
+
+      <div class="checkout-security-badge">
+        <i class="fas fa-check-circle" style="color:#059669;"></i>
+        <span>Order Received Successfully</span>
+      </div>
+
+      <a href="index.html" class="checkout-back-link">
+        <i class="fas fa-home"></i> Home
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN CONFIRMATION CONTENT -->
+  <main class="container order-success-container">
+    
+    <!-- SUCCESS CELEBRATION HERO -->
+    <div class="success-hero-card">
+      <div class="success-icon-wrap">
+        <i class="fas fa-check"></i>
+      </div>
+      <span class="success-subheading">🌸 Thank You for Your Celebration Order!</span>
+      <h1 class="success-main-title">Order Confirmed & Sent to Kitchen</h1>
+      <p class="success-desc">
+        We have received your artisanal bake request. Our master bakers will handcrafted your order with fresh organic blooms.
+      </p>
+      
+      <div class="order-id-badge-wrap">
+        <span class="order-id-label">Order Reference ID:</span>
+        <span class="order-id-val" id="successOrderId">FB-1001</span>
+      </div>
+    </div>
+
+    <!-- 5-STAGE LIVE DELIVERY TIMELINE -->
+    <section class="order-tracker-card">
+      <h2 class="tracker-heading"><i class="fas fa-route"></i> Live Order Tracker</h2>
+      <div class="tracker-stepper">
+        
+        <div class="track-step completed">
+          <div class="track-dot"><i class="fas fa-check"></i></div>
+          <div class="track-info">
+            <span class="track-title">Order Placed</span>
+            <span class="track-time">Confirmed</span>
+          </div>
+        </div>
+
+        <div class="track-line active"></div>
+
+        <div class="track-step active">
+          <div class="track-dot"><i class="fas fa-fire"></i></div>
+          <div class="track-info">
+            <span class="track-title">Kitchen Baking</span>
+            <span class="track-time">In Progress</span>
+          </div>
+        </div>
+
+        <div class="track-line"></div>
+
+        <div class="track-step">
+          <div class="track-dot"><i class="fas fa-seedling"></i></div>
+          <div class="track-info">
+            <span class="track-title">Floral Styling</span>
+            <span class="track-time">Upcoming</span>
+          </div>
+        </div>
+
+        <div class="track-line"></div>
+
+        <div class="track-step">
+          <div class="track-dot"><i class="fas fa-motorcycle"></i></div>
+          <div class="track-info">
+            <span class="track-title">Out for Delivery</span>
+            <span class="track-time">Nashik Chilled Van</span>
+          </div>
+        </div>
+
+        <div class="track-line"></div>
+
+        <div class="track-step">
+          <div class="track-dot"><i class="fas fa-gift"></i></div>
+          <div class="track-info">
+            <span class="track-title">Delivered</span>
+            <span class="track-time">Doorstep</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2-COLUMN DETAILS (DELIVERY INFO & ITEMIZED RECEIPT) -->
+    <div class="success-details-grid">
+      
+      <!-- LEFT: DELIVERY & CUSTOMER DETAILS -->
+      <div class="success-info-card">
+        <h3 class="card-section-title"><i class="fas fa-truck"></i> Delivery Information</h3>
+        
+        <div class="info-list">
+          <div class="info-item">
+            <span class="info-label">Customer Name:</span>
+            <span class="info-val" id="successCustName">Pooja Deshmukh</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">WhatsApp Contact:</span>
+            <span class="info-val" id="successCustPhone">+91 98230 12345</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email Receipt:</span>
+            <span class="info-val" id="successCustEmail">pooja@example.com</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Scheduled Date:</span>
+            <span class="info-val" id="successDeliveryDate">Today</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Delivery Slot:</span>
+            <span class="info-val" id="successTimeSlot">Afternoon (1:00 PM – 5:00 PM)</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Destination Address:</span>
+            <span class="info-val" id="successAddress">Sai Nath Nagar, Nashik</span>
+          </div>
+          <div class="info-item" id="successCakeMsgRow" style="display:none;">
+            <span class="info-label">Cake Inscription:</span>
+            <span class="info-val" id="successCakeMsg" style="color:var(--rose-deep); font-weight:700;">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Payment Method:</span>
+            <span class="info-val" id="successPaymentStatus"><span class="badge-pill" style="background:#DCFCE7; color:#166534;">Cash on Delivery</span></span>
+          </div>
+        </div>
+
+        <!-- DIRECT WHATSAPP CONCIERGE TRACKER BUTTON -->
+        <a href="#" id="successWhatsAppBtn" target="_blank" rel="noopener" class="btn btn-primary btn-block whatsapp-track-cta">
+          <i class="fab fa-whatsapp"></i> Chat with Baker on WhatsApp
+        </a>
+      </div>
+
+      <!-- RIGHT: ITEMIZED BILL / TAX INVOICE -->
+      <div class="success-info-card print-invoice-card" id="invoiceReceiptArea">
+        <div class="invoice-header">
+          <h3 class="card-section-title"><i class="fas fa-file-invoice"></i> Itemized Tax Invoice</h3>
+          <button type="button" class="btn btn-secondary print-invoice-btn" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Invoice
+          </button>
+        </div>
+
+        <div class="receipt-items-table" id="successItemsList">
+          <!-- Populated dynamically -->
+        </div>
+
+        <hr class="summary-divider">
+
+        <div class="receipt-totals-table">
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="receiptSubtotal">₹0</span>
+          </div>
+          <div class="summary-row discount-row" id="receiptDiscountRow" style="display:none;">
+            <span>Discount Savings</span>
+            <span id="receiptDiscount">-₹0</span>
+          </div>
+          <div class="summary-row">
+            <span>Delivery Fee</span>
+            <span id="receiptDelivery">₹0</span>
+          </div>
+          <div class="summary-row grand-total-row">
+            <span>Total Amount Due</span>
+            <span class="grand-amount" id="receiptGrandTotal">₹0</span>
+          </div>
+        </div>
+
+        <div class="invoice-pure-veg-tag">
+          <span class="veg-emblem"></span> 100% Pure Vegetarian / Eggless Certified Patisserie
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER ACTIONS -->
+    <div class="success-actions-footer">
+      <a href="shop.html" class="btn btn-primary">
+        <i class="fas fa-birthday-cake"></i> Explore More Bakes
+      </a>
+      <a href="contact.html" class="btn btn-secondary continue-shopping-btn">
+        <i class="fas fa-headset"></i> Contact Bakery Concierge
+      </a>
+    </div>
+
+  </main>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Unified Scripts -->
+  <script src="js/store-data.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('orderId');
+      
+      const orders = FloraDB.getOrders();
+      const order = orderId ? FloraDB.getOrderById(orderId) : orders[0];
+
+      if (!order) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Populate Elements
+      document.getElementById('successOrderId').textContent = order.id;
+      document.getElementById('successCustName').textContent = order.customerName;
+      document.getElementById('successCustPhone').textContent = order.phone;
+      document.getElementById('successCustEmail').textContent = order.email;
+      document.getElementById('successDeliveryDate').textContent = order.deliveryDate;
+      document.getElementById('successTimeSlot').textContent = order.timeSlot;
+      document.getElementById('successAddress').textContent = order.address;
+
+      if (order.cakeMessage) {
+        document.getElementById('successCakeMsgRow').style.display = 'flex';
+        document.getElementById('successCakeMsg').textContent = `"${order.cakeMessage}"`;
+      }
+
+      // WhatsApp Button URL
+      const waBtn = document.getElementById('successWhatsAppBtn');
+      if (waBtn) {
+        const waMsg = `Hello The Flora Bakery! 🌸 I placed order #${order.id} for ${order.deliveryDate} (${order.customerName}). Please confirm kitchen status!`;
+        waBtn.href = `https://api.whatsapp.com/send?phone=917083517862&text=${encodeURIComponent(waMsg)}`;
+      }
+
+      // Populate Items Table
+      const itemsList = document.getElementById('successItemsList');
+      if (itemsList && order.items) {
+        itemsList.innerHTML = order.items.map(item => `
+          <div class="receipt-item-row">
+            <div class="receipt-item-left">
+              <span class="receipt-item-name">${item.name}</span>
+              <span class="receipt-item-meta">${item.variantName || 'Standard'} x ${item.qty}</span>
+              ${item.cakeMessage ? `<span class="receipt-item-inscription">Msg: "${item.cakeMessage}"</span>` : ''}
+            </div>
+            <span class="receipt-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}</span>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('receiptSubtotal').textContent = `₹${order.subtotal.toLocaleString('en-IN')}`;
+      if (order.discount > 0) {
+        document.getElementById('receiptDiscountRow').style.display = 'flex';
+        document.getElementById('receiptDiscount').textContent = `-₹${order.discount.toLocaleString('en-IN')}`;
+      }
+      document.getElementById('receiptDelivery').textContent = order.deliveryFee === 0 ? 'FREE' : `₹${order.deliveryFee}`;
+      document.getElementById('receiptGrandTotal').textContent = `₹${order.total.toLocaleString('en-IN')}`;
+    });
+  </script>
+</body>
+</html>

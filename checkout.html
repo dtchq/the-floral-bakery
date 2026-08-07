@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Secure Checkout | The Flora Bakery Nashik</title>
+  <meta name="description" content="Complete your artisanal floral cake order with Cash on Delivery or UPI in Nashik. 100% Pure Vegetarian & Eggless.">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="checkout-body">
+
+  <!-- CHECKOUT BRAND HEADER -->
+  <header class="checkout-header">
+    <div class="container checkout-header-inner">
+      <a href="index.html" class="logo" aria-label="Return to Storefront">
+        <span class="logo-mark"><i class="fas fa-seedling"></i></span>
+        <div class="logo-text-group">
+          <span class="logo-title">THE FLORA BAKERY</span>
+          <span class="logo-subtitle">Nashik • Secure Checkout</span>
+        </div>
+      </a>
+
+      <div class="checkout-security-badge">
+        <i class="fas fa-lock security-lock-icon"></i>
+        <span>256-Bit SSL Encrypted • Pure Veg Certified</span>
+      </div>
+
+      <a href="index.html" class="checkout-back-link">
+        <i class="fas fa-arrow-left"></i> Return to Store
+      </a>
+    </div>
+  </header>
+
+  <!-- MOBILE ORDER SUMMARY ACCORDION ACCELERATOR -->
+  <div class="mobile-summary-toggle-bar" id="mobileSummaryToggle" onclick="toggleMobileSummary()">
+    <div class="toggle-left">
+      <i class="fas fa-shopping-bag"></i>
+      <span>Show Order Summary</span>
+      <i class="fas fa-chevron-down toggle-arrow" id="mobileSummaryArrow"></i>
+    </div>
+    <span class="toggle-total" id="mobileBarTotal">₹0</span>
+  </div>
+
+  <!-- MAIN CHECKOUT CONTENT -->
+  <main class="container checkout-container">
+    <div class="checkout-layout-grid">
+      
+      <!-- LEFT COLUMN: GUEST CHECKOUT & DELIVERY INFORMATION -->
+      <section class="checkout-form-column">
+        
+        <!-- STEP INDICATOR -->
+        <div class="checkout-stepper-row">
+          <div class="step-item active">
+            <span class="step-num">1</span>
+            <span class="step-label">Delivery</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item active">
+            <span class="step-num">2</span>
+            <span class="step-label">Payment</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <span class="step-label">Confirmation</span>
+          </div>
+        </div>
+
+        <form id="checkoutForm" onsubmit="handlePlaceOrder(event)" novalidate>
+          
+          <!-- SECTION 1: CONTACT INFORMATION (ZERO FRICTION GUEST) -->
+          <div class="checkout-card">
+            <div class="checkout-card-header">
+              <div class="card-icon-pill"><i class="fas fa-user"></i></div>
+              <div>
+                <h2 class="card-heading">Contact Details</h2>
+                <p class="card-subtext">Order receipt & WhatsApp tracking will be dispatched to these details.</p>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="customerName" class="form-label">Full Name <span class="required-star">*</span></label>
+                <div class="input-with-icon">
+                  <i class="fas fa-user-circle"></i>
+                  <input type="text" id="customerName" class="form-input" placeholder="e.g. Pooja Deshmukh" required autocomplete="name">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="customerPhone" class="form-label">WhatsApp Mobile Number <span class="required-star">*</span></label>
+                <div class="input-with-icon">
+                  <i class="fab fa-whatsapp" style="color:#25D366;"></i>
+                  <input type="tel" id="customerPhone" class="form-input" placeholder="e.g. 98230 12345" required autocomplete="tel">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="customerEmail" class="form-label">Email Address <span class="required-star">*</span></label>
+              <div class="input-with-icon">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="customerEmail" class="form-input" placeholder="e.g. pooja@example.com" required autocomplete="email">
+              </div>
+              <span class="field-hint">Instant PDF receipt & baking updates are sent here.</span>
+            </div>
+          </div>
+
+          <!-- SECTION 2: NASHIK DELIVERY SCHEDULE & ADDRESS -->
+          <div class="checkout-card">
+            <div class="checkout-card-header">
+              <div class="card-icon-pill"><i class="fas fa-truck"></i></div>
+              <div>
+                <h2 class="card-heading">Nashik Delivery Schedule & Address</h2>
+                <p class="card-subtext">Chilled, insulated delivery directly to your doorstep in Nashik.</p>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="deliveryDate" class="form-label">Delivery Date <span class="required-star">*</span></label>
+                <div class="input-with-icon">
+                  <i class="fas fa-calendar-alt"></i>
+                  <input type="date" id="deliveryDate" class="form-input" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="deliverySlot" class="form-label">Preferred Time Slot <span class="required-star">*</span></label>
+                <div class="input-with-icon">
+                  <i class="fas fa-clock"></i>
+                  <select id="deliverySlot" class="form-select" required>
+                    <option value="Morning (9:00 AM – 1:00 PM)">Morning (9:00 AM – 1:00 PM)</option>
+                    <option value="Afternoon (1:00 PM – 5:00 PM)" selected>Afternoon (1:00 PM – 5:00 PM)</option>
+                    <option value="Evening (5:00 PM – 9:00 PM)">Evening (5:00 PM – 9:00 PM)</option>
+                    <option value="Midnight Surprise (11:30 PM – 12:00 AM)">Midnight Surprise (11:30 PM – 12:00 AM)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="deliveryAddress" class="form-label">Street Address / House & Flat No. <span class="required-star">*</span></label>
+              <div class="input-with-icon">
+                <i class="fas fa-home"></i>
+                <input type="text" id="deliveryAddress" class="form-input" placeholder="Flat 402, Blossom Heights, Near College Road" required>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="deliveryLocality" class="form-label">Nashik Locality / Area <span class="required-star">*</span></label>
+                <select id="deliveryLocality" class="form-select" required>
+                  <option value="College Road">College Road (Free Delivery)</option>
+                  <option value="Gangapur Road">Gangapur Road (Free Delivery)</option>
+                  <option value="Indira Nagar">Indira Nagar (Free Delivery)</option>
+                  <option value="Mahatma Nagar">Mahatma Nagar (Free Delivery)</option>
+                  <option value="Govind Nagar">Govind Nagar (Chilled Delivery)</option>
+                  <option value="Panchavati">Panchavati (Chilled Delivery)</option>
+                  <option value="Nashik Road">Nashik Road (Standard Delivery)</option>
+                  <option value="Satpur">Satpur</option>
+                  <option value="Ambad">Ambad</option>
+                  <option value="Other Area in Nashik">Other Nashik Locality</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="deliveryLandmark" class="form-label">Landmark (Optional)</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-map-pin"></i>
+                  <input type="text" id="deliveryLandmark" class="form-input" placeholder="e.g. Opp. Big Bazaar / Near Circle">
+                </div>
+              </div>
+            </div>
+
+            <!-- CUSTOM CAKE MESSAGE -->
+            <div class="form-group">
+              <label for="checkoutCakeMessage" class="form-label">Complimentary Message on Cake / Card (Optional)</label>
+              <div class="input-with-icon">
+                <i class="fas fa-pen-fancy"></i>
+                <input type="text" id="checkoutCakeMessage" class="form-input" placeholder="e.g. Happy Birthday Rhea! 🌸" maxlength="45">
+              </div>
+            </div>
+
+            <!-- SPECIAL BAKER NOTES -->
+            <div class="form-group">
+              <label for="orderNotes" class="form-label">Special Delivery / Baking Instructions (Optional)</label>
+              <textarea id="orderNotes" class="form-textarea" rows="2" placeholder="e.g. Call before arriving, keep extra ribbons, handle with love"></textarea>
+            </div>
+          </div>
+
+          <!-- SECTION 3: PAYMENT METHOD -->
+          <div class="checkout-card">
+            <div class="checkout-card-header">
+              <div class="card-icon-pill"><i class="fas fa-credit-card"></i></div>
+              <div>
+                <h2 class="card-heading">Payment Method</h2>
+                <p class="card-subtext">Safe, convenient payment options for your celebration.</p>
+              </div>
+            </div>
+
+            <div class="payment-options-list">
+              
+              <!-- Option 1: Cash on Delivery (COD) -->
+              <label class="payment-option-card selected" id="codOptionCard">
+                <div class="radio-wrap">
+                  <input type="radio" name="paymentMethod" value="COD" checked onchange="handlePaymentMethodChange('COD')">
+                </div>
+                <div class="payment-content">
+                  <div class="payment-title-row">
+                    <span class="payment-name"><i class="fas fa-money-bill-wave" style="color:#059669;"></i> Cash on Delivery (Pay on Delivery)</span>
+                    <span class="payment-badge-tag">Preselected</span>
+                  </div>
+                  <p class="payment-desc">Pay via Cash or any UPI App (GPay, PhonePe, Paytm) upon safe doorstep delivery.</p>
+                </div>
+              </label>
+
+              <!-- Option 2: Online Payment Gateway -->
+              <label class="payment-option-card" id="onlineOptionCard">
+                <div class="radio-wrap">
+                  <input type="radio" name="paymentMethod" value="ONLINE" onchange="handlePaymentMethodChange('ONLINE')">
+                </div>
+                <div class="payment-content">
+                  <div class="payment-title-row">
+                    <span class="payment-name"><i class="fas fa-qrcode" style="color:var(--rose-deep);"></i> Instant UPI / Cards / NetBanking</span>
+                    <span class="payment-badge-tag" style="background:#E0F2FE; color:#0369A1;">Instant Confirmation</span>
+                  </div>
+                  <p class="payment-desc">Zero convenience fees. Instant order priority in our kitchen queue.</p>
+                </div>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- SUBMIT CTA (DESKTOP) -->
+          <div class="checkout-desktop-submit-wrap">
+            <button type="submit" class="btn btn-primary btn-block checkout-submit-btn" id="checkoutSubmitBtn">
+              <i class="fas fa-check-circle"></i> Place Order (Cash on Delivery)
+            </button>
+            <p class="checkout-terms-note">
+              By placing your order, you agree to The Flora Bakery's Freshness & Delivery Terms. 100% Eggless Certified.
+            </p>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- RIGHT COLUMN: ORDER SUMMARY SIDEBAR (STICKY) -->
+      <aside class="checkout-summary-column" id="checkoutSummaryPanel">
+        <div class="summary-card-sticky">
+          
+          <div class="summary-card-header">
+            <h3 class="summary-title"><i class="fas fa-shopping-bag"></i> Order Summary</h3>
+            <span class="summary-items-count" id="summaryCountBadge">0 items</span>
+          </div>
+
+          <!-- ITEMS LIST -->
+          <div class="summary-items-list" id="summaryItemsList">
+            <!-- Populated dynamically by JS -->
+          </div>
+
+          <hr class="summary-divider">
+
+          <!-- PROMO CODE INPUT -->
+          <div class="summary-promo-box">
+            <div class="promo-input-group">
+              <input type="text" id="promoCodeInput" class="promo-input" placeholder="Promo code (e.g. FLORA10)">
+              <button type="button" class="btn btn-secondary promo-btn" onclick="handleApplyPromo()">Apply</button>
+            </div>
+            <div class="available-promos-hint">
+              <span>Try: </span>
+              <button type="button" class="promo-chip-btn" onclick="applySuggestedPromo('FLORA10')">FLORA10</button>
+              <button type="button" class="promo-chip-btn" onclick="applySuggestedPromo('NASHIKFREE')">NASHIKFREE</button>
+            </div>
+          </div>
+
+          <hr class="summary-divider">
+
+          <!-- CALCULATION BREAKDOWN -->
+          <div class="summary-totals-table">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="summarySubtotalVal">₹0</span>
+            </div>
+
+            <div class="summary-row discount-row" id="summaryDiscountRow" style="display:none;">
+              <span>Promo Savings (<strong id="summaryDiscountCode">FLORA10</strong>)</span>
+              <span id="summaryDiscountVal">-₹0</span>
+            </div>
+
+            <div class="summary-row">
+              <span>Doorstep Delivery (Nashik)</span>
+              <span id="summaryDeliveryVal">₹99</span>
+            </div>
+
+            <div class="summary-row grand-total-row">
+              <div class="total-label-wrap">
+                <span class="grand-label">Grand Total</span>
+                <span class="tax-tag">Inclusive of all taxes</span>
+              </div>
+              <span class="grand-amount" id="summaryGrandTotalVal">₹0</span>
+            </div>
+          </div>
+
+          <!-- GUARANTEES & TRUST -->
+          <div class="summary-trust-footer">
+            <div class="trust-item"><i class="fas fa-leaf" style="color:#16A34A;"></i> 100% Pure Veg (Eggless)</div>
+            <div class="trust-item"><i class="fas fa-temperature-low" style="color:#0284C7;"></i> Temperature-Controlled Delivery</div>
+            <div class="trust-item"><i class="fas fa-sparkles" style="color:#E11D48;"></i> Handcrafted with Organic Petals</div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- STICKY MOBILE BOTTOM CHECKOUT ACTION BAR -->
+  <div class="mobile-sticky-checkout-bar" id="mobileCheckoutBar">
+    <div class="mobile-bar-pricing">
+      <span class="mobile-bar-label">Total to Pay:</span>
+      <span class="mobile-bar-amount" id="mobileBarAmount">₹0</span>
+    </div>
+    <button type="button" class="btn btn-primary mobile-bar-btn" onclick="document.getElementById('checkoutSubmitBtn').click()">
+      <span>Place Order</span>
+      <i class="fas fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Unified Scripts -->
+  <script src="js/store-data.js"></script>
+  <script src="js/checkout.js"></script>
+</body>
+</html>

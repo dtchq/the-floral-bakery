@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Artisanal Floral Bake Details | The Flora Bakery Nashik</title>
+  <meta name="description" content="Handcrafted 100% pure vegetarian floral bakes crowned with organic edible blooms. Same-day chilled delivery in Nashik.">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="pdp-body">
+
+  <!-- 1. LUXURY SINGLE-LINE ANNOUNCEMENT TICKER -->
+  <aside class="announcement-bar" role="region" aria-label="Special Offers">
+    <div class="announcement-wrapper">
+      <div class="announcement-track">
+        <span class="announcement-item"><span class="badge-pill">SAME DAY</span> 🌸 Order before 3 PM for Chilled Same-Day Delivery in Nashik</span>
+        <span class="announcement-item"><span class="badge-pill">100% EGGLESS</span> 🌿 All Creations are Pure Vegetarian & Crowned with Organic Edible Blooms</span>
+        <span class="announcement-item"><span class="badge-pill">SPECIAL OFFER</span> ✨ Use Code <strong>FLORA10</strong> for 10% OFF on Orders Above ₹499</span>
+        <span class="announcement-item"><span class="badge-pill">FREE SHIPPING</span> 🛵 Free Doorstep Delivery Across Nashik on Orders Over ₹999</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 2. STICKY BRAND HEADER -->
+  <header class="header" id="siteHeader">
+    <div class="header-inner container">
+      <button class="mobile-toggle" id="mobileMenuToggle" aria-label="Open Navigation Menu">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <a href="index.html" class="logo" aria-label="The Flora Bakery Homepage">
+        <span class="logo-mark"><i class="fas fa-seedling"></i></span>
+        <div class="logo-text-group">
+          <span class="logo-title">THE FLORA BAKERY</span>
+          <span class="logo-subtitle">Nashik • Est. 2024</span>
+        </div>
+      </a>
+
+      <nav class="nav-desktop" aria-label="Primary Navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="shop.html" class="nav-link">Shop Bakes</a>
+        <a href="categories.html" class="nav-link">Categories</a>
+        <a href="about.html" class="nav-link">About Us</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="https://api.whatsapp.com/send?phone=917083517862&text=Hello%20The%20Flora%20Bakery!%20I%20have%20an%20inquiry%20regarding%20custom%20floral%20cakes." target="_blank" rel="noopener" class="concierge-link-btn" title="Chat with Head Baker on WhatsApp">
+          <i class="fab fa-whatsapp"></i>
+          <span class="concierge-text">Concierge</span>
+        </a>
+
+        <button class="cart-trigger-btn" id="cartBtn" onclick="openCartDrawer()" aria-label="Open Shopping Bag">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-badge" id="cartCountBadge" style="display: none;">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <div class="mobile-nav-content">
+      <div class="mobile-drawer-header">
+        <div class="logo-text-group">
+          <span class="logo-title">THE FLORA BAKERY</span>
+          <span class="logo-subtitle">Artisanal Botanical Patisserie</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
+      </div>
+      <ul class="mobile-nav-links">
+        <li><a href="index.html" class="mobile-nav-link"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="shop.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-birthday-cake"></i> Shop All Bakes</a></li>
+        <li><a href="categories.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-th-large"></i> Explore Categories</a></li>
+        <li><a href="about.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-leaf"></i> About Our Bakery</a></li>
+        <li><a href="contact.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-envelope"></i> Contact & Studio</a></li>
+      </ul>
+      <div class="mobile-drawer-footer">
+        <p class="drawer-contact-info"><i class="fas fa-map-marker-alt"></i> Sai Nath Nagar, Nashik</p>
+        <p class="drawer-contact-info"><i class="fas fa-phone-alt"></i> +91 70835 17862</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN PRODUCT DETAIL PAGE CONTENT -->
+  <main class="container pdp-container" id="pdpMainContent">
+    
+    <!-- BREADCRUMBS -->
+    <nav class="pdp-breadcrumbs" aria-label="Breadcrumbs">
+      <a href="index.html">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="shop.html" id="pdpBreadcrumbCategory">Shop Bakes</a>
+      <i class="fas fa-chevron-right"></i>
+      <span id="pdpBreadcrumbCurrent" class="current-crumb">Loading product...</span>
+    </nav>
+
+    <!-- 2-COLUMN PDP LAYOUT -->
+    <div class="pdp-grid">
+      
+      <!-- LEFT COLUMN: VISUAL GALLERY & VIDEO -->
+      <div class="pdp-gallery-col">
+        <div class="pdp-main-image-wrap">
+          <div class="pdp-badges-overlay">
+            <span class="veg-emblem" title="100% Pure Vegetarian Eggless Certified"></span>
+            <span class="product-tag-badge" id="pdpTagBadge">Bestseller</span>
+          </div>
+          <img id="pdpMainImage" src="images/cat-cakes.jpg" alt="Artisanal Floral Bake" class="pdp-main-img">
+          
+          <button class="pdp-video-badge" id="pdpVideoBtn" onclick="openVideoModal()" title="Watch Chef Decorating Preview">
+            <i class="fas fa-play"></i> Watch Decorating
+          </button>
+        </div>
+
+        <!-- THUMBNAIL STRIP -->
+        <div class="pdp-thumb-strip" id="pdpThumbStrip">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- TRUST HIGHLIGHTS (DESKTOP) -->
+        <div class="pdp-trust-highlights desktop-only">
+          <div class="trust-highlight-item">
+            <i class="fas fa-leaf"></i>
+            <div>
+              <strong>100% Pure Veg (Eggless)</strong>
+              <p>Baked fresh with premium cultured butter & organic extracts</p>
+            </div>
+          </div>
+          <div class="trust-highlight-item">
+            <i class="fas fa-fan"></i>
+            <div>
+              <strong>Edible Organic Blooms</strong>
+              <p>Hand-picked, pesticide-free culinary botanical blossoms</p>
+            </div>
+          </div>
+          <div class="trust-highlight-item">
+            <i class="fas fa-temperature-low"></i>
+            <div>
+              <strong>Temperature Controlled Delivery</strong>
+              <p>Chilled insulated vans ensure pristine delivery across Nashik</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: PRODUCT DETAILS & BUYING ENGINE -->
+      <div class="pdp-info-col">
+        
+        <!-- Category & Rating Meta -->
+        <div class="pdp-meta-top">
+          <span class="pdp-category-tag" id="pdpCategoryTag">SIGNATURE FLORAL CAKE</span>
+          <div class="product-rating-pill" id="pdpRatingPill">
+            <i class="fas fa-star"></i>
+            <span id="pdpRatingNum">4.9</span>
+            <span class="rating-count" id="pdpReviewCount">(142 reviews)</span>
+          </div>
+        </div>
+
+        <!-- PRODUCT TITLE (PLUS JAKARTA SANS) -->
+        <h1 class="pdp-title" id="pdpTitle">Blush Rose & Lychee Chiffon Cake</h1>
+
+        <!-- SHORT DESCRIPTION -->
+        <p class="pdp-short-desc" id="pdpShortDesc">
+          Light-as-air vanilla chiffon sponge layered with French rosewater mascarpone cream, fresh hand-cut lychee compote, and crowned with edible organic pink garden roses and 24K pure gold leaf.
+        </p>
+
+        <!-- PRICING ROW WITH SAVINGS -->
+        <div class="pdp-price-row">
+          <span class="pdp-price-current" id="pdpPriceCurrent">₹1,299</span>
+          <span class="pdp-price-original" id="pdpPriceOriginal">₹1,499</span>
+          <span class="pdp-discount-pill" id="pdpDiscountPill">SAVE 15%</span>
+          <span class="tax-inclusive-tag">Taxes Included</span>
+        </div>
+
+        <!-- STOCK SCARCITY STATUS -->
+        <div class="pdp-stock-indicator in-stock" id="pdpStockStatus">
+          <i class="fas fa-check-circle"></i>
+          <span>Fresh Batch Available Today • Baked Upon Order</span>
+        </div>
+
+        <hr class="pdp-divider">
+
+        <!-- VARIANT / WEIGHT SELECTOR CHIPS -->
+        <div class="pdp-option-group" id="pdpVariantsGroup">
+          <div class="option-label-row">
+            <label class="option-label">Select Weight / Size:</label>
+            <span class="option-selected-val" id="pdpSelectedVariantLabel">0.5 kg (Serves 4–6)</span>
+          </div>
+          <div class="pdp-variant-chips" id="pdpVariantChips">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
+
+        <!-- CUSTOM INSCRIPTION / MESSAGE ON CAKE -->
+        <div class="pdp-option-group">
+          <div class="option-label-row">
+            <label class="option-label" for="pdpCustomMessage">Name / Message on Cake (Optional):</label>
+            <span class="char-counter" id="pdpMsgCharCount">0/35</span>
+          </div>
+          <div class="input-with-icon">
+            <i class="fas fa-pen-fancy"></i>
+            <input type="text" id="pdpCustomMessage" class="pdp-text-input" placeholder="e.g. Happy 25th Birthday Rhea 🌸" maxlength="35">
+          </div>
+          <span class="field-hint"><i class="fas fa-magic"></i> Complimentary hand-piped on artisanal chocolate plaque</span>
+        </div>
+
+        <!-- NASHIK PINCODE / LOCALITY ESTIMATE CHECKER -->
+        <div class="pdp-delivery-checker">
+          <div class="checker-title">
+            <i class="fas fa-map-marker-alt"></i> Check Doorstep Delivery in Nashik:
+          </div>
+          <div class="checker-form">
+            <select id="pdpLocalitySelect" class="pdp-select-input">
+              <option value="College Road">College Road (Free Delivery)</option>
+              <option value="Gangapur Road">Gangapur Road (Free Delivery)</option>
+              <option value="Indira Nagar">Indira Nagar (Free Delivery)</option>
+              <option value="Mahatma Nagar">Mahatma Nagar (Free Delivery)</option>
+              <option value="Panchavati">Panchavati (Chilled Delivery)</option>
+              <option value="Govind Nagar">Govind Nagar (Chilled Delivery)</option>
+              <option value="Nashik Road">Nashik Road (Standard Delivery)</option>
+              <option value="Other Nashik Area">Other Nashik Locality</option>
+            </select>
+            <button type="button" class="btn btn-secondary checker-btn" onclick="checkPdpDelivery()">Check</button>
+          </div>
+          <div class="checker-result" id="pdpCheckerResult">
+            <i class="fas fa-bolt"></i> <strong>Same-Day Chilled Delivery Available!</strong> Order in the next 2 hrs for delivery by this evening.
+          </div>
+        </div>
+
+        <!-- QUANTITY STEPPER & ACTION BUTTONS -->
+        <div class="pdp-cta-block">
+          <div class="pdp-qty-stepper-box">
+            <button class="qty-btn" onclick="changePdpQty(-1)" aria-label="Decrease quantity"><i class="fas fa-minus"></i></button>
+            <span class="qty-num" id="pdpQtyVal">1</span>
+            <button class="qty-btn" onclick="changePdpQty(1)" aria-label="Increase quantity"><i class="fas fa-plus"></i></button>
+          </div>
+
+          <button class="btn btn-primary pdp-btn-cart" id="pdpAddToCartBtn" onclick="handlePdpAddToCart()">
+            <i class="fas fa-shopping-bag"></i> Add to Cart
+          </button>
+
+          <button class="btn btn-accent pdp-btn-buy" id="pdpBuyNowBtn" onclick="handlePdpBuyNow()">
+            <i class="fas fa-bolt"></i> Buy Now
+          </button>
+        </div>
+
+        <!-- PROMOTIONS & PAYMENT GUAGE -->
+        <div class="pdp-promo-callout">
+          <i class="fas fa-gift"></i>
+          <div>
+            <strong>Bloom Club Offer:</strong> Apply code <span class="promo-badge-text" onclick="copyPromo('FLORA10')">FLORA10</span> at checkout for 10% instant discount.
+          </div>
+        </div>
+
+        <!-- ACCORDIONS (BOTANICAL SPECS, STORAGE, FAQS, DELIVERY) -->
+        <div class="pdp-accordion-group">
+          
+          <!-- Accordion 1: Botanicals & Ingredients -->
+          <details class="pdp-accordion" open>
+            <summary class="accordion-summary">
+              <span><i class="fas fa-seedling"></i> Botanical Ingredients & Flavour Notes</span>
+              <i class="fas fa-chevron-down accordion-arrow"></i>
+            </summary>
+            <div class="accordion-content">
+              <ul class="botanical-tags-list" id="pdpBotanicalsList">
+                <li>Organic Damascus Rose Petals</li>
+                <li>Madagascar Bourbon Vanilla</li>
+                <li>French Mascarpone Cream</li>
+                <li>Fresh Lychee Compote</li>
+                <li>24K Edible Gold Leaf</li>
+              </ul>
+              <p class="specs-p" id="pdpFlavourNotes"><strong>Flavour Profile:</strong> Delicate floral rose balanced with sweet vanilla chiffon and luscious fresh lychee fruit.</p>
+            </div>
+          </details>
+
+          <!-- Accordion 2: Care, Storage & Shelf Life -->
+          <details class="pdp-accordion">
+            <summary class="accordion-summary">
+              <span><i class="fas fa-temperature-low"></i> Freshness & Handling Guide</span>
+              <i class="fas fa-chevron-down accordion-arrow"></i>
+            </summary>
+            <div class="accordion-content">
+              <p>• <strong>Refrigeration:</strong> Keep chilled in refrigerator at 4°C – 6°C until 15 minutes prior to slicing.</p>
+              <p>• <strong>Shelf Life:</strong> Best consumed within 48 hours of delivery for peak floral fragrance and sponge moisture.</p>
+              <p>• <strong>Dietary Guarantee:</strong> 100% Pure Vegetarian, Eggless, and crafted in a sanitized dedicated bakery kitchen.</p>
+            </div>
+          </details>
+
+          <!-- Accordion 3: Delivery & Shipping in Nashik -->
+          <details class="pdp-accordion">
+            <summary class="accordion-summary">
+              <span><i class="fas fa-truck"></i> Chilled Delivery Policy</span>
+              <i class="fas fa-chevron-down accordion-arrow"></i>
+            </summary>
+            <div class="accordion-content">
+              <p>• <strong>Delivery Slots:</strong> Morning (9 AM – 1 PM), Afternoon (1 PM – 5 PM), Evening (5 PM – 9 PM).</p>
+              <p>• <strong>Free Shipping:</strong> Automatically applied to all orders above ₹999.</p>
+              <p>• <strong>Zero Damage Guarantee:</strong> Insulated cake boxes with base stability locks prevent tilting or shifting during transit.</p>
+            </div>
+          </details>
+
+          <!-- Accordion 4: FAQs -->
+          <details class="pdp-accordion">
+            <summary class="accordion-summary">
+              <span><i class="fas fa-question-circle"></i> Frequently Asked Questions</span>
+              <i class="fas fa-chevron-down accordion-arrow"></i>
+            </summary>
+            <div class="accordion-content" id="pdpFaqsList">
+              <div class="faq-item">
+                <strong>Q: Are the flowers on the cake completely edible?</strong>
+                <p>A: Yes! Every blossom is organically cultivated in certified botanical nurseries free from synthetic pesticides.</p>
+              </div>
+              <div class="faq-item">
+                <strong>Q: Can I schedule delivery for a future date?</strong>
+                <p>A: Yes! During checkout, you can select any delivery date and preferred time slot up to 30 days in advance.</p>
+              </div>
+            </div>
+          </details>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VERIFIED CUSTOMER REVIEWS SECTION -->
+    <section class="pdp-reviews-section">
+      <div class="section-heading-wrap">
+        <span class="sub-heading-pill"><i class="fas fa-heart"></i> Patron Love</span>
+        <h2 class="section-title">Verified Reviews from Nashik</h2>
+        <p class="section-desc">Real celebration moments shared by our patrons across Nashik.</p>
+      </div>
+
+      <div class="reviews-grid" id="pdpReviewsGrid">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </section>
+
+    <!-- "YOU MAY ALSO LOVE" / FREQUENTLY BOUGHT TOGETHER -->
+    <section class="pdp-related-section">
+      <div class="section-heading-wrap">
+        <span class="sub-heading-pill"><i class="fas fa-sparkles"></i> Curated Pairings</span>
+        <h2 class="section-title">You May Also Love</h2>
+        <p class="section-desc">Artisanal creations that pair exquisitely with your selection.</p>
+      </div>
+
+      <div class="product-grid" id="pdpRelatedGrid">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STICKY MOBILE BOTTOM ACTION BAR -->
+  <div class="mobile-sticky-pdp-bar" id="mobileStickyBar">
+    <div class="sticky-bar-info">
+      <img src="images/cat-cakes.jpg" alt="Thumb" class="sticky-thumb" id="stickyThumb">
+      <div class="sticky-text">
+        <span class="sticky-title" id="stickyTitle">Floral Cake</span>
+        <span class="sticky-price" id="stickyPrice">₹1,299</span>
+      </div>
+    </div>
+    <div class="sticky-actions">
+      <button class="btn btn-primary sticky-btn" onclick="handlePdpAddToCart()">
+        <i class="fas fa-shopping-bag"></i> Add
+      </button>
+      <button class="btn btn-accent sticky-btn" onclick="handlePdpBuyNow()">
+        <i class="fas fa-bolt"></i> Buy Now
+      </button>
+    </div>
+  </div>
+
+  <!-- SLIDE-OUT CART DRAWER WITH UPSELL RECOMMENDATIONS -->
+  <div class="cart-drawer-overlay" id="cartDrawerOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping Cart">
+    <div class="cart-drawer-header">
+      <div class="cart-header-title-wrap">
+        <i class="fas fa-shopping-bag cart-title-icon"></i>
+        <h2 class="cart-drawer-heading">Your Floral Bag (<span id="cartDrawerCount">0</span>)</h2>
+      </div>
+      <button class="cart-drawer-close-btn" id="cartDrawerClose" onclick="closeCartDrawer()" aria-label="Close Shopping Bag">&times;</button>
+    </div>
+
+    <!-- FREE SHIPPING PROGRESS BAR -->
+    <div class="free-shipping-meter" id="freeShippingMeter">
+      <div class="meter-text" id="freeShippingText">
+        <i class="fas fa-truck"></i> Add ₹200 more for <strong>FREE Delivery in Nashik</strong>!
+      </div>
+      <div class="meter-bar-track">
+        <div class="meter-bar-fill" id="meterBarFill" style="width: 75%;"></div>
+      </div>
+    </div>
+
+    <!-- CART ITEMS CONTAINER -->
+    <div class="cart-drawer-body" id="cartDrawerItems">
+      <!-- Items dynamically populated -->
+    </div>
+
+    <!-- UPSELL RECOMMENDATIONS CAROUSEL ("COMPLETE YOUR CELEBRATION") -->
+    <div class="cart-upsell-container" id="cartUpsellSection">
+      <div class="upsell-heading-row">
+        <span class="upsell-title"><i class="fas fa-sparkles"></i> Complete Your Celebration</span>
+        <span class="upsell-badge">Popular Add-ons</span>
+      </div>
+      <div class="upsell-items-track" id="cartUpsellItems">
+        <!-- Upsells dynamically injected by JS -->
+      </div>
+    </div>
+
+    <!-- CART DRAWER FOOTER (COUPON + TOTALS + PROCEED CTA) -->
+    <div class="cart-drawer-footer" id="cartDrawerFooter">
+      <div class="cart-coupon-row">
+        <input type="text" id="cartCouponInput" class="coupon-input" placeholder="Promo code (e.g. FLORA10)" uppercase>
+        <button class="btn btn-secondary coupon-apply-btn" onclick="applyCartCoupon()">Apply</button>
+      </div>
+
+      <div class="cart-totals-breakdown">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span id="cartSubtotalVal">₹0</span>
+        </div>
+        <div class="total-row discount-row" id="cartDiscountRow" style="display:none;">
+          <span>Promo Discount</span>
+          <span id="cartDiscountVal">-₹0</span>
+        </div>
+        <div class="total-row">
+          <span>Delivery (Nashik)</span>
+          <span id="cartDeliveryVal">₹99</span>
+        </div>
+        <div class="total-row grand-total-row">
+          <span>Estimated Total</span>
+          <span id="cartGrandTotalVal" class="grand-total-highlight">₹0</span>
+        </div>
+      </div>
+
+      <!-- PROCEED TO DEDICATED CHECKOUT PAGE -->
+      <a href="checkout.html" class="btn btn-primary btn-block proceed-checkout-btn" id="proceedCheckoutBtn">
+        <span>Proceed to Checkout</span>
+        <i class="fas fa-arrow-right"></i>
+      </a>
+
+      <p class="cart-safe-note">
+        <i class="fas fa-shield-alt"></i> Chilled Same-Day Delivery across Nashik • 100% Eggless
+      </p>
+    </div>
+  </aside>
+
+  <!-- VIDEO MODAL PREVIEW -->
+  <div class="modal-backdrop" id="videoModal">
+    <div class="modal-card video-modal-card">
+      <button class="modal-close-btn" onclick="closeVideoModal()">&times;</button>
+      <h3 class="modal-title">🌸 Behind the Blooms: Artisanal Handcrafting</h3>
+      <div class="video-embed-wrap">
+        <iframe id="videoIframe" width="100%" height="315" src="" title="Decorating Floral Cake" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <p class="modal-subtext">Each floral cake is decorated with freshly hand-cut organic petals minutes before dispatch.</p>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-col footer-brand">
+        <a href="index.html" class="brand-logo-wrap">
+          <span class="logo-mark"><i class="fas fa-seedling"></i></span>
+          <div class="logo-text-group">
+            <span class="logo-title">THE FLORA BAKERY</span>
+            <span class="logo-subtitle">Nashik • Est. 2024</span>
+          </div>
+        </a>
+        <p class="footer-desc">Nashik's premier botanical patisserie handcrafting 100% eggless luxury cakes crowned with organic edible blooms.</p>
+        <div class="social-links">
+          <a href="https://www.instagram.com/the.flora.bakery" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://wa.me/917083517862" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="tel:07083517862" class="social-btn" aria-label="Call Us"><i class="fas fa-phone"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="shop.html">Shop All Bakes</a></li>
+          <li><a href="categories.html">Categories</a></li>
+          <li><a href="about.html">About Our Bakery</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Collections</h4>
+        <ul class="footer-links">
+          <li><a href="shop.html?category=cakes">Floral Celebration Cakes</a></li>
+          <li><a href="shop.html?category=pastries">French Craquelin Choux</a></li>
+          <li><a href="shop.html?category=muffins">Chamomile Muffins</a></li>
+          <li><a href="shop.html?category=combos">Luxury Flower Hampers</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Direct Concierge</h4>
+        <div class="contact-info-list">
+          <div class="contact-item"><i class="fas fa-map-marker-alt"></i><span>Sai Nath Nagar, Nashik, Maharashtra 422009</span></div>
+          <div class="contact-item"><i class="fas fa-phone-alt"></i><span>+91 70835 17862</span></div>
+          <div class="contact-item"><i class="fas fa-clock"></i><span>Daily: 8:00 AM – 10:00 PM</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom container text-center">
+      <p>&copy; 2026 The Flora Bakery, Nashik. All Rights Reserved. 100% Pure Vegetarian Certified.</p>
+    </div>
+  </footer>
+
+  <!-- Unified Scripts -->
+  <script src="js/store-data.js"></script>
+  <script src="js/pdp.js"></script>
+</body>
+</html>
