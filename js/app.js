@@ -187,20 +187,24 @@ function filterCategory(category, buttonEl) {
 }
 
 // Mobile Navigation Drawer Controls
-function openMobileNav() {
-  const drawer = document.getElementById("mobileNavDrawer");
-  if (drawer) {
-    drawer.classList.add("active");
-    document.body.style.overflow = "hidden";
-  }
+if (!window.openMobileNav) {
+  window.openMobileNav = function() {
+    const drawer = document.getElementById("mobileNavDrawer");
+    if (drawer) {
+      drawer.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+  };
 }
 
-function closeMobileNav() {
-  const drawer = document.getElementById("mobileNavDrawer");
-  if (drawer) {
-    drawer.classList.remove("active");
-    document.body.style.overflow = "auto";
-  }
+if (!window.closeMobileNav) {
+  window.closeMobileNav = function() {
+    const drawer = document.getElementById("mobileNavDrawer");
+    if (drawer) {
+      drawer.classList.remove("active");
+      document.body.style.overflow = "auto";
+    }
+  };
 }
 
 // =============================================================================
@@ -253,26 +257,32 @@ function removeFromCart(cartKeyOrId) {
 function updateCartUI() {
   if (!window.FloraDB) return;
 
+  if (window.SiteLayout && typeof window.SiteLayout.renderCartDrawerContent === 'function') {
+    window.SiteLayout.renderCartDrawerContent();
+    if (typeof window.SiteLayout.updateCartBadge === 'function') {
+      window.SiteLayout.updateCartBadge();
+    }
+    return;
+  }
+
   const summary = window.FloraDB.getCartSummary();
   const cart = summary.items;
 
   // Header Badges
   const badge1 = document.getElementById("cartCountBadge");
-  const badge2 = document.getElementById("cartBadge");
   const drawerCount = document.getElementById("cartDrawerCount");
 
-  [badge1, badge2].forEach(b => {
-    if (b) {
-      b.textContent = summary.totalCount;
-      b.style.display = summary.totalCount > 0 ? "flex" : "none";
-    }
-  });
+  if (badge1) {
+    badge1.textContent = summary.totalCount;
+    badge1.style.display = summary.totalCount > 0 ? "flex" : "none";
+  }
 
   if (drawerCount) drawerCount.textContent = summary.totalCount;
 
   // Free Shipping Progress Bar
-  const fillEl = document.getElementById("freeShippingFill") || document.getElementById("meterBarFill");
-  const textEl = document.getElementById("freeShippingText");
+  const fillEl = document.getElementById("shippingMeterFill");
+  const textEl = document.getElementById("shippingMeterText");
+  const neededEl = document.getElementById("shippingMeterNeeded");
   
   if (fillEl) fillEl.style.width = `${summary.progressPercent}%`;
   if (textEl) {
@@ -280,7 +290,7 @@ function updateCartUI() {
       textEl.innerHTML = `<i class="fas fa-check-circle" style="color:#059669;"></i> 🎉 You unlocked <strong>FREE Chilled Delivery in Nashik</strong>!`;
       if (fillEl) fillEl.style.background = "#059669";
     } else {
-      textEl.innerHTML = `<i class="fas fa-truck"></i> Add <strong>₹${summary.amountNeededForFreeShipping.toLocaleString('en-IN')}</strong> more for <strong>FREE Delivery in Nashik</strong>`;
+      textEl.innerHTML = `<i class="fas fa-truck"></i> Add <strong id="shippingMeterNeeded">₹${summary.amountNeededForFreeShipping.toLocaleString('en-IN')}</strong> more for <strong>FREE Delivery in Nashik</strong>`;
       if (fillEl) fillEl.style.background = "linear-gradient(90deg, var(--rose-deep), #FF85A1)";
     }
   }
@@ -294,16 +304,25 @@ function updateCartUI() {
   const deliveryFee = summary.isFreeShipping ? 0 : summary.deliveryFee;
   const grandTotal = Math.max(0, summary.subtotal - discountAmount + deliveryFee);
 
-  const subtotalEl = document.getElementById("cartSubtotal") || document.getElementById("cartSubtotalVal");
-  const grandTotalEl = document.getElementById("cartGrandTotal") || document.getElementById("cartGrandTotalVal");
-  const deliveryEl = document.getElementById("cartDeliveryVal");
+  const subtotalEl = document.getElementById("cartDrawerSubtotal");
+  const grandTotalEl = document.getElementById("cartDrawerGrandTotal");
+  const deliveryEl = document.getElementById("cartDrawerShipping");
+  const discountRow = document.getElementById("cartDrawerDiscountRow");
+  const discountVal = document.getElementById("cartDrawerDiscountVal");
 
   if (subtotalEl) subtotalEl.textContent = `₹${summary.subtotal.toLocaleString('en-IN')}`;
-  if (deliveryEl) deliveryEl.textContent = summary.isFreeShipping ? "FREE (Nashik)" : `₹${deliveryFee}`;
+  if (deliveryEl) deliveryEl.textContent = summary.isFreeShipping ? "FREE" : `₹${deliveryFee}`;
   if (grandTotalEl) grandTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
+  
+  if (discountAmount > 0 && discountRow && discountVal) {
+    discountRow.style.display = "flex";
+    discountVal.textContent = `-₹${discountAmount.toLocaleString('en-IN')}`;
+  } else if (discountRow) {
+    discountRow.style.display = "none";
+  }
 
   // Render Items List
-  const itemsContainer = document.getElementById("cartItemsBody") || document.getElementById("cartDrawerItems");
+  const itemsContainer = document.getElementById("cartDrawerBody");
   const footerEl = document.getElementById("cartDrawerFooter");
 
   if (itemsContainer) {
@@ -398,21 +417,25 @@ function addUpsell(productId) {
 }
 
 // Cart Drawer Visibility
-function openCartDrawer() {
-  const overlay = document.getElementById("cartDrawerOverlay");
-  const drawer = document.getElementById("cartDrawer");
-  if (overlay) overlay.classList.add("active");
-  if (drawer) drawer.classList.add("active");
-  document.body.style.overflow = "hidden";
-  updateCartUI();
+if (!window.openCartDrawer) {
+  window.openCartDrawer = function() {
+    const overlay = document.getElementById("cartDrawerOverlay");
+    const drawer = document.getElementById("cartDrawer");
+    if (overlay) overlay.classList.add("active");
+    if (drawer) drawer.classList.add("active");
+    document.body.style.overflow = "hidden";
+    updateCartUI();
+  };
 }
 
-function closeCartDrawer() {
-  const overlay = document.getElementById("cartDrawerOverlay");
-  const drawer = document.getElementById("cartDrawer");
-  if (overlay) overlay.classList.remove("active");
-  if (drawer) drawer.classList.remove("active");
-  document.body.style.overflow = "auto";
+if (!window.closeCartDrawer) {
+  window.closeCartDrawer = function() {
+    const overlay = document.getElementById("cartDrawerOverlay");
+    const drawer = document.getElementById("cartDrawer");
+    if (overlay) overlay.classList.remove("active");
+    if (drawer) drawer.classList.remove("active");
+    document.body.style.overflow = "auto";
+  };
 }
 
 // Promo Code Application
@@ -519,28 +542,30 @@ function setupAnnouncements() {
 }
 
 // Toast Alert Engine
-function showToast(message) {
-  let container = document.getElementById("toastContainer");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "toastContainer";
-    container.className = "toast-container";
-    document.body.appendChild(container);
-  }
+if (!window.showToast) {
+  window.showToast = function(message) {
+    let container = document.getElementById("toastContainer");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "toastContainer";
+      container.className = "toast-container";
+      document.body.appendChild(container);
+    }
 
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.innerHTML = `
-    <span class="toast-icon">🌸</span>
-    <span class="toast-message">${message}</span>
-  `;
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerHTML = `
+      <span class="toast-icon">🌸</span>
+      <span class="toast-message">${message}</span>
+    `;
 
-  container.appendChild(toast);
+    container.appendChild(toast);
 
-  setTimeout(() => {
-    toast.style.animation = "toastOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards";
-    setTimeout(() => toast.remove(), 400);
-  }, 3200);
+    setTimeout(() => {
+      toast.style.animation = "toastOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+      setTimeout(() => toast.remove(), 400);
+    }, 3200);
+  };
 }
 
 // Newsletter Subscription
@@ -583,3 +608,55 @@ function setupEventListeners() {
     });
   }
 }
+
+// Modal Handlers
+if (!window.closeQuickViewModal) {
+  window.closeQuickViewModal = function() {
+    const modal = document.getElementById("quickViewModal");
+    if (modal) modal.classList.remove("active");
+    document.body.style.overflow = "auto";
+  };
+}
+
+if (!window.closeCheckoutModal) {
+  window.closeCheckoutModal = function() {
+    const modal = document.getElementById("checkoutModal");
+    if (modal) modal.classList.remove("active");
+    document.body.style.overflow = "auto";
+  };
+}
+
+if (!window.processCheckoutOrder) {
+  window.processCheckoutOrder = function(event) {
+    if (event) event.preventDefault();
+    if (window.closeCheckoutModal) window.closeCheckoutModal();
+    const successModal = document.getElementById("orderSuccessModal");
+    if (successModal) successModal.classList.add("active");
+    if (window.FloraDB && typeof window.FloraDB.clearCart === 'function') {
+        window.FloraDB.clearCart();
+    }
+    updateCartUI();
+  };
+}
+
+if (!window.openEmailReceiptModal) {
+  window.openEmailReceiptModal = function() {
+    const modal = document.getElementById("emailReceiptModal");
+    if (modal) modal.classList.add("active");
+  };
+}
+
+if (!window.closeOrderSuccessModal) {
+  window.closeOrderSuccessModal = function() {
+    const modal = document.getElementById("orderSuccessModal");
+    if (modal) modal.classList.remove("active");
+  };
+}
+
+if (!window.closeEmailReceiptModal) {
+  window.closeEmailReceiptModal = function() {
+    const modal = document.getElementById("emailReceiptModal");
+    if (modal) modal.classList.remove("active");
+  };
+}
+

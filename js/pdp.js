@@ -450,131 +450,38 @@
     if (closeBtn) closeBtn.addEventListener('click', closeCartDrawer);
   }
 
-  window.openCartDrawer = function() {
-    const drawer = document.getElementById('cartDrawer');
-    const overlay = document.getElementById('cartDrawerOverlay');
-    if (drawer && overlay) {
-      updateCartUI();
-      drawer.classList.add('active');
-      overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-  };
+  if (!window.openCartDrawer) {
+    window.openCartDrawer = function() {
+      const drawer = document.getElementById('cartDrawer');
+      const overlay = document.getElementById('cartDrawerOverlay');
+      if (drawer && overlay) {
+        updateCartUI();
+        drawer.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    };
+  }
 
-  window.closeCartDrawer = function() {
-    const drawer = document.getElementById('cartDrawer');
-    const overlay = document.getElementById('cartDrawerOverlay');
-    if (drawer && overlay) {
-      drawer.classList.remove('active');
-      overlay.classList.remove('active');
-      document.body.style.overflow = 'auto';
-    }
-  };
+  if (!window.closeCartDrawer) {
+    window.closeCartDrawer = function() {
+      const drawer = document.getElementById('cartDrawer');
+      const overlay = document.getElementById('cartDrawerOverlay');
+      if (drawer && overlay) {
+        drawer.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    };
+  }
 
   function updateCartUI() {
-    const summary = FloraDB.getCartSummary();
-    const cart = summary.items;
-
-    // Badges
-    const badge = document.getElementById('cartCountBadge');
-    if (badge) {
-      badge.textContent = summary.totalCount;
-      badge.style.display = summary.totalCount > 0 ? 'flex' : 'none';
-    }
-
-    const drawerCount = document.getElementById('cartDrawerCount');
-    if (drawerCount) drawerCount.textContent = summary.totalCount;
-
-    // Free Shipping Progress
-    const meterFill = document.getElementById('meterBarFill');
-    const meterText = document.getElementById('freeShippingText');
-    if (meterFill && meterText) {
-      meterFill.style.width = `${summary.progressPercent}%`;
-      if (summary.isFreeShipping) {
-        meterText.innerHTML = `<i class="fas fa-check-circle" style="color:#059669;"></i> <strong>Congratulations!</strong> You have unlocked <strong>FREE Doorstep Delivery in Nashik</strong>!`;
-        meterFill.style.background = '#059669';
-      } else {
-        meterText.innerHTML = `<i class="fas fa-truck"></i> Add <strong>₹${summary.amountNeededForFreeShipping.toLocaleString('en-IN')}</strong> more for <strong>FREE Delivery in Nashik</strong>!`;
-        meterFill.style.background = 'linear-gradient(90deg, var(--rose-deep), #FF85A1)';
-      }
-    }
-
-    // Cart Items Rendering
-    const itemsContainer = document.getElementById('cartDrawerItems');
-    const footerEl = document.getElementById('cartDrawerFooter');
-
-    if (!itemsContainer) return;
-
-    if (cart.length === 0) {
-      itemsContainer.innerHTML = `
-        <div class="empty-cart-view">
-          <i class="fas fa-shopping-bag empty-icon"></i>
-          <h3>Your Floral Bag is Empty</h3>
-          <p>Treat yourself or a loved one to fresh artisanal floral bakes handcrafted in Nashik.</p>
-          <a href="index.html#categories" class="btn btn-primary" onclick="closeCartDrawer()">Explore Bakes</a>
-        </div>
-      `;
-      if (footerEl) footerEl.style.display = 'none';
-      renderCartUpsells();
+    // Delegate to SiteLayout universal cart rendering
+    if (window.SiteLayout) {
+      window.SiteLayout.renderCartDrawerContent();
+      window.SiteLayout.updateCartBadge();
       return;
     }
-
-    if (footerEl) footerEl.style.display = 'block';
-
-    itemsContainer.innerHTML = cart.map(item => `
-      <div class="cart-item-row" data-key="${item.cartKey}">
-        <img src="${item.image}" alt="${item.name}" class="cart-item-thumb">
-        <div class="cart-item-details">
-          <div class="cart-item-title-row">
-            <h4 class="cart-item-title">${item.name}</h4>
-            <button class="cart-item-remove-btn" onclick="removeCartItem('${item.cartKey}')" title="Remove item">&times;</button>
-          </div>
-          <span class="cart-item-variant">${item.variantName || 'Standard'}</span>
-          ${item.cakeMessage ? `<span class="cart-item-inscription"><i class="fas fa-pen-nib"></i> "${item.cakeMessage}"</span>` : ''}
-          <div class="cart-item-bottom-row">
-            <div class="cart-qty-stepper">
-              <button class="cart-qty-btn" onclick="changeCartItemQty('${item.cartKey}', -1)">-</button>
-              <span class="cart-qty-val">${item.qty}</span>
-              <button class="cart-qty-btn" onclick="changeCartItemQty('${item.cartKey}', 1)">+</button>
-            </div>
-            <span class="cart-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}</span>
-          </div>
-        </div>
-      </div>
-    `).join('');
-
-    // Summary calculations
-    let discountVal = 0;
-    if (appliedDiscount) {
-      discountVal = appliedDiscount.discountAmount;
-    }
-
-    const deliveryVal = summary.isFreeShipping ? 0 : summary.deliveryFee;
-    const grandTotal = Math.max(0, summary.subtotal - discountVal + deliveryVal);
-
-    const subtotalEl = document.getElementById('cartSubtotalVal');
-    const discountRow = document.getElementById('cartDiscountRow');
-    const discountEl = document.getElementById('cartDiscountVal');
-    const deliveryEl = document.getElementById('cartDeliveryVal');
-    const grandTotalEl = document.getElementById('cartGrandTotalVal');
-
-    if (subtotalEl) subtotalEl.textContent = `₹${summary.subtotal.toLocaleString('en-IN')}`;
-    if (discountRow && discountEl) {
-      if (discountVal > 0) {
-        discountRow.style.display = 'flex';
-        discountEl.textContent = `-₹${discountVal.toLocaleString('en-IN')}`;
-      } else {
-        discountRow.style.display = 'none';
-      }
-    }
-    if (deliveryEl) {
-      deliveryEl.textContent = summary.isFreeShipping ? 'FREE (Nashik)' : `₹${deliveryVal}`;
-      deliveryEl.style.color = summary.isFreeShipping ? '#059669' : 'inherit';
-    }
-    if (grandTotalEl) grandTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
-
-    // Render Upsell Carousel inside drawer
-    renderCartUpsells();
   }
 
   // Dynamic Upsell Recommendations Inside Drawer
@@ -643,27 +550,29 @@
   };
 
   // Toast System
-  function showToast(message) {
-    let container = document.getElementById('toastContainer');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'toastContainer';
-      container.className = 'toast-container';
-      document.body.appendChild(container);
-    }
+  if (!window.showToast) {
+    window.showToast = function(message) {
+      let container = document.getElementById('toastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+      }
 
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerHTML = `
-      <i class="fas fa-seedling toast-icon" style="color:var(--rose-deep);"></i>
-      <span class="toast-message">${message}</span>
-    `;
-    container.appendChild(toast);
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <i class="fas fa-seedling toast-icon" style="color:var(--rose-deep);"></i>
+        <span class="toast-message">${message}</span>
+      `;
+      container.appendChild(toast);
 
-    setTimeout(() => {
-      toast.style.animation = 'toastOut 0.3s ease forwards';
-      setTimeout(() => toast.remove(), 300);
-    }, 3200);
+      setTimeout(() => {
+        toast.style.animation = 'toastOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    };
   }
 
   // Mobile Drawer

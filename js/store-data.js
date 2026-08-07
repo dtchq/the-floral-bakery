@@ -1178,6 +1178,16 @@
       Storage.set(STORAGE_KEYS.EMAIL_LOGS, []);
       this.broadcastChange(STORAGE_KEYS.ORDERS, { action: 'orders-cleared' });
       return true;
+    },
+
+    // Cart count helper (used by site-layout.js)
+    getCartCount() {
+      return this.getCartSummary().totalCount;
+    },
+
+    // Alias for admin panel compatibility
+    clearAllOrders() {
+      return this.resetOrdersData();
     }
   };
 
