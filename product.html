@@ -62,30 +62,6 @@
           <!-- Populated by JavaScript -->
         </div>
 
-        <!-- TRUST HIGHLIGHTS (DESKTOP) -->
-        <div class="pdp-trust-highlights desktop-only">
-          <div class="trust-highlight-item">
-            <i class="fas fa-leaf"></i>
-            <div>
-              <strong>100% Pure Veg (Eggless)</strong>
-              <p>Baked fresh with premium cultured butter & organic extracts</p>
-            </div>
-          </div>
-          <div class="trust-highlight-item">
-            <i class="fas fa-fan"></i>
-            <div>
-              <strong>Edible Organic Blooms</strong>
-              <p>Hand-picked, pesticide-free culinary botanical blossoms</p>
-            </div>
-          </div>
-          <div class="trust-highlight-item">
-            <i class="fas fa-temperature-low"></i>
-            <div>
-              <strong>Temperature Controlled Delivery</strong>
-              <p>Chilled insulated packaging ensures pristine delivery in Nashik</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- RIGHT COLUMN: PRODUCT DETAILS & BUYING ENGINE -->
@@ -113,14 +89,29 @@
         <div class="pdp-price-row">
           <span class="pdp-price-current" id="pdpPriceCurrent">₹1,299</span>
           <span class="pdp-price-original" id="pdpPriceOriginal">₹1,499</span>
-          <span class="pdp-discount-pill" id="pdpDiscountPill">SAVE 15%</span>
           <span class="tax-inclusive-tag">Taxes Included</span>
         </div>
 
-        <!-- STOCK SCARCITY STATUS -->
-        <div class="pdp-stock-indicator in-stock" id="pdpStockStatus">
-          <i class="fas fa-check-circle"></i>
-          <span>Fresh Batch Available Today • Baked Upon Order</span>
+        <!-- MERGED STOCK & DISCOUNT -->
+        <div class="pdp-stock-indicator in-stock compact-indicator" id="pdpStockStatus">
+          <span class="pdp-discount-pill" id="pdpDiscountPill">SAVE 15%</span>
+          <span><i class="fas fa-check-circle"></i> Fresh Batch Available</span>
+        </div>
+
+        <!-- COMPACT TRUST HIGHLIGHTS -->
+        <div class="pdp-trust-highlights compact-trust-row">
+          <div class="trust-highlight-item">
+            <i class="fas fa-leaf"></i>
+            <strong>Pure Veg</strong>
+          </div>
+          <div class="trust-highlight-item">
+            <i class="fas fa-fan"></i>
+            <strong>Edible Blooms</strong>
+          </div>
+          <div class="trust-highlight-item">
+            <i class="fas fa-temperature-low"></i>
+            <strong>Chilled Delivery</strong>
+          </div>
         </div>
 
         <hr class="pdp-divider">
@@ -131,7 +122,6 @@
             <label class="option-label">
               <i class="fas fa-layer-group" style="color: var(--rose-deep);"></i> Select Size / Weight / Pack:
             </label>
-            <span class="option-selected-badge" id="pdpSelectedVariantLabel">0.5 kg (Serves 4–6)</span>
           </div>
           <div class="pdp-variant-selector-grid pdp-variant-chips" id="pdpVariantChips">
             <!-- Populated dynamically by JS with interactive cards -->

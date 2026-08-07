@@ -6695,28 +6695,40 @@ button {
 }
 .checkout-card-header {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border-subtle);
 }
+.checkout-card-header > div {
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 768px) {
+  .checkout-card-header > div {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+  }
+}
 .card-icon-pill {
-  width: 48px;
-  height: 48px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--pink-soft);
   color: var(--rose-deep);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 .card-heading {
   font-family: var(--font-serif);
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   color: var(--text-cocoa);
-  margin-bottom: 4px;
+  margin-bottom: 0;
 }
 .card-subtext {
   font-size: 0.9rem;
@@ -6958,14 +6970,15 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  background: #FFF;
+  padding: 16px 20px max(16px, env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
   border-top: 1px solid var(--border-light);
   position: fixed;
   bottom: 0;
   width: 100%;
-  z-index: 1000;
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+  z-index: 9999;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
 }
 @media (min-width: 992px) {
   .mobile-sticky-checkout-bar {
@@ -7408,26 +7421,37 @@ button {
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: 16px;
-    background: #FFF;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-    z-index: 999;
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-light);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    z-index: 9999;
     margin: 0 !important;
     display: flex;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
   }
   .pdp-qty-stepper-box {
-    display: none !important; /* Save space on mobile, user can adjust in cart */
+    display: flex !important;
+    height: 48px !important;
+    border-width: 1px !important;
+    min-width: 90px;
+  }
+  .qty-btn {
+    width: 32px !important;
+  }
+  .qty-input {
+    width: 26px !important;
   }
   .btn-add-to-cart, .pdp-btn-buy {
     flex: 1;
-    font-size: 0.95rem !important;
-    padding: 12px 0 !important;
+    font-size: 0.9rem !important;
+    padding: 0 !important;
     height: 48px !important;
   }
   .pdp-container {
-    padding-bottom: 100px !important;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom)) !important;
   }
   
   /* Make variant chips slightly smaller */
@@ -7471,5 +7495,73 @@ button {
   box-shadow: var(--shadow-md);
 }
 
+/* Compact Trust Highlights */
+.compact-trust-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.compact-trust-row .trust-highlight-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 12px 8px;
+  background: var(--bg-cream-warm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+}
+.compact-trust-row .trust-highlight-item i {
+  font-size: 1.2rem;
+  color: var(--rose-deep);
+}
+.compact-trust-row .trust-highlight-item strong {
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+.compact-trust-row .trust-highlight-item p {
+  display: none;
+}
 
+/* Compact Indicator */
+.compact-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
+/* Compact Form Elements */
+.pdp-option-group {
+  margin-bottom: 16px;
+}
+.pdp-delivery-checker {
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+/* Checkout Container Fix */
+.checkout-container {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Mobile Summary Toggle Polish */
+.mobile-summary-toggle-bar {
+  cursor: pointer;
+}
+.toggle-arrow {
+  transition: transform 0.3s ease;
+}
+.toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Fix Checkout Contact Form Spacing */
+@media (max-width: 767px) {
+  .form-grid-2 {
+    gap: 16px !important;
+  }
+}
