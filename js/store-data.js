@@ -785,6 +785,10 @@
       return cart;
     },
 
+    updateCartItemQty(cartKeyOrId, qty) {
+      return this.updateCartQty(cartKeyOrId, qty);
+    },
+
     removeFromCart(cartKeyOrId) {
       let cart = this.getCart();
       cart = cart.filter(i => i.cartKey !== cartKeyOrId && i.id !== Number(cartKeyOrId));

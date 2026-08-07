@@ -22,102 +22,11 @@
 </head>
 <body>
 
-  <!-- ==========================================================================
-       1. ANNOUNCEMENT BAR (SLIM, STRICTLY SINGLE-LINE)
-       ========================================================================== -->
-  <div class="announcement-bar" id="announcementBar">
-    <div class="announcement-item">
-      <span id="announcementText" class="announcement-text">
-        🌸 Free Delivery Above ₹999 across Nashik • Order 24 Hrs in Advance
-      </span>
-    </div>
-  </div>
+  <!-- Universal Header Root -->
+  <div id="siteHeaderRoot"></div>
 
-  <!-- ==========================================================================
-       2. STICKY NAVIGATION HEADER
-       ========================================================================== -->
-  <header class="site-header" id="siteHeader">
-    <div class="container">
-      <div class="header-inner">
-        
-        <!-- Brand Logo & Name -->
-        <a href="#hero" class="brand-logo-wrap" title="The Flora Bakery Nashik">
-          <img src="images/logo-icon.svg" alt="The Flora Bakery Logo" class="brand-logo-img">
-          <div class="brand-text-block">
-            <span class="brand-name">The Flora Bakery</span>
-            <span class="brand-tagline">Artisanal Patisserie & Blooms</span>
-          </div>
-        </a>
-
-        <!-- Desktop Navigation Menu -->
-        <nav>
-          <ul class="nav-menu" id="navMenu">
-            <li><a href="index.html" class="nav-link active">Home</a></li>
-            <li><a href="shop.html" class="nav-link">Shop Bakes</a></li>
-            <li><a href="categories.html" class="nav-link">Categories</a></li>
-            <li><a href="about.html" class="nav-link">About Us</a></li>
-            <li><a href="contact.html" class="nav-link">Contact</a></li>
-          </ul>
-        </nav>
-
-        <!-- Header Actions (Cart, Quick Custom CTA) -->
-        <div class="header-actions">
-          <button class="action-icon-btn" onclick="openCartDrawer()" title="View Shopping Cart" aria-label="Shopping Cart">
-            <i class="fas fa-shopping-bag"></i>
-            <span class="cart-count-badge" id="cartCountBadge">0</span>
-          </button>
-          
-          <button class="btn btn-primary btn-sm header-custom-cta" onclick="openCakeBuilderModal()">
-            <i class="fas fa-magic"></i> Order Custom Cake
-          </button>
-
-          <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="openMobileNav()" aria-label="Toggle navigation">
-            <i class="fas fa-bars"></i>
-          </button>
-        </div>
-
-      </div>
-    </div>
-  </header>
-
-  <!-- Mobile Slide Navigation Drawer -->
-  <div class="mobile-nav-drawer" id="mobileNavDrawer" onclick="closeMobileNav()">
-    <div class="mobile-nav-content" onclick="event.stopPropagation()">
-      <div class="mobile-drawer-header">
-        <div class="brand-logo-wrap">
-          <img src="images/logo-icon.svg" alt="The Flora Bakery Logo" class="brand-logo-img" style="width:38px; height:38px;">
-          <span class="brand-name" style="font-size:1.15rem;">The Flora Bakery</span>
-        </div>
-        <button class="cart-close-btn" onclick="closeMobileNav()" aria-label="Close menu">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <ul class="mobile-nav-links">
-        <li><a href="index.html" class="mobile-nav-link active" onclick="closeMobileNav()"><span>🌸 Home</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="shop.html" class="mobile-nav-link" onclick="closeMobileNav()"><span>🎂 Shop All Bakes</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="categories.html" class="mobile-nav-link" onclick="closeMobileNav()"><span>✨ Explore Categories</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="about.html" class="mobile-nav-link" onclick="closeMobileNav()"><span>🌿 About Our Bakery</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-        <li><a href="contact.html" class="mobile-nav-link" onclick="closeMobileNav()"><span>💌 Contact & Studio</span> <i class="fas fa-chevron-right" style="font-size:0.8rem; color:var(--pink-blush);"></i></a></li>
-      </ul>
-
-      <div style="margin-bottom: 20px;">
-        <button class="btn btn-primary" style="width: 100%;" onclick="closeMobileNav(); openCakeBuilderModal();">
-          <i class="fas fa-magic"></i> Order Custom Cake
-        </button>
-      </div>
-
-      <div class="mobile-drawer-contact">
-        <p style="margin-bottom:6px;"><strong>Bakery Studio:</strong> Sai Nath Nagar, Nashik</p>
-        <p style="margin-bottom:12px;"><strong>Direct Call / WhatsApp:</strong> <a href="tel:07083517862" style="color:var(--rose-deep); font-weight:700;">070835 17862</a></p>
-        <div class="social-links">
-          <a href="https://www.instagram.com/the.flora.bakery" target="_blank" rel="noopener noreferrer" class="social-btn"><i class="fab fa-instagram"></i></a>
-          <a href="https://wa.me/917083517862" target="_blank" rel="noopener noreferrer" class="social-btn"><i class="fab fa-whatsapp"></i></a>
-          <a href="tel:07083517862" class="social-btn"><i class="fas fa-phone"></i></a>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Universal Mobile Navigation Drawer Root -->
+  <div id="mobileDrawerRoot"></div>
 
   <main>
     <!-- ==========================================================================
@@ -875,173 +784,11 @@
     </section>
   </main>
 
-  <!-- ==========================================================================
-       14. WARM CREAM FOOTER
-       ========================================================================== -->
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        
-        <!-- Brand Column -->
-        <div class="footer-col footer-brand">
-          <a href="#hero" class="brand-logo-wrap">
-            <img src="images/logo-icon.svg" alt="The Flora Bakery Logo" class="brand-logo-img">
-            <div class="brand-text-block">
-              <span class="brand-name">The Flora Bakery</span>
-              <span class="brand-tagline">Artisanal Patisserie & Blooms</span>
-            </div>
-          </a>
-          <p class="footer-desc">
-            Nashik's premier handcrafted floral bakery. Dedicated to crafting memorable celebrations with fresh organic edible blooms, 100% vegetarian bakes, and artistic French pastries.
-          </p>
-          <div class="social-links">
-            <a href="https://www.instagram.com/the.flora.bakery" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">
-              <i class="fab fa-instagram"></i>
-            </a>
-            <a href="https://wa.me/917083517862" target="_blank" rel="noopener noreferrer" class="social-btn" title="WhatsApp">
-              <i class="fab fa-whatsapp"></i>
-            </a>
-            <a href="tel:07083517862" class="social-btn" title="Call Us">
-              <i class="fas fa-phone"></i>
-            </a>
-          </div>
-        </div>
+  <!-- Universal Slide-Out Cart Drawer Root -->
+  <div id="cartDrawerRoot"></div>
 
-        <!-- Quick Links -->
-        <div class="footer-col">
-          <h4>Navigation</h4>
-          <ul class="footer-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="shop.html">Shop All Bakes</a></li>
-            <li><a href="categories.html">Categories</a></li>
-            <li><a href="about.html">About Our Bakery</a></li>
-            <li><a href="contact.html">Contact & Studio</a></li>
-          </ul>
-        </div>
-
-        <!-- Collections -->
-        <div class="footer-col">
-          <h4>Collections</h4>
-          <ul class="footer-links">
-            <li><a href="shop.html?category=cakes">Floral Celebration Cakes</a></li>
-            <li><a href="shop.html?category=pastries">French Craquelin Choux</a></li>
-            <li><a href="shop.html?category=muffins">Chamomile Muffins</a></li>
-            <li><a href="shop.html?category=combos">Luxury Flower Hampers</a></li>
-            <li><a href="shop.html?category=breads">Artisanal Breads</a></li>
-          </ul>
-        </div>
-
-        <!-- Studio & Contact Info -->
-        <div class="footer-col">
-          <h4>Bakery Studio</h4>
-          <div class="contact-info-list">
-            <div class="contact-item">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>Sai Nath Nagar, Nashik, Maharashtra 422009</span>
-            </div>
-            <div class="contact-item">
-              <i class="fas fa-phone-alt"></i>
-              <a href="tel:07083517862" style="font-weight:700; color:var(--rose-deep);">+91 70835 17862</a>
-            </div>
-            <div class="contact-item">
-              <i class="fas fa-clock"></i>
-              <span>Daily: 8:00 AM – 10:00 PM</span>
-            </div>
-            <div class="contact-item">
-              <i class="fas fa-shield-heart"></i>
-              <span>100% Pure Vegetarian / Eggless Kitchen</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Bottom Bar -->
-      <div class="footer-bottom">
-        <div>
-          © 2026 The Flora Bakery, Nashik. All Rights Reserved. 100% Pure Vegetarian Certified.
-        </div>
-        <div style="display:flex; gap:16px; align-items:center;">
-          <span>Chilled Same-Day Delivery Across Nashik • Cash on Delivery</span>
-        </div>
-      </div>
-
-    </div>
-  </footer>
-
-  <!-- ==========================================================================
-       CART SLIDE-OUT DRAWER
-       ========================================================================== -->
-  <div class="cart-drawer-overlay" id="cartDrawerOverlay" onclick="closeCartDrawer()">
-    <div class="cart-drawer" onclick="event.stopPropagation()">
-      
-      <div class="cart-header">
-        <h3><i class="fas fa-shopping-bag" style="color:var(--rose-deep); margin-right:8px;"></i> Your Sweet Cart</h3>
-        <button class="cart-close-btn" onclick="closeCartDrawer()" aria-label="Close cart">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <!-- Free Shipping Tracker to ₹999 -->
-      <div class="cart-free-shipping-bar">
-        <div id="freeShippingText">Add <strong>₹0</strong> more for <strong>FREE Delivery</strong> in Nashik</div>
-        <div class="progress-track">
-          <div class="progress-fill" id="freeShippingFill"></div>
-        </div>
-      </div>
-
-      <!-- Cart Items List Container -->
-      <div class="cart-items-body" id="cartItemsBody">
-        <!-- Dynamically rendered by app.js -->
-      </div>
-
-      <!-- Dynamic Upsell Recommendations Container -->
-      <div class="cart-upsell-container" id="cartUpsellSection" style="display:none; padding:12px 16px; background:#FFF9F9; border-top:1px dashed var(--pink-blush);">
-        <div class="upsell-heading-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <span class="upsell-title" style="font-size:0.85rem; font-weight:700; color:var(--text-cocoa);"><i class="fas fa-sparkles" style="color:var(--rose-deep);"></i> Complete Your Celebration</span>
-          <span class="upsell-badge" style="font-size:0.75rem; background:var(--pink-blush); color:var(--rose-deep); padding:2px 8px; border-radius:12px; font-weight:600;">Popular</span>
-        </div>
-        <div class="upsell-items-track" id="cartUpsellItems" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:6px;">
-          <!-- Upsells dynamically injected by JS -->
-        </div>
-      </div>
-
-      <!-- Promo Code & Totals -->
-      <div class="cart-footer" id="cartDrawerFooter">
-        
-        <div style="display:flex; gap:8px; margin-bottom:14px;">
-          <input type="text" id="cartPromoInput" placeholder="Promo code (e.g. FLORA10)" style="flex-grow:1; padding:10px 14px; border:1px solid var(--border-light); border-radius:var(--radius-sm); text-transform:uppercase; font-size:0.85rem;">
-          <button class="btn btn-secondary btn-sm" onclick="applyPromoCode()">Apply</button>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--text-secondary); margin-bottom:6px;">
-          <span>Subtotal:</span>
-          <span id="cartSubtotal">₹0</span>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--text-secondary); margin-bottom:6px;">
-          <span>Delivery (Nashik):</span>
-          <span id="cartDeliveryVal">₹99</span>
-        </div>
-
-        <div class="cart-total-row">
-          <span>Estimated Total:</span>
-          <span id="cartGrandTotal" style="color:var(--rose-deep);">₹0</span>
-        </div>
-
-        <a href="checkout.html" class="btn btn-primary btn-checkout-site" style="width:100%; margin-bottom:10px; font-size:1rem; font-weight:700; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none;">
-          <span>Proceed to Dedicated Checkout</span> <i class="fas fa-arrow-right"></i>
-        </a>
-
-        <div style="display:flex; justify-content:center; gap:16px; font-size:0.78rem; color:var(--text-muted);">
-          <span><i class="fas fa-truck" style="color:var(--rose-deep);"></i> Chilled Delivery</span>
-          <span><i class="fas fa-hand-holding-usd" style="color:#059669;"></i> Cash on Delivery</span>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
+  <!-- Universal Footer Root -->
+  <div id="siteFooterRoot"></div>
 
   <!-- ==========================================================================
        CUSTOM CAKE BUILDER MODAL
@@ -1491,6 +1238,7 @@
 
   <!-- Javascript Layer -->
   <script src="js/store-data.js"></script>
+  <script src="js/site-layout.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

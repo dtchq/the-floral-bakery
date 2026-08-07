@@ -99,13 +99,22 @@
     selectedVariant = variantsList.find(v => v.isDefault) || variantsList[0];
 
     if (variantsContainer) {
-      variantsContainer.innerHTML = variantsList.map(v => `
-        <button type="button" class="variant-chip ${v.id === selectedVariant.id ? 'active' : ''}" 
-          data-id="${v.id}" onclick="selectVariant('${v.id}')">
-          <span class="variant-name">${v.name}</span>
-          <span class="variant-price">₹${Number(v.price).toLocaleString('en-IN')}</span>
-        </button>
-      `).join('');
+      variantsContainer.innerHTML = variantsList.map(v => {
+        const savings = (v.comparePrice && v.comparePrice > v.price) ? Math.round(((v.comparePrice - v.price) / v.comparePrice) * 100) : 0;
+        return `
+          <button type="button" class="pdp-variant-chip variant-chip ${v.id === selectedVariant.id ? 'active' : ''}" 
+            data-id="${v.id}" onclick="selectVariant('${v.id}')">
+            <div class="variant-chip-top">
+              <span class="variant-name">${v.name}</span>
+              ${savings > 0 ? `<span class="variant-savings-badge">${savings}% OFF</span>` : ''}
+            </div>
+            <div class="variant-chip-bottom">
+              <span class="variant-price">₹${Number(v.price).toLocaleString('en-IN')}</span>
+              ${v.comparePrice && v.comparePrice > v.price ? `<span class="variant-compare-price">₹${Number(v.comparePrice).toLocaleString('en-IN')}</span>` : ''}
+            </div>
+          </button>
+        `;
+      }).join('');
     }
 
     if (variantLabel) variantLabel.textContent = selectedVariant.name;
@@ -160,7 +169,7 @@
     if (!variant) return;
 
     selectedVariant = variant;
-    document.querySelectorAll('.variant-chip').forEach(c => {
+    document.querySelectorAll('.variant-chip, .pdp-variant-chip').forEach(c => {
       c.classList.toggle('active', c.dataset.id === variantId);
     });
 

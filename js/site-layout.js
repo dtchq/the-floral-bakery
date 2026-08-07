@@ -49,13 +49,15 @@
       return `
         <!-- ANNOUNCEMENT BAR TICKER -->
         <aside class="announcement-bar" role="region" aria-label="Special Announcements">
-          <div class="announcement-wrapper">
-            <div class="announcement-track">
-              <span class="announcement-item"><span class="badge-pill">SAME DAY</span> 🌸 Order before 3 PM for Chilled Same-Day Delivery across Nashik</span>
-              <span class="announcement-item"><span class="badge-pill">100% EGGLESS</span> 🌿 All Creations are Pure Vegetarian & Crowned with Organic Edible Blooms</span>
-              <span class="announcement-item"><span class="badge-pill">SPECIAL OFFER</span> ✨ Use Code <strong>FLORA10</strong> for 10% OFF on Orders Above ₹499</span>
-              <span class="announcement-item"><span class="badge-pill">FREE SHIPPING</span> 🛵 Free Doorstep Delivery Across Nashik on Orders Over ₹999</span>
-            </div>
+          <div class="announcement-track">
+            <span class="announcement-item"><span class="badge-pill">SAME DAY</span> 🌸 Order before 3 PM for Chilled Same-Day Delivery in Nashik</span>
+            <span class="announcement-item"><span class="badge-pill">100% EGGLESS</span> 🌿 Pure Vegetarian Botanicals with Organic Edible Blooms</span>
+            <span class="announcement-item"><span class="badge-pill">SPECIAL OFFER</span> ✨ Use Code <strong>FLORA10</strong> for 10% OFF Orders Above ₹499</span>
+            <span class="announcement-item"><span class="badge-pill">FREE SHIPPING</span> 🛵 Free Delivery Across Nashik on Orders Over ₹999</span>
+            <span class="announcement-item" aria-hidden="true"><span class="badge-pill">SAME DAY</span> 🌸 Order before 3 PM for Chilled Same-Day Delivery in Nashik</span>
+            <span class="announcement-item" aria-hidden="true"><span class="badge-pill">100% EGGLESS</span> 🌿 Pure Vegetarian Botanicals with Organic Edible Blooms</span>
+            <span class="announcement-item" aria-hidden="true"><span class="badge-pill">SPECIAL OFFER</span> ✨ Use Code <strong>FLORA10</strong> for 10% OFF Orders Above ₹499</span>
+            <span class="announcement-item" aria-hidden="true"><span class="badge-pill">FREE SHIPPING</span> 🛵 Free Delivery Across Nashik on Orders Over ₹999</span>
           </div>
         </aside>
 
