@@ -6112,3 +6112,106 @@ button {
   0% { transform: translateY(20px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 }
+
+/* ==========================================================================
+   UI POLISH & RESPONSIVE OVERRIDES
+   ========================================================================== */
+
+/* Cart Drawer Glassmorphism */
+.cart-drawer-overlay {
+  background: rgba(31, 23, 20, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+.cart-drawer {
+  background: rgba(255, 253, 249, 0.98) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* Shop Filters Mobile Scroll */
+.shop-category-pills {
+  display: flex !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+  gap: 12px !important;
+  padding-bottom: 8px !important;
+}
+.shop-category-pills::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Product Grid Breakpoints */
+.shop-product-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  gap: 16px !important;
+}
+@media (min-width: 768px) {
+  .shop-product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 24px !important;
+  }
+}
+.product-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Categories Grid Breakpoints */
+.categories-page-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 24px !important;
+}
+@media (min-width: 768px) {
+  .categories-page-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 32px !important;
+  }
+}
+@media (min-width: 1024px) {
+  .categories-page-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* About & Contact Page */
+.about-story-grid, .contact-main-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 32px !important;
+}
+@media (min-width: 992px) {
+  .about-story-grid, .contact-main-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 48px !important;
+    align-items: center !important;
+  }
+}
+
+/* Checkout Page */
+.checkout-layout-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 32px !important;
+}
+@media (min-width: 992px) {
+  .checkout-layout-grid {
+    grid-template-columns: 1.5fr 1fr !important;
+    align-items: start !important;
+  }
+  #checkoutSummaryPanel {
+    position: sticky !important;
+    top: 100px !important;
+  }
+}
+
+/* Premium Interactive Inputs */
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  border-color: var(--rose-deep) !important;
+  box-shadow: 0 0 0 3px rgba(232, 105, 138, 0.15) !important;
+}
+
