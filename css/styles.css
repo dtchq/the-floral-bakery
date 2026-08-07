@@ -3507,57 +3507,232 @@ button {
   margin: 16px 0 20px;
 }
 
-/* Variant & Option Selectors */
+/* ==========================================================================
+   PDP LUXURY VARIANT SELECTION & CRO SYSTEM
+   ========================================================================== */
+
 .pdp-option-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .option-label-row {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .option-label {
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: var(--text-cocoa);
-}
-
-.option-selected-val {
-  font-size: 0.85rem;
-  color: var(--rose-deep);
-  font-weight: 600;
-}
-
-.pdp-variant-chips {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
 }
 
-.pdp-variant-chip {
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  border: 1.5px solid var(--border-light);
-  background: #FFFFFF;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text-cocoa);
-  cursor: pointer;
-  transition: var(--transition-smooth);
-}
-
-.pdp-variant-chip:hover {
-  border-color: var(--rose-deep);
-}
-
-.pdp-variant-chip.active {
-  border-color: var(--rose-deep);
-  background: #FFF0F5;
+.option-selected-val,
+.option-selected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
   color: var(--rose-deep);
-  box-shadow: 0 2px 8px rgba(232, 105, 138, 0.2);
+  background: var(--pink-soft);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(232, 105, 138, 0.25);
+  box-shadow: 0 1px 4px rgba(232, 105, 138, 0.08);
+}
+
+/* Variant Cards Container */
+.pdp-variant-selector-grid,
+.pdp-variant-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 600px) {
+  .pdp-variant-selector-grid,
+  .pdp-variant-chips {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* Individual Variant Card Button */
+.pdp-variant-card,
+.pdp-variant-chip,
+.variant-chip {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px !important;
+  border-radius: var(--radius-md) !important;
+  border: 2px solid #EAE0D7 !important;
+  background: #FFFFFF !important;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 2px 6px rgba(45, 27, 30, 0.03);
+}
+
+.pdp-variant-card:hover,
+.pdp-variant-chip:hover,
+.variant-chip:hover {
+  border-color: var(--rose-light) !important;
+  background: #FFFDFB !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(232, 105, 138, 0.12);
+}
+
+/* Active / Selected Variant Card */
+.pdp-variant-card.active,
+.pdp-variant-chip.active,
+.variant-chip.active {
+  border-color: var(--rose-deep) !important;
+  background: linear-gradient(135deg, #FFF5F7 0%, #FFFFFF 100%) !important;
+  box-shadow: 0 4px 16px rgba(232, 105, 138, 0.22) !important;
+  transform: translateY(-1px);
+}
+
+/* Left Group: Radio + Text Info */
+.variant-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Custom Radio Ring */
+.variant-radio-ring {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  border: 2px solid #CBD5E1;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.pdp-variant-card:hover .variant-radio-ring,
+.pdp-variant-chip:hover .variant-radio-ring {
+  border-color: var(--rose-deep);
+}
+
+.pdp-variant-card.active .variant-radio-ring,
+.pdp-variant-chip.active .variant-radio-ring,
+.variant-chip.active .variant-radio-ring {
+  border-color: var(--rose-deep);
+  background: #FFFFFF;
+  box-shadow: 0 0 0 2px rgba(232, 105, 138, 0.2);
+}
+
+.variant-radio-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--rose-deep);
+  transform: scale(0);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pdp-variant-card.active .variant-radio-dot,
+.pdp-variant-chip.active .variant-radio-dot,
+.variant-chip.active .variant-radio-dot {
+  transform: scale(1);
+}
+
+/* Text Information */
+.variant-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.variant-main-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-cocoa);
+  line-height: 1.25;
+}
+
+.pdp-variant-card.active .variant-main-title,
+.pdp-variant-chip.active .variant-main-title,
+.variant-chip.active .variant-main-title {
+  color: var(--rose-deep);
+}
+
+.variant-serving-hint {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+/* Right Group: Price & Savings */
+.variant-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.variant-price-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.variant-current-price {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-cocoa);
+  letter-spacing: -0.2px;
+}
+
+.pdp-variant-card.active .variant-current-price,
+.pdp-variant-chip.active .variant-current-price,
+.variant-chip.active .variant-current-price {
+  color: var(--rose-deep);
+}
+
+.variant-compare-price {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.variant-savings-badge,
+.variant-badge-pill {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #059669;
+  background: #ECFDF5;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 .pdp-text-input, .pdp-select-input {
@@ -3569,11 +3744,13 @@ button {
   color: var(--text-cocoa);
   background: #FFFFFF;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .pdp-text-input:focus, .pdp-select-input:focus {
   border-color: var(--rose-deep);
   outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 105, 138, 0.15);
 }
 
 .char-counter {
@@ -3585,7 +3762,32 @@ button {
   display: block;
   font-size: 0.76rem;
   color: var(--text-muted);
-  margin-top: 5px;
+  margin-top: 6px;
+}
+
+/* Inscription Live Preview Box */
+.cake-msg-preview-box {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: #FFFBF5;
+  border: 1px dashed #E2D7CE;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-cocoa);
+  transition: all 0.2s ease;
+}
+
+.cake-msg-preview-box i {
+  color: var(--gold-accent);
+}
+
+.cake-msg-preview-text {
+  font-style: italic;
+  font-weight: 600;
+  color: var(--rose-deep);
 }
 
 /* Locality Checker */
@@ -3598,7 +3800,7 @@ button {
 }
 
 .checker-title {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-cocoa);
   margin-bottom: 10px;
@@ -3620,7 +3822,7 @@ button {
 
 .checker-result {
   margin-top: 10px;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: #059669;
   line-height: 1.4;
 }

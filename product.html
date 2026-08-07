@@ -128,25 +128,33 @@
         <!-- VARIANT / WEIGHT SELECTOR CHIPS -->
         <div class="pdp-option-group" id="pdpVariantsGroup">
           <div class="option-label-row">
-            <label class="option-label">Select Weight / Size:</label>
-            <span class="option-selected-val" id="pdpSelectedVariantLabel">0.5 kg (Serves 4–6)</span>
+            <label class="option-label">
+              <i class="fas fa-layer-group" style="color: var(--rose-deep);"></i> Select Size / Weight / Pack:
+            </label>
+            <span class="option-selected-badge" id="pdpSelectedVariantLabel">0.5 kg (Serves 4–6)</span>
           </div>
-          <div class="pdp-variant-chips" id="pdpVariantChips">
-            <!-- Populated dynamically by JS -->
+          <div class="pdp-variant-selector-grid pdp-variant-chips" id="pdpVariantChips">
+            <!-- Populated dynamically by JS with interactive cards -->
           </div>
         </div>
 
         <!-- CUSTOM INSCRIPTION / MESSAGE ON CAKE -->
         <div class="pdp-option-group">
           <div class="option-label-row">
-            <label class="option-label" for="pdpCustomMessage">Name / Message on Cake (Optional):</label>
+            <label class="option-label" for="pdpCustomMessage">
+              <i class="fas fa-pen-fancy" style="color: var(--rose-deep);"></i> Personalized Inscription on Cake (Complimentary):
+            </label>
             <span class="char-counter" id="pdpMsgCharCount">0/35</span>
           </div>
           <div class="input-with-icon">
-            <i class="fas fa-pen-fancy"></i>
-            <input type="text" id="pdpCustomMessage" class="pdp-text-input" placeholder="e.g. Happy 25th Birthday Rhea 🌸" maxlength="35">
+            <i class="fas fa-quote-left"></i>
+            <input type="text" id="pdpCustomMessage" class="pdp-text-input" placeholder="e.g. Happy Birthday Rhea 🌸" maxlength="35" autocomplete="off">
           </div>
-          <span class="field-hint"><i class="fas fa-magic"></i> Complimentary hand-piped on artisanal chocolate plaque</span>
+          <div class="cake-msg-preview-box" id="pdpMsgPreviewBox" style="display: none;">
+            <i class="fas fa-sparkles"></i>
+            <span>Live Chocolate Plaque: <span class="cake-msg-preview-text" id="pdpMsgPreviewText">""</span></span>
+          </div>
+          <span class="field-hint"><i class="fas fa-magic"></i> Hand-piped with Belgian chocolate on an organic flower petal plaque</span>
         </div>
 
         <!-- NASHIK PINCODE / LOCALITY ESTIMATE CHECKER -->

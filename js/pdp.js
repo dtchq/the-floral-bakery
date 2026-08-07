@@ -100,24 +100,39 @@
 
     if (variantsContainer) {
       variantsContainer.innerHTML = variantsList.map(v => {
-        const savings = (v.comparePrice && v.comparePrice > v.price) ? Math.round(((v.comparePrice - v.price) / v.comparePrice) * 100) : 0;
+        const info = formatVariantDisplay(v);
+        const isSelected = (v.id === selectedVariant.id);
         return `
-          <button type="button" class="pdp-variant-chip variant-chip ${v.id === selectedVariant.id ? 'active' : ''}" 
-            data-id="${v.id}" onclick="selectVariant('${v.id}')">
-            <div class="variant-chip-top">
-              <span class="variant-name">${v.name}</span>
-              ${savings > 0 ? `<span class="variant-savings-badge">${savings}% OFF</span>` : ''}
+          <button type="button" 
+                  class="pdp-variant-card ${isSelected ? 'active' : ''}" 
+                  data-id="${v.id}" 
+                  onclick="selectVariant('${v.id}')"
+                  aria-pressed="${isSelected}">
+            <div class="variant-card-left">
+              <span class="variant-radio-ring">
+                <span class="variant-radio-dot"></span>
+              </span>
+              <div class="variant-card-text">
+                <span class="variant-main-title">${info.mainTitle}</span>
+                ${info.subHint ? `<span class="variant-serving-hint">${info.subHint}</span>` : ''}
+              </div>
             </div>
-            <div class="variant-chip-bottom">
-              <span class="variant-price">₹${Number(v.price).toLocaleString('en-IN')}</span>
-              ${v.comparePrice && v.comparePrice > v.price ? `<span class="variant-compare-price">₹${Number(v.comparePrice).toLocaleString('en-IN')}</span>` : ''}
+
+            <div class="variant-card-right">
+              <div class="variant-price-wrap">
+                <span class="variant-current-price">₹${info.price.toLocaleString('en-IN')}</span>
+                ${info.comparePrice && info.comparePrice > info.price ? `<span class="variant-compare-price">₹${info.comparePrice.toLocaleString('en-IN')}</span>` : ''}
+              </div>
+              ${info.savings > 0 ? `<span class="variant-savings-badge">SAVE ${info.savings}%</span>` : ''}
             </div>
           </button>
         `;
       }).join('');
     }
 
-    if (variantLabel) variantLabel.textContent = selectedVariant.name;
+    if (variantLabel) {
+      variantLabel.innerHTML = `<i class="fas fa-check-circle"></i> ${selectedVariant.name}`;
+    }
 
     updatePricingDisplay();
 
@@ -127,13 +142,30 @@
       botanicalsList.innerHTML = product.botanicals.map(b => `<li><i class="fas fa-seedling"></i> ${b}</li>`).join('');
     }
 
-    // Inscription message counter
+    // Inscription message counter & live preview
     const customMsgInput = document.getElementById('pdpCustomMessage');
     const charCounter = document.getElementById('pdpMsgCharCount');
+    const previewBox = document.getElementById('pdpMsgPreviewBox');
+    const previewText = document.getElementById('pdpMsgPreviewText');
     if (customMsgInput && charCounter) {
       customMsgInput.addEventListener('input', () => {
-        charCounter.textContent = `${customMsgInput.value.length}/35`;
+        const val = customMsgInput.value;
+        charCounter.textContent = `${val.length}/35`;
+        if (previewBox && previewText) {
+          if (val.trim().length > 0) {
+            previewBox.style.display = 'flex';
+            previewText.textContent = `"${val.trim()}"`;
+          } else {
+            previewBox.style.display = 'none';
+          }
+        }
       });
+    }
+
+    // Auto-update delivery checker on locality dropdown change
+    const localitySelect = document.getElementById('pdpLocalitySelect');
+    if (localitySelect) {
+      localitySelect.addEventListener('change', checkPdpDelivery);
     }
 
     // Reviews List
@@ -146,6 +178,40 @@
     if (stickyThumb) stickyThumb.src = product.image;
     if (stickyTitle) stickyTitle.textContent = product.name;
     if (stickyPrice) stickyPrice.textContent = `₹${selectedVariant.price.toLocaleString('en-IN')}`;
+  }
+
+  // Variant Display Parser Helper
+  function formatVariantDisplay(variant) {
+    let mainTitle = variant.name;
+    let subHint = '';
+    
+    if (variant.name.includes('(')) {
+      const parts = variant.name.split('(');
+      mainTitle = parts[0].trim();
+      subHint = parts.slice(1).join('(').replace(/\)/g, '').trim();
+    } else if (variant.name.toLowerCase().includes('0.5 kg') || variant.name.toLowerCase().includes('500g')) {
+      subHint = 'Serves 4–6 • Perfect for intimate celebrations';
+    } else if (variant.name.toLowerCase().includes('1.0 kg') || variant.name.toLowerCase().includes('1 kg')) {
+      subHint = 'Serves 8–10 • Most Popular Party Size';
+    } else if (variant.name.toLowerCase().includes('1.5 kg')) {
+      subHint = 'Serves 12–15 • Grand Family Gathering';
+    } else if (variant.name.toLowerCase().includes('2.0 kg') || variant.name.toLowerCase().includes('2.5 kg')) {
+      subHint = 'Serves 18–25 • Showstopper Masterpiece';
+    } else if (variant.name.toLowerCase().includes('2 pieces')) {
+      subHint = 'Ideal for 1–2 Persons';
+    } else if (variant.name.toLowerCase().includes('4 pieces')) {
+      subHint = 'Family Treat Box';
+    } else if (variant.name.toLowerCase().includes('6 pieces')) {
+      subHint = 'Party & Gifting Pack';
+    }
+
+    const price = Number(variant.price);
+    const comparePrice = Number(variant.comparePrice || (variant.price * 1.15));
+    const savings = (variant.comparePrice && variant.comparePrice > variant.price)
+      ? Math.round(((variant.comparePrice - variant.price) / variant.comparePrice) * 100)
+      : 0;
+
+    return { mainTitle, subHint, price, comparePrice, savings };
   }
 
   // Gallery Image Switcher
@@ -169,12 +235,16 @@
     if (!variant) return;
 
     selectedVariant = variant;
-    document.querySelectorAll('.variant-chip, .pdp-variant-chip').forEach(c => {
-      c.classList.toggle('active', c.dataset.id === variantId);
+    document.querySelectorAll('.pdp-variant-card, .pdp-variant-chip, .variant-chip').forEach(c => {
+      const match = (c.dataset.id === variantId);
+      c.classList.toggle('active', match);
+      c.setAttribute('aria-pressed', match);
     });
 
     const variantLabel = document.getElementById('pdpSelectedVariantLabel');
-    if (variantLabel) variantLabel.textContent = selectedVariant.name;
+    if (variantLabel) {
+      variantLabel.innerHTML = `<i class="fas fa-check-circle"></i> ${selectedVariant.name}`;
+    }
 
     updatePricingDisplay();
   };
