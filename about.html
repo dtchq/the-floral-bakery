@@ -22,322 +22,124 @@
 </head>
 <body class="about-page-body">
 
-  <!-- 1. ANNOUNCEMENT TICKER -->
-  <aside class="announcement-bar" role="region" aria-label="Special Offers">
-    <div class="announcement-wrapper">
-      <div class="announcement-track">
-        <span class="announcement-item"><span class="badge-pill">SAME DAY</span> 🌸 Order before 3 PM for Chilled Same-Day Delivery in Nashik</span>
-        <span class="announcement-item"><span class="badge-pill">100% EGGLESS</span> 🌿 All Creations are Pure Vegetarian & Crowned with Organic Edible Blooms</span>
-        <span class="announcement-item"><span class="badge-pill">SPECIAL OFFER</span> ✨ Use Code <strong>FLORA10</strong> for 10% OFF on Orders Above ₹499</span>
-      </div>
-    </div>
-  </aside>
+  <!-- Universal Header Root -->
+  <div id="siteHeaderRoot"></div>
 
-  <!-- 2. STICKY BRAND HEADER -->
-  <header class="header" id="siteHeader">
-    <div class="header-inner container">
-      <button class="mobile-toggle" id="mobileMenuToggle" onclick="openMobileNav()" aria-label="Open Navigation Menu">
-        <i class="fas fa-bars"></i>
-      </button>
+  <!-- Universal Mobile Navigation Drawer Root -->
+  <div id="mobileDrawerRoot"></div>
 
-      <a href="index.html" class="logo" aria-label="The Flora Bakery Homepage">
-        <span class="logo-mark"><i class="fas fa-seedling"></i></span>
-        <div class="logo-text-group">
-          <span class="logo-title">THE FLORA BAKERY</span>
-          <span class="logo-subtitle">Nashik • Est. 2024</span>
-        </div>
-      </a>
-
-      <!-- Universal Desktop Navigation -->
-      <nav class="nav-desktop" aria-label="Primary Navigation">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="shop.html" class="nav-link">Shop Bakes</a>
-        <a href="categories.html" class="nav-link">Categories</a>
-        <a href="about.html" class="nav-link active">About Us</a>
-        <a href="contact.html" class="nav-link">Contact</a>
-      </nav>
-
-      <div class="header-actions">
-        <a href="https://api.whatsapp.com/send?phone=917083517862&text=Hello%20The%20Flora%20Bakery!%20I%20have%20an%20inquiry%20regarding%20custom%20floral%20cakes." target="_blank" rel="noopener" class="concierge-link-btn" title="Chat with Head Baker on WhatsApp">
-          <i class="fab fa-whatsapp"></i>
-          <span class="concierge-text">Concierge</span>
-        </a>
-
-        <button class="cart-trigger-btn" id="cartBtn" onclick="openCartDrawer()" aria-label="Open Shopping Bag">
-          <i class="fas fa-shopping-bag"></i>
-          <span class="cart-badge" id="cartCountBadge" style="display: none;">0</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- 3. MOBILE NAVIGATION DRAWER -->
-  <div class="mobile-nav-drawer" id="mobileNavDrawer">
-    <div class="mobile-nav-content">
-      <div class="mobile-drawer-header">
-        <div class="logo-text-group">
-          <span class="logo-title">THE FLORA BAKERY</span>
-          <span class="logo-subtitle">Artisanal Botanical Patisserie</span>
-        </div>
-        <button class="modal-close-btn" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
-      </div>
-      <ul class="mobile-nav-links">
-        <li><a href="index.html" class="mobile-nav-link"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="shop.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-birthday-cake"></i> Shop All Bakes</a></li>
-        <li><a href="categories.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-th-large"></i> Explore Categories</a></li>
-        <li><a href="about.html" class="mobile-nav-link active" onclick="closeMobileNav()"><i class="fas fa-leaf"></i> About Our Bakery</a></li>
-        <li><a href="contact.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-envelope"></i> Contact & Studio</a></li>
-      </ul>
-      <div class="mobile-drawer-footer">
-        <p class="drawer-contact-info"><i class="fas fa-map-marker-alt"></i> Sai Nath Nagar, Nashik</p>
-        <p class="drawer-contact-info"><i class="fas fa-phone-alt"></i> +91 70835 17862</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 4. PAGE HERO BANNER -->
-  <section class="page-banner-section">
+  <!-- 1. HERO STORY SECTION -->
+  <section class="about-hero-section">
     <div class="container text-center">
-      <span class="sub-heading-pill"><i class="fas fa-seedling"></i> Our Story & Heritage</span>
-      <h1 class="page-banner-title">Where Floral Art Meets Fine Patisserie</h1>
-      <p class="page-banner-desc">
-        Born in Nashik, The Flora Bakery was founded with a singular devotion: crafting 100% pure vegetarian, eggless confections crowned with organic edible blooms.
+      <span class="sub-heading-pill"><i class="fas fa-seedling"></i> Nashik's Botanical Patisserie</span>
+      <h1 class="about-hero-title">Where Floral Art Meets French Confectionery</h1>
+      <p class="about-hero-subtitle">
+        Born out of an obsession with delicate edible botanicals and classical French baking techniques, The Flora Bakery crafts desserts that are living floral centrepieces.
       </p>
     </div>
   </section>
 
-  <!-- 5. ABOUT STORY SECTION -->
-  <main class="container about-page-container">
-    
+  <!-- 2. FOUNDER STORY & PHILOSOPHY -->
+  <main class="container about-main-content">
     <div class="about-story-grid">
-      <div class="about-text-col">
-        <span class="heading-tag">Handcrafted in Nashik</span>
-        <h2 class="about-section-title">A Symphony of Organic Blooms & Delicate Flavours</h2>
-        <p class="about-paragraph">
-          At The Flora Bakery, every cake is a botanical canvas. We believe celebrations deserve more than ordinary sugar frosting — they deserve the natural elegance of fresh organic rose petals, soothing French lavender, golden chamomile, and 24-karat pure edible gold leaf.
+      <div class="about-story-text">
+        <span class="section-label">OUR PHILOSOPHY</span>
+        <h2 class="story-heading">100% Eggless. Zero Compromise on Luxury.</h2>
+        <p class="story-p">
+          Founded in Nashik, Maharashtra, <strong>The Flora Bakery</strong> was born to fill a vital void: the lack of truly luxurious, high-fashion celebration cakes that are 100% Pure Vegetarian (Eggless).
         </p>
-        <p class="about-paragraph">
-          From our dedicated kitchen studio in Sai Nath Nagar, Nashik, our master pâtissiers handcraft small-batch chiffon sponges, French craquelin choux, and gourmet gifting hampers. Every recipe is meticulously perfected to be <strong>100% Pure Vegetarian and Eggless</strong> without ever compromising on feather-light texture or luscious moisture.
+        <p class="story-p">
+          We believe cakes should not merely be sweet desserts — they should be the crowning memory of life's most precious milestones. Each sponge is whipped from scratch daily using slow-churned cultured butter, cold-extracted Madagascar vanilla, and pure Belgian chocolate.
         </p>
-        
-        <div class="about-metrics-row">
-          <div class="metric-item">
-            <span class="metric-number">100%</span>
-            <span class="metric-label">Pure Veg & Eggless</span>
+        <div class="story-stats-grid">
+          <div class="stat-box">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Pure Veg (Eggless)</span>
           </div>
-          <div class="metric-item">
-            <span class="metric-number">4.9★</span>
-            <span class="metric-label">Patron Rating in Nashik</span>
+          <div class="stat-box">
+            <span class="stat-number">15+</span>
+            <span class="stat-label">Edible Bloom Varieties</span>
           </div>
-          <div class="metric-item">
-            <span class="metric-number">3,200+</span>
-            <span class="metric-label">Celebrations Sweetened</span>
+          <div class="stat-box">
+            <span class="stat-number">3,500+</span>
+            <span class="stat-label">Celebrations in Nashik</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number">4.9★</span>
+            <span class="stat-label">Patron Rating</span>
           </div>
         </div>
       </div>
-
-      <div class="about-image-col">
-        <div class="about-image-card">
-          <img src="images/hero-cake.jpg" alt="Artisanal Floral Cake Decorating" class="about-featured-img">
-          <div class="about-badge-card">
-            <span class="badge-icon"><i class="fas fa-award"></i></span>
-            <div>
-              <strong>Pure Botanical Guarantee</strong>
-              <p>100% Organic, Pesticide-Free Blooms</p>
-            </div>
+      <div class="about-story-media">
+        <img src="images/hero-floral-cake.jpg" alt="Artisanal Floral Cake Decorating" class="story-hero-img">
+        <div class="experience-badge">
+          <i class="fas fa-award"></i>
+          <div>
+            <strong>Artisanal Botanical Studio</strong>
+            <span>Sai Nath Nagar, Nashik</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 4 CORE PILLARS SECTION -->
-    <section class="about-pillars-section">
-      <div class="text-center" style="margin-bottom: 40px;">
-        <span class="sub-heading-pill"><i class="fas fa-check-circle"></i> The Flora Standard</span>
-        <h2 class="section-title">Our Four Botanical Pillars</h2>
-        <p class="section-subtitle">The principles guiding every creation that leaves our ovens.</p>
+    <!-- 3. OUR FOUR CORE PILLARS -->
+    <section class="pillars-section">
+      <div class="section-heading-wrap text-center">
+        <span class="sub-heading-pill"><i class="fas fa-sparkles"></i> The Flora Standard</span>
+        <h2 class="section-title">The Four Pillars of Our Bakery</h2>
       </div>
 
       <div class="pillars-grid">
         <div class="pillar-card">
-          <div class="pillar-icon"><i class="fas fa-leaf"></i></div>
-          <h3>100% Pure Vegetarian & Eggless</h3>
-          <p>Every single bake is certified pure vegetarian. We utilize cultured butter, fresh cream, and organic vanilla without a trace of gelatin or eggs.</p>
+          <div class="pillar-icon"><i class="fas fa-seedling"></i></div>
+          <h3>Organically Grown Edible Blooms</h3>
+          <p>We source pesticide-free culinary roses, violas, pansies, and cornflowers grown specifically for patisserie decoration.</p>
         </div>
 
         <div class="pillar-card">
-          <div class="pillar-icon"><i class="fas fa-fan"></i></div>
-          <h3>Organically Cultivated Blooms</h3>
-          <p>We source food-grade culinary flowers from organic nurseries — free from synthetic pesticides, carefully sanitized, and placed minutes before delivery.</p>
+          <div class="pillar-icon"><i class="fas fa-leaf"></i></div>
+          <h3>100% Pure Vegetarian Guarantee</h3>
+          <p>Our dedicated kitchen is completely eggless, gelatin-free, and certified pure vegetarian with pristine food hygiene.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon"><i class="fas fa-crown"></i></div>
+          <h3>French Patisserie Precision</h3>
+          <p>From crispy craquelin choux to velvety mascarpone chantilly, each technique honors classical European baking traditions.</p>
         </div>
 
         <div class="pillar-card">
           <div class="pillar-icon"><i class="fas fa-temperature-low"></i></div>
-          <h3>Chilled Doorstep Delivery</h3>
-          <p>Our dedicated temperature-controlled vans ensure your delicate cakes arrive in pristine, chilled condition anywhere across Nashik city.</p>
-        </div>
-
-        <div class="pillar-card">
-          <div class="pillar-icon"><i class="fas fa-heart"></i></div>
-          <h3>Pinterest Aesthetic Bespoke Styling</h3>
-          <p>Every cake is hand-styled to order. You can request custom chocolate plaques, color palettes, and floral arrangements tailored for your milestone.</p>
+          <h3>Chilled Safe-Delivery Fleet</h3>
+          <p>Every cake is transported in refrigerated delivery vans across Nashik to ensure pristine petals and chilled freshness upon arrival.</p>
         </div>
       </div>
     </section>
 
-    <!-- CHEF PROCESS TIMELINE -->
-    <section class="about-process-section">
-      <div class="text-center" style="margin-bottom: 40px;">
-        <span class="sub-heading-pill"><i class="fas fa-magic"></i> Behind The Scenes</span>
-        <h2 class="section-title">How We Handcraft Your Bake</h2>
-      </div>
-
-      <div class="process-steps-row">
-        <div class="process-step-item">
-          <span class="step-circle">1</span>
-          <h4>Select Botanicals</h4>
-          <p>Hand-harvesting edible garden roses, lavender, and pansies.</p>
-        </div>
-        <div class="process-step-item">
-          <span class="step-circle">2</span>
-          <h4>Slow-Bake Sponge</h4>
-          <p>Pure butter vanilla chiffon baked to airy, moist perfection.</p>
-        </div>
-        <div class="process-step-item">
-          <span class="step-circle">3</span>
-          <h4>Floral Infusion</h4>
-          <p>Layering French mascarpone cream and fresh fruit compotes.</p>
-        </div>
-        <div class="process-step-item">
-          <span class="step-circle">4</span>
-          <h4>Chilled Dispatch</h4>
-          <p>Secure base-locking boxes delivered in temperature-controlled vans.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- EXPLORE CTA SECTION -->
+    <!-- 4. CTA BANNER -->
     <div class="about-cta-banner">
-      <div class="about-cta-text">
-        <h2>Experience the Taste of Fresh Organic Blooms</h2>
-        <p>Browse our signature collection or design your bespoke celebratory tier today.</p>
-      </div>
-      <div class="about-cta-actions">
-        <a href="shop.html" class="btn btn-primary btn-lg">
-          <i class="fas fa-shopping-bag"></i> Shop The Collection
-        </a>
-        <a href="contact.html" class="btn btn-secondary btn-lg">
-          <i class="fas fa-envelope"></i> Contact Our Studio
-        </a>
+      <div class="cta-inner">
+        <h2>Ready to Celebrate with Flora?</h2>
+        <p>Order online for same-day chilled delivery in Nashik or chat directly with our head baker.</p>
+        <div class="cta-btns-group">
+          <a href="shop.html" class="btn btn-primary btn-lg"><i class="fas fa-shopping-bag"></i> Shop All Bakes</a>
+          <a href="contact.html" class="btn btn-secondary btn-lg"><i class="fas fa-map-marker-alt"></i> Visit Our Studio</a>
+        </div>
       </div>
     </div>
-
   </main>
 
-  <!-- 6. SLIDE-OUT CART DRAWER -->
-  <div class="cart-drawer-overlay" id="cartDrawerOverlay" onclick="closeCartDrawer()"></div>
-  <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping Cart">
-    <div class="cart-drawer-header">
-      <div class="cart-header-title-wrap">
-        <i class="fas fa-shopping-bag cart-title-icon"></i>
-        <h2 class="cart-drawer-heading">Your Floral Bag (<span id="cartDrawerCount">0</span>)</h2>
-      </div>
-      <button class="cart-drawer-close-btn" id="cartDrawerClose" onclick="closeCartDrawer()" aria-label="Close Shopping Bag">&times;</button>
-    </div>
+  <!-- Universal Slide-Out Cart Drawer Root -->
+  <div id="cartDrawerRoot"></div>
 
-    <div class="free-shipping-meter" id="freeShippingMeter">
-      <div class="meter-text" id="freeShippingText">
-        <i class="fas fa-truck"></i> Add ₹200 more for <strong>FREE Delivery in Nashik</strong>!
-      </div>
-      <div class="meter-bar-track">
-        <div class="meter-bar-fill" id="meterBarFill" style="width: 75%;"></div>
-      </div>
-    </div>
+  <!-- Universal Footer Root -->
+  <div id="siteFooterRoot"></div>
 
-    <div class="cart-drawer-body" id="cartDrawerItems"></div>
-
-    <div class="cart-upsell-container" id="cartUpsellSection">
-      <div class="upsell-heading-row">
-        <span class="upsell-title"><i class="fas fa-sparkles"></i> Complete Your Celebration</span>
-        <span class="upsell-badge">Popular Add-ons</span>
-      </div>
-      <div class="upsell-items-track" id="cartUpsellItems"></div>
-    </div>
-
-    <div class="cart-drawer-footer" id="cartDrawerFooter">
-      <div class="cart-coupon-row">
-        <input type="text" id="cartCouponInput" class="coupon-input" placeholder="Promo code (e.g. FLORA10)">
-        <button class="btn btn-secondary coupon-apply-btn" onclick="applyCartCoupon()">Apply</button>
-      </div>
-      <div class="cart-totals-breakdown">
-        <div class="total-row"><span>Subtotal</span><span id="cartSubtotalVal">₹0</span></div>
-        <div class="total-row discount-row" id="cartDiscountRow" style="display:none;"><span>Promo Discount</span><span id="cartDiscountVal">-₹0</span></div>
-        <div class="total-row"><span>Delivery (Nashik)</span><span id="cartDeliveryVal">₹99</span></div>
-        <div class="total-row grand-total-row"><span>Estimated Total</span><span id="cartGrandTotalVal" class="grand-total-highlight">₹0</span></div>
-      </div>
-      <a href="checkout.html" class="btn btn-primary btn-block proceed-checkout-btn" id="proceedCheckoutBtn">
-        <span>Proceed to Checkout</span>
-        <i class="fas fa-arrow-right"></i>
-      </a>
-    </div>
-  </aside>
-
-  <!-- 7. SITE FOOTER -->
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div class="footer-col footer-brand">
-        <a href="index.html" class="brand-logo-wrap">
-          <span class="logo-mark"><i class="fas fa-seedling"></i></span>
-          <div class="logo-text-group">
-            <span class="logo-title">THE FLORA BAKERY</span>
-            <span class="logo-subtitle">Nashik • Est. 2024</span>
-          </div>
-        </a>
-        <p class="footer-desc">Nashik's premier botanical patisserie handcrafting 100% eggless luxury cakes crowned with organic edible blooms.</p>
-        <div class="social-links">
-          <a href="https://www.instagram.com/the.flora.bakery" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="https://wa.me/917083517862" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-          <a href="tel:07083517862" class="social-btn" aria-label="Call Us"><i class="fas fa-phone"></i></a>
-        </div>
-      </div>
-
-      <div class="footer-col">
-        <h4>Navigation</h4>
-        <ul class="footer-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="shop.html">Shop All Bakes</a></li>
-          <li><a href="categories.html">Categories</a></li>
-          <li><a href="about.html">About Our Bakery</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Collections</h4>
-        <ul class="footer-links">
-          <li><a href="shop.html?category=cakes">Floral Celebration Cakes</a></li>
-          <li><a href="shop.html?category=pastries">French Craquelin Choux</a></li>
-          <li><a href="shop.html?category=muffins">Chamomile Muffins</a></li>
-          <li><a href="shop.html?category=combos">Luxury Flower Hampers</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Direct Concierge</h4>
-        <div class="contact-info-list">
-          <div class="contact-item"><i class="fas fa-map-marker-alt"></i><span>Sai Nath Nagar, Nashik, Maharashtra 422009</span></div>
-          <div class="contact-item"><i class="fas fa-phone-alt"></i><span>+91 70835 17862</span></div>
-          <div class="contact-item"><i class="fas fa-clock"></i><span>Daily: 8:00 AM – 10:00 PM</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom container text-center">
-      <p>&copy; 2026 The Flora Bakery, Nashik. All Rights Reserved. 100% Pure Vegetarian Certified.</p>
-    </div>
-  </footer>
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
 
   <!-- Scripts -->
   <script src="js/store-data.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/site-layout.js"></script>
 </body>
 </html>

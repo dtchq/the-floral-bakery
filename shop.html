@@ -22,81 +22,13 @@
 </head>
 <body class="shop-page-body">
 
-  <!-- 1. LUXURY SINGLE-LINE ANNOUNCEMENT TICKER -->
-  <aside class="announcement-bar" role="region" aria-label="Special Offers">
-    <div class="announcement-wrapper">
-      <div class="announcement-track">
-        <span class="announcement-item"><span class="badge-pill">SAME DAY</span> 🌸 Order before 3 PM for Chilled Same-Day Delivery in Nashik</span>
-        <span class="announcement-item"><span class="badge-pill">100% EGGLESS</span> 🌿 All Creations are Pure Vegetarian & Crowned with Organic Edible Blooms</span>
-        <span class="announcement-item"><span class="badge-pill">SPECIAL OFFER</span> ✨ Use Code <strong>FLORA10</strong> for 10% OFF on Orders Above ₹499</span>
-        <span class="announcement-item"><span class="badge-pill">FREE SHIPPING</span> 🛵 Free Doorstep Delivery Across Nashik on Orders Over ₹999</span>
-      </div>
-    </div>
-  </aside>
+  <!-- Universal Header Root -->
+  <div id="siteHeaderRoot"></div>
 
-  <!-- 2. STICKY BRAND HEADER -->
-  <header class="header" id="siteHeader">
-    <div class="header-inner container">
-      <button class="mobile-toggle" id="mobileMenuToggle" onclick="openMobileNav()" aria-label="Open Navigation Menu">
-        <i class="fas fa-bars"></i>
-      </button>
+  <!-- Universal Mobile Navigation Drawer Root -->
+  <div id="mobileDrawerRoot"></div>
 
-      <a href="index.html" class="logo" aria-label="The Flora Bakery Homepage">
-        <span class="logo-mark"><i class="fas fa-seedling"></i></span>
-        <div class="logo-text-group">
-          <span class="logo-title">THE FLORA BAKERY</span>
-          <span class="logo-subtitle">Nashik • Est. 2024</span>
-        </div>
-      </a>
-
-      <!-- Universal Desktop Navigation -->
-      <nav class="nav-desktop" aria-label="Primary Navigation">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="shop.html" class="nav-link active">Shop Bakes</a>
-        <a href="categories.html" class="nav-link">Categories</a>
-        <a href="about.html" class="nav-link">About Us</a>
-        <a href="contact.html" class="nav-link">Contact</a>
-      </nav>
-
-      <div class="header-actions">
-        <a href="https://api.whatsapp.com/send?phone=917083517862&text=Hello%20The%20Flora%20Bakery!%20I%20have%20an%20inquiry%20regarding%20custom%20floral%20cakes." target="_blank" rel="noopener" class="concierge-link-btn" title="Chat with Head Baker on WhatsApp">
-          <i class="fab fa-whatsapp"></i>
-          <span class="concierge-text">Concierge</span>
-        </a>
-
-        <button class="cart-trigger-btn" id="cartBtn" onclick="openCartDrawer()" aria-label="Open Shopping Bag">
-          <i class="fas fa-shopping-bag"></i>
-          <span class="cart-badge" id="cartCountBadge" style="display: none;">0</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- 3. MOBILE NAVIGATION DRAWER (NO ADMIN LINKS) -->
-  <div class="mobile-nav-drawer" id="mobileNavDrawer">
-    <div class="mobile-nav-content">
-      <div class="mobile-drawer-header">
-        <div class="logo-text-group">
-          <span class="logo-title">THE FLORA BAKERY</span>
-          <span class="logo-subtitle">Artisanal Botanical Patisserie</span>
-        </div>
-        <button class="modal-close-btn" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
-      </div>
-      <ul class="mobile-nav-links">
-        <li><a href="index.html" class="mobile-nav-link"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="shop.html" class="mobile-nav-link active" onclick="closeMobileNav()"><i class="fas fa-birthday-cake"></i> Shop All Bakes</a></li>
-        <li><a href="categories.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-th-large"></i> Explore Categories</a></li>
-        <li><a href="about.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-leaf"></i> About Our Bakery</a></li>
-        <li><a href="contact.html" class="mobile-nav-link" onclick="closeMobileNav()"><i class="fas fa-envelope"></i> Contact & Studio</a></li>
-      </ul>
-      <div class="mobile-drawer-footer">
-        <p class="drawer-contact-info"><i class="fas fa-map-marker-alt"></i> Sai Nath Nagar, Nashik</p>
-        <p class="drawer-contact-info"><i class="fas fa-phone-alt"></i> +91 70835 17862</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 4. SHOP PAGE HEADER BANNER -->
+  <!-- 1. SHOP PAGE HEADER BANNER -->
   <section class="page-banner-section">
     <div class="container text-center">
       <span class="sub-heading-pill"><i class="fas fa-sparkles"></i> Pure Vegetarian Patisserie</span>
@@ -107,7 +39,7 @@
     </div>
   </section>
 
-  <!-- 5. MAIN SHOPPING CATALOG -->
+  <!-- 2. MAIN SHOPPING CATALOG -->
   <main class="container shop-catalog-container">
     
     <!-- Filter & Search Controls Bar -->
@@ -184,158 +116,24 @@
 
   </main>
 
-  <!-- 6. SLIDE-OUT CART DRAWER WITH UPSELL RECOMMENDATIONS -->
-  <div class="cart-drawer-overlay" id="cartDrawerOverlay" onclick="closeCartDrawer()"></div>
-  <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping Cart">
-    <div class="cart-drawer-header">
-      <div class="cart-header-title-wrap">
-        <i class="fas fa-shopping-bag cart-title-icon"></i>
-        <h2 class="cart-drawer-heading">Your Floral Bag (<span id="cartDrawerCount">0</span>)</h2>
-      </div>
-      <button class="cart-drawer-close-btn" id="cartDrawerClose" onclick="closeCartDrawer()" aria-label="Close Shopping Bag">&times;</button>
-    </div>
+  <!-- Universal Slide-Out Cart Drawer Root -->
+  <div id="cartDrawerRoot"></div>
 
-    <!-- FREE SHIPPING PROGRESS BAR -->
-    <div class="free-shipping-meter" id="freeShippingMeter">
-      <div class="meter-text" id="freeShippingText">
-        <i class="fas fa-truck"></i> Add ₹200 more for <strong>FREE Delivery in Nashik</strong>!
-      </div>
-      <div class="meter-bar-track">
-        <div class="meter-bar-fill" id="meterBarFill" style="width: 75%;"></div>
-      </div>
-    </div>
+  <!-- Universal Footer Root -->
+  <div id="siteFooterRoot"></div>
 
-    <!-- CART ITEMS CONTAINER -->
-    <div class="cart-drawer-body" id="cartDrawerItems">
-      <!-- Items dynamically populated -->
-    </div>
-
-    <!-- UPSELL RECOMMENDATIONS CAROUSEL ("COMPLETE YOUR CELEBRATION") -->
-    <div class="cart-upsell-container" id="cartUpsellSection">
-      <div class="upsell-heading-row">
-        <span class="upsell-title"><i class="fas fa-sparkles"></i> Complete Your Celebration</span>
-        <span class="upsell-badge">Popular Add-ons</span>
-      </div>
-      <div class="upsell-items-track" id="cartUpsellItems">
-        <!-- Upsells dynamically injected by JS -->
-      </div>
-    </div>
-
-    <!-- CART DRAWER FOOTER (COUPON + TOTALS + PROCEED CTA) -->
-    <div class="cart-drawer-footer" id="cartDrawerFooter">
-      <div class="cart-coupon-row">
-        <input type="text" id="cartCouponInput" class="coupon-input" placeholder="Promo code (e.g. FLORA10)">
-        <button class="btn btn-secondary coupon-apply-btn" onclick="applyCartCoupon()">Apply</button>
-      </div>
-
-      <div class="cart-totals-breakdown">
-        <div class="total-row">
-          <span>Subtotal</span>
-          <span id="cartSubtotalVal">₹0</span>
-        </div>
-        <div class="total-row discount-row" id="cartDiscountRow" style="display:none;">
-          <span>Promo Discount</span>
-          <span id="cartDiscountVal">-₹0</span>
-        </div>
-        <div class="total-row">
-          <span>Delivery (Nashik)</span>
-          <span id="cartDeliveryVal">₹99</span>
-        </div>
-        <div class="total-row grand-total-row">
-          <span>Estimated Total</span>
-          <span id="cartGrandTotalVal" class="grand-total-highlight">₹0</span>
-        </div>
-      </div>
-
-      <!-- PROCEED TO DEDICATED CHECKOUT PAGE -->
-      <a href="checkout.html" class="btn btn-primary btn-block proceed-checkout-btn" id="proceedCheckoutBtn">
-        <span>Proceed to Checkout</span>
-        <i class="fas fa-arrow-right"></i>
-      </a>
-
-      <p class="cart-safe-note">
-        <i class="fas fa-shield-alt"></i> Chilled Same-Day Delivery across Nashik • 100% Eggless
-      </p>
-    </div>
-  </aside>
-
-  <!-- 7. TOAST CONTAINER -->
+  <!-- Toast Container -->
   <div id="toastContainer" class="toast-container"></div>
-
-  <!-- 8. SITE FOOTER -->
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div class="footer-col footer-brand">
-        <a href="index.html" class="brand-logo-wrap">
-          <span class="logo-mark"><i class="fas fa-seedling"></i></span>
-          <div class="logo-text-group">
-            <span class="logo-title">THE FLORA BAKERY</span>
-            <span class="logo-subtitle">Nashik • Est. 2024</span>
-          </div>
-        </a>
-        <p class="footer-desc">Nashik's premier botanical patisserie handcrafting 100% eggless luxury cakes crowned with organic edible blooms.</p>
-        <div class="social-links">
-          <a href="https://www.instagram.com/the.flora.bakery" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="https://wa.me/917083517862" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-          <a href="tel:07083517862" class="social-btn" aria-label="Call Us"><i class="fas fa-phone"></i></a>
-        </div>
-      </div>
-
-      <div class="footer-col">
-        <h4>Navigation</h4>
-        <ul class="footer-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="shop.html">Shop All Bakes</a></li>
-          <li><a href="categories.html">Categories</a></li>
-          <li><a href="about.html">About Our Bakery</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Collections</h4>
-        <ul class="footer-links">
-          <li><a href="shop.html?category=cakes">Floral Celebration Cakes</a></li>
-          <li><a href="shop.html?category=pastries">French Craquelin Choux</a></li>
-          <li><a href="shop.html?category=muffins">Chamomile Muffins</a></li>
-          <li><a href="shop.html?category=combos">Luxury Flower Hampers</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Direct Concierge</h4>
-        <div class="contact-info-list">
-          <div class="contact-item">
-            <i class="fas fa-map-marker-alt"></i>
-            <span>Sai Nath Nagar, Nashik, Maharashtra 422009</span>
-          </div>
-          <div class="contact-item">
-            <i class="fas fa-phone-alt"></i>
-            <span>+91 70835 17862</span>
-          </div>
-          <div class="contact-item">
-            <i class="fas fa-clock"></i>
-            <span>Daily: 8:00 AM – 10:00 PM</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom container text-center">
-      <p>&copy; 2026 The Flora Bakery, Nashik. All Rights Reserved. 100% Pure Vegetarian Certified.</p>
-    </div>
-  </footer>
 
   <!-- Scripts -->
   <script src="js/store-data.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/site-layout.js"></script>
   <script>
-    // Shop page specialized filtering & URL param handling
     let currentShopCategory = 'all';
     let currentShopSearch = '';
     let currentShopSort = 'featured';
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Parse category from URL param (e.g. ?category=cakes)
       const urlParams = new URLSearchParams(window.location.search);
       const catParam = urlParams.get('category');
       if (catParam) {
@@ -347,6 +145,8 @@
         }
       }
       renderShopCatalog();
+
+      window.addEventListener('flora:cart-updated', () => renderShopCatalog());
     });
 
     function filterShopCategory(cat, btn) {
@@ -372,7 +172,6 @@
 
       let products = window.FloraDB ? window.FloraDB.getProducts({ status: 'active' }) : [];
 
-      // Update badge counts
       const counts = {
         all: products.length,
         cakes: products.filter(p => p.category === 'cakes').length,
@@ -387,12 +186,10 @@
         if (el) el.textContent = counts[key];
       });
 
-      // Filter by category
       if (currentShopCategory !== 'all') {
         products = products.filter(p => p.category === currentShopCategory);
       }
 
-      // Filter by search
       if (currentShopSearch) {
         products = products.filter(p => 
           p.name.toLowerCase().includes(currentShopSearch) ||
@@ -401,7 +198,6 @@
         );
       }
 
-      // Sort
       if (currentShopSort === 'price-asc') {
         products.sort((a, b) => a.price - b.price);
       } else if (currentShopSort === 'price-desc') {
@@ -412,7 +208,6 @@
         products.sort((a, b) => a.name.localeCompare(b.name));
       }
 
-      // Update count text
       const countEl = document.getElementById('shopCountStatus');
       if (countEl) {
         countEl.innerHTML = `Showing <strong>${products.length} botanical bakes</strong>`;
@@ -440,11 +235,9 @@
 
         return `
           <div class="product-card" data-id="${product.id}">
-            <!-- Thumbnail Clicks Directly to Product Detail Page (PDP) -->
             <div class="product-thumb-holder" onclick="window.location.href='product.html?id=${product.id}'">
-              <img src="${product.image}" alt="${product.name}" class="product-thumb" loading="lazy">
+              <img src="${product.image}" alt="${product.name}" class="product-thumb" loading="lazy" onerror="this.src='images/hero-floral-cake.jpg'">
               
-              <!-- Badges -->
               <div class="card-top-badges">
                 ${product.eggless ? `<span class="veg-emblem" title="100% Pure Vegetarian Eggless"></span>` : '<span></span>'}
                 ${product.badge ? `<span class="product-tag-badge">${product.badge}</span>` : isOutOfStock ? `<span class="product-tag-badge sold-out">Sold Out</span>` : ''}
@@ -455,7 +248,6 @@
               </a>
             </div>
 
-            <!-- Product Info -->
             <div class="product-info-wrap">
               <div class="product-category-tag">${product.categoryLabel || product.category}</div>
               <h3 class="product-name" onclick="window.location.href='product.html?id=${product.id}'">${product.name}</h3>
@@ -469,12 +261,10 @@
               </div>
 
               <div class="product-pricing-row">
-                <span class="price-current">₹${product.price.toLocaleString('en-IN')}</span>
-                ${product.comparePrice ? `<span class="price-original">₹${product.comparePrice.toLocaleString('en-IN')}</span>` : ''}
-                <span class="product-unit">/ ${product.unit || '0.5 kg'}</span>
+                <span class="price-current">₹${Number(product.price).toLocaleString('en-IN')}</span>
+                ${product.comparePrice ? `<span class="price-original">₹${Number(product.comparePrice).toLocaleString('en-IN')}</span>` : ''}
               </div>
 
-              <!-- Stock radar -->
               <div class="product-stock-status ${isOutOfStock ? 'out-of-stock' : product.stock <= 4 ? 'low-stock' : 'in-stock'}">
                 ${isOutOfStock 
                   ? '✕ Sold Out for Today' 
@@ -483,26 +273,15 @@
                     : `✓ Baked Fresh Upon Order`}
               </div>
 
-              <!-- Actions -->
               <div class="product-card-actions">
                 ${isOutOfStock ? `
                   <button class="btn btn-disabled" disabled>
                     Sold Out
                   </button>
-                ` : inCartQty === 0 ? `
-                  <button class="btn btn-primary btn-add-cart" onclick="addToCart(${product.id})">
+                ` : `
+                  <button class="btn btn-primary btn-add-cart" onclick="quickShopAddToCart(${product.id})">
                     <i class="fas fa-shopping-bag"></i> Add to Cart
                   </button>
-                ` : `
-                  <div class="qty-control-pill">
-                    <button class="qty-stepper-btn" onclick="changeQty(${product.id}, -1)" aria-label="Decrease quantity">
-                      <i class="fas fa-minus"></i>
-                    </button>
-                    <span class="qty-stepper-val" onclick="openCartDrawer()">${inCartQty} in Bag</span>
-                    <button class="qty-stepper-btn" onclick="changeQty(${product.id}, 1)" aria-label="Increase quantity">
-                      <i class="fas fa-plus"></i>
-                    </button>
-                  </div>
                 `}
               </div>
 
@@ -510,6 +289,23 @@
           </div>
         `;
       }).join('');
+    }
+
+    function quickShopAddToCart(productId) {
+      if (!window.FloraDB) return;
+      const product = window.FloraDB.getProductById(productId);
+      if (!product) return;
+
+      const variant = (product.variants && product.variants.length > 0) ? product.variants[0] : null;
+      window.FloraDB.addToCart(product, variant, 1);
+      
+      if (window.showToast) {
+        window.showToast(`🌸 Added "${product.name}" to your bag!`, 'success');
+      }
+      
+      if (window.openCartDrawer) {
+        window.openCartDrawer();
+      }
     }
   </script>
 </body>
